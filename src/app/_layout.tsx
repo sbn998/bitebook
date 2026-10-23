@@ -1,27 +1,17 @@
-import { NativeTabs } from "expo-router/native-tabs";
+import { Stack } from "expo-router";
 import { SQLiteProvider } from "expo-sqlite";
 
 import { migrateDbIfNeeded } from "@/db/migrations";
 
+// The tabs are one screen of this Stack. Screens outside (tabs), like the food form,
+// open on top of the tabs, covering the tab bar.
 export default function RootLayout() {
   return (
     <SQLiteProvider databaseName="macro-tracker.db" onInit={migrateDbIfNeeded}>
-      <NativeTabs>
-        <NativeTabs.Trigger name="index">
-          <NativeTabs.Trigger.Label>Main</NativeTabs.Trigger.Label>
-          <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
-        </NativeTabs.Trigger>
-
-        <NativeTabs.Trigger name="foods">
-          <NativeTabs.Trigger.Label>Foods</NativeTabs.Trigger.Label>
-          <NativeTabs.Trigger.Icon sf="fork.knife" md="restaurant" />
-        </NativeTabs.Trigger>
-
-        <NativeTabs.Trigger name="settings">
-          <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
-          <NativeTabs.Trigger.Icon sf="gearshape.fill" md="settings" />
-        </NativeTabs.Trigger>
-      </NativeTabs>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="food-form" options={{ title: "Add food" }} />
+      </Stack>
     </SQLiteProvider>
   );
 }
