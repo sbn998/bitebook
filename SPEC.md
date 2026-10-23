@@ -7,6 +7,7 @@ A simple app that will let users log what they eat each day, so they can track h
 ## Features (v1)
 
 - Add foods so they can be reused: name, brand (optional), calories (per reference amount e.g 100g, or 1 serving, cup, etc), macronutrients (protein, carbs, fats), type (meat, vegetables, fruit, etc)
+- When adding a food, empty macronutrients are saved as 0, and if calories are left empty they are calculated from the macronutrients (4 kcal per g of protein or carbs, 9 kcal per g of fat)
 - Filter foods based on name, brand or type
 - Add meal names (like dinner, lunch, breakfast...), will show the sum of calories and macros of the food entries they contain each day
 - Add a meal entry to the day (after selecting which meal, it will let us select which foods will be used as entries, and the quantity of those foods. it will also show how many calories the meal will have)
@@ -35,7 +36,6 @@ A simple app that will let users log what they eat each day, so they can track h
 - Charts and weekly stats
 - Food suggestions based on how many calories and macronutrients you have left
 - Light or dark mode, and other customization
-- Autocalculate calories based on amount of macronutrients (e.g amount of protein, % of fats, amount of carbs)
 - Reusable meals (e.g Breakfast 1, breakfast 2, etc) which already contain pre-selected foods and you only need to change the amount of each one
 - Translate the app to more languages
 - Gestures (to delete food entries, navigation between screens, etc)
