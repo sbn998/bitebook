@@ -2,6 +2,7 @@
 
 An app to track daily calories and macronutrients and compare them to a set goal. Using SQLite to save data locally. Multilanguage.
 Spec is in SPEC.md
+Database design is in DATABASE.md
 
 ## 1. Think Before Coding
 
