@@ -1,7 +1,7 @@
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text } from "react-native";
 
 import { foodTypeLabel, unitLabel } from "@/constants/food";
 import { type Food, getFoods } from "@/db/foods";
@@ -25,7 +25,10 @@ export default function Foods() {
       contentContainerStyle={styles.list}
       ListEmptyComponent={<Text style={styles.empty}>No foods yet</Text>}
       renderItem={({ item: food }) => (
-        <View style={styles.row}>
+        <Pressable
+          style={styles.row}
+          onPress={() => router.push({ pathname: "/food-form", params: { id: food.id } })}
+        >
           <Text style={styles.name}>{food.name}</Text>
           <Text style={styles.details}>
             {[food.brand, foodTypeLabel(food.type)].filter(Boolean).join(" · ")}
@@ -34,7 +37,7 @@ export default function Foods() {
             {food.calories} kcal · P {food.protein} · C {food.carbs} · F {food.fat} per{" "}
             {food.reference_amount} {unitLabel(food.unit)}
           </Text>
-        </View>
+        </Pressable>
       )}
     />
   );

@@ -1,8 +1,9 @@
-import { router } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
 import { useSQLiteContext } from "expo-sqlite";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  Alert,
   Button,
   FlatList,
   KeyboardAvoidingView,
@@ -20,7 +21,7 @@ import {
 } from "react-native";
 
 import { FOOD_TYPES, type FoodType, UNITS, type Unit } from "@/constants/food";
-import { addFood } from "@/db/foods";
+import { addFood, deleteFood, getFood, updateFood } from "@/db/foods";
 
 type MacroKey = "protein" | "carbs" | "fat";
 
@@ -45,6 +46,10 @@ function caloriesFromMacros(protein: number, carbs: number, fat: number) {
 
 export default function FoodForm() {
   const db = useSQLiteContext();
+  // With an id (/food-form?id=3) the form edits that food; without one it adds a new food.
+  const params = useLocalSearchParams<{ id?: string }>();
+  const id = params.id ? Number(params.id) : null;
+  const [loaded, setLoaded] = useState(id === null);
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
   const [type, setType] = useState<FoodType | null>(null);
@@ -54,6 +59,23 @@ export default function FoodForm() {
   const [macros, setMacros] = useState<Record<MacroKey, string>>({ protein: "", carbs: "", fat: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const headerHeight = useHeaderHeight();
+
+  // In edit mode, load the food once and fill in the fields.
+  useEffect(() => {
+    if (id === null) return;
+    getFood(db, id).then((food) => {
+      if (food) {
+        setName(food.name);
+        setBrand(food.brand ?? "");
+        setType(food.type);
+        setUnit(food.unit);
+        setReferenceAmount(String(food.reference_amount));
+        setCalories(String(food.calories));
+        setMacros({ protein: String(food.protein), carbs: String(food.carbs), fat: String(food.fat) });
+      }
+      setLoaded(true);
+    });
+  }, [db, id]);
 
   const hasMacros = MACRO_FIELDS.some(({ key }) => macros[key].trim() !== "");
   const calculatedCalories = caloriesFromMacros(
@@ -94,7 +116,7 @@ export default function FoodForm() {
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0 || !type || amount === null || kcal === null) return;
 
-    await addFood(db, {
+    const food = {
       name: name.trim(),
       brand: brand.trim() || null,
       type,
@@ -102,9 +124,31 @@ export default function FoodForm() {
       unit,
       calories: kcal,
       ...macroValues,
-    });
+    };
+    if (id === null) await addFood(db, food);
+    else await updateFood(db, id, food);
     router.back();
   }
+
+  function confirmDelete() {
+    if (id === null) return;
+    Alert.alert(`Delete ${name}?`, "This can't be undone.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          await deleteFood(db, id);
+          router.back();
+        },
+      },
+    ]);
+  }
+
+  const title = <Stack.Screen options={{ title: id === null ? "Add food" : "Edit food" }} />;
+
+  // Show nothing until the food has loaded, so the empty form doesn't flash first.
+  if (!loaded) return title;
 
   return (
     // On Android, shrink the form when the keyboard opens so the focused field stays visible.
@@ -115,6 +159,7 @@ export default function FoodForm() {
       behavior={Platform.OS === "android" ? "height" : undefined}
       keyboardVerticalOffset={headerHeight}
     >
+      {title}
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled"
@@ -175,6 +220,7 @@ export default function FoodForm() {
         ))}
 
         <Button title="Save" onPress={save} />
+        {id !== null && <Button title="Delete" color="#d32f2f" onPress={confirmDelete} />}
       </ScrollView>
     </KeyboardAvoidingView>
   );
