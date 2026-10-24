@@ -1,6 +1,6 @@
 import type { SQLiteDatabase } from "expo-sqlite";
 
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
 
 // Runs every time the app opens the database, before any screen is shown.
 export async function migrateDbIfNeeded(db: SQLiteDatabase) {
@@ -83,6 +83,33 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
 
       CREATE INDEX meal_entries_date ON meal_entries(date);
       CREATE INDEX food_entries_meal_entry_id ON food_entries(meal_entry_id);
+    `);
+  }
+
+  // Migration 2: make goal macro targets optional (empty = no target).
+  // SQLite can't remove NOT NULL from a column, so the goals table is rebuilt:
+  // create the new version, copy the rows over, then swap it in. Foreign keys are
+  // switched off meanwhile so dropping the old table doesn't touch weekday_goals or days.
+  if (currentDbVersion < 2) {
+    await db.execAsync(`
+      PRAGMA foreign_keys = OFF;
+      BEGIN;
+
+      CREATE TABLE goals_new (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        calories REAL NOT NULL,
+        protein REAL,
+        carbs REAL,
+        fat REAL
+      );
+      INSERT INTO goals_new (id, name, calories, protein, carbs, fat)
+        SELECT id, name, calories, protein, carbs, fat FROM goals;
+      DROP TABLE goals;
+      ALTER TABLE goals_new RENAME TO goals;
+
+      COMMIT;
+      PRAGMA foreign_keys = ON;
     `);
   }
 

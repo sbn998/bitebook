@@ -45,14 +45,16 @@ Meal labels (Breakfast, Lunch, Dinner...).
 
 Calorie and macronutrient goal presets. Names don't have to be unique.
 
-| Column   | Type    | Notes                     |
-| -------- | ------- | ------------------------- |
-| id       | INTEGER | Primary key               |
-| name     | TEXT    | Required. e.g. "Rest day" |
-| calories | REAL    | Required                  |
-| protein  | REAL    | Required                  |
-| carbs    | REAL    | Required                  |
-| fat      | REAL    | Required                  |
+| Column   | Type    | Notes                                  |
+| -------- | ------- | -------------------------------------- |
+| id       | INTEGER | Primary key                            |
+| name     | TEXT    | Required. e.g. "Rest day"              |
+| calories | REAL    | Required                               |
+| protein  | REAL    | Optional. Empty = no target for it     |
+| carbs    | REAL    | Optional. Empty = no target for it     |
+| fat      | REAL    | Optional. Empty = no target for it     |
+
+Macro targets are stored in grams. They became optional in migration 2 (see [Migrations](#migrations)).
 
 ### `weekday_goals`
 
@@ -119,6 +121,17 @@ A food eaten in a meal entry.
 - Values are copied per reference amount, so editing the quantity recalculates correctly: `quantity / reference_amount × calories`.
 - Deleting a meal entry deletes its food entries.
 - Editing or deleting a saved food doesn't affect existing food entries.
+
+## Migrations
+
+The database stores its version in `PRAGMA user_version`. On every app start, any migration newer than that version runs once (`src/db/migrations.ts`).
+
+| Version | Change |
+| ------- | ------ |
+| 1 | Create all tables |
+| 2 | Make `goals.protein`, `goals.carbs` and `goals.fat` optional. SQLite can't drop `NOT NULL`, so the table is rebuilt and its rows copied over |
+
+All dates compared against "today" use the phone's local date, passed in by the app, not SQLite's `now` (which is UTC).
 
 ## Relationships
 
