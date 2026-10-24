@@ -160,6 +160,10 @@ export const es: Strings = {
     deleteMealFoods: (count: number) =>
       count === 1 ? "También se eliminará su alimento." : `También se eliminarán sus ${count} alimentos.`,
   },
+  calendar: {
+    previousMonth: "Mes anterior",
+    nextMonth: "Mes siguiente",
+  },
   summary: {
     kcalLeft: "kcal restantes",
     kcalOver: "kcal de más",

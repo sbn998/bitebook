@@ -1,14 +1,14 @@
-import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { router, useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown, FadeOut, LayoutAnimationConfig, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/components/button";
+import { CalendarDialog } from "@/components/calendar-dialog";
 import { DaySummary } from "@/components/day-summary";
-import { ConfirmDialog, Dialog } from "@/components/dialog";
+import { ConfirmDialog } from "@/components/dialog";
 import { FoodEntryDialog } from "@/components/food-entry-dialog";
 import { FoodPicker } from "@/components/food-picker";
 import { Icon } from "@/components/icon";
@@ -28,7 +28,7 @@ import {
 } from "@/db/entries";
 import type { Food } from "@/db/foods";
 import { useTranslation } from "@/i18n";
-import { addDays, dayTitle, longDate, parseDateString, toDateString, todayString, weekdayOf } from "@/utils/date";
+import { addDays, dayTitle, longDate, todayString, weekdayOf } from "@/utils/date";
 
 export default function Main() {
   const db = useSQLiteContext();
@@ -40,8 +40,7 @@ export default function Main() {
   // cards never animate in again while waiting.
   const [entriesDate, setEntriesDate] = useState(date);
   const [goal, setGoal] = useState<DayGoal | null>(null);
-  // iOS shows the calendar inside our own dialog; Android opens the phone's calendar popup.
-  const [showIosCalendar, setShowIosCalendar] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   // The meal cards only report taps; these say which meal or food the open picker or popup is for.
   const [pickingForMealId, setPickingForMealId] = useState<number | null>(null);
   const [editingFood, setEditingFood] = useState<FoodEntry | null>(null);
@@ -59,20 +58,6 @@ export default function Main() {
 
   // Reload when the screen comes into view (e.g. after changing goals) and when the date changes.
   useFocusEffect(load);
-
-  function openCalendar() {
-    if (Platform.OS === "android") {
-      DateTimePickerAndroid.open({
-        value: parseDateString(date),
-        mode: "date",
-        onChange: (event, picked) => {
-          if (event.type === "set" && picked) setDate(toDateString(picked));
-        },
-      });
-    } else {
-      setShowIosCalendar(true);
-    }
-  }
 
   // Foods picked from a meal card are added right away at their reference amount; tap them to adjust.
   async function addFoodToMeal(food: Food) {
@@ -132,7 +117,7 @@ export default function Main() {
         </Pressable>
 
         <View style={styles.headerRight}>
-          <Pressable onPress={openCalendar} hitSlop={spacing.sm} accessibilityLabel={t.main.pickDate}>
+          <Pressable onPress={() => setShowCalendar(true)} hitSlop={spacing.sm} accessibilityLabel={t.main.pickDate}>
             <Icon name="calendar" size={22} color={colors.primaryText} />
           </Pressable>
           <Pressable onPress={() => setDate(addDays(date, 1))} hitSlop={spacing.sm} accessibilityLabel={t.main.nextDay}>
@@ -182,18 +167,17 @@ export default function Main() {
         </Animated.View>
       </ScrollView>
 
-      <Dialog visible={showIosCalendar} title={t.main.pickDate} onClose={() => setShowIosCalendar(false)}>
-        <DateTimePicker
-          value={parseDateString(date)}
-          mode="date"
-          display="inline"
-          accentColor={colors.primary}
-          onChange={(_event, picked) => {
-            if (picked) setDate(toDateString(picked));
-            setShowIosCalendar(false);
+      {showCalendar && (
+        <CalendarDialog
+          date={date}
+          today={today}
+          onPick={(picked) => {
+            setDate(picked);
+            setShowCalendar(false);
           }}
+          onClose={() => setShowCalendar(false)}
         />
-      </Dialog>
+      )}
 
       <FoodPicker
         visible={pickingForMealId !== null}

@@ -165,6 +165,10 @@ export const en = {
     setGoalFor: (weekdays: string) => `Set a goal for ${weekdays}`,
     deleteMealFoods: (count: number) => `Its ${count} ${count === 1 ? "food" : "foods"} will be removed too.`,
   },
+  calendar: {
+    previousMonth: "Previous month",
+    nextMonth: "Next month",
+  },
   summary: {
     kcalLeft: "kcal left",
     kcalOver: "kcal over",
