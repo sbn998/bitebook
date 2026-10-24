@@ -6,3 +6,10 @@ export function todayString() {
   const day = String(now.getDate()).padStart(2, "0");
   return `${now.getFullYear()}-${month}-${day}`;
 }
+
+// The weekday of a YYYY-MM-DD date, numbered like the database: 1 = Monday ... 7 = Sunday.
+export function weekdayOf(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+  const sundayFirst = new Date(year, month - 1, day).getDay(); // 0 = Sunday ... 6 = Saturday
+  return ((sundayFirst + 6) % 7) + 1;
+}
