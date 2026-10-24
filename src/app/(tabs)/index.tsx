@@ -1,5 +1,5 @@
 import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -12,9 +12,7 @@ import { Icon } from "@/components/icon";
 import { MealEntryCard } from "@/components/meal-entry-card";
 import { colors, fontSize, spacing } from "@/constants/theme";
 import { type DayGoal, getDayGoal } from "@/db/days";
-import { addMealEntry, getDayEntries, type MealEntry, sumNutrition } from "@/db/entries";
-import { getFoods } from "@/db/foods";
-import { getMeals } from "@/db/meals";
+import { getDayEntries, type MealEntry, sumNutrition } from "@/db/entries";
 import { addDays, dayTitle, longDate, parseDateString, toDateString, todayString, weekdayOf } from "@/utils/date";
 
 export default function Main() {
@@ -49,14 +47,6 @@ export default function Main() {
     }
   }
 
-  // TEMPORARY: adds a meal with up to two foods, until the Add meal screen exists (part C).
-  async function addSampleMeal() {
-    const [meals, foods] = await Promise.all([getMeals(db), getFoods(db)]);
-    if (meals.length === 0) return;
-    const sampleFoods = foods.slice(0, 2).map((food) => ({ food, quantity: food.reference_amount }));
-    await addMealEntry(db, date, weekdayOf(date), meals[0], sampleFoods);
-    load();
-  }
 
   const goalName = goal ? ` · ${goal.name}` : "";
   const dayTotals = sumNutrition(entries.flatMap((entry) => entry.foods));
@@ -96,8 +86,7 @@ export default function Main() {
           entries.map((entry) => <MealEntryCard key={entry.id} entry={entry} />)
         )}
 
-        {/* TEMPORARY: replaced by the Add meal button in part C. */}
-        <Button title="Add sample meal (temporary)" variant="secondary" onPress={addSampleMeal} />
+        <Button title="Add meal" onPress={() => router.push({ pathname: "/meal-entry-form", params: { date } })} />
       </ScrollView>
 
       <Dialog visible={showIosCalendar} title="Pick a date" onClose={() => setShowIosCalendar(false)}>
