@@ -14,7 +14,7 @@ A simple app that will let users log what they eat each day, so they can track h
 - Add food entries to a meal on the day (lets us add entries if we missed adding them/ate them after a short while after adding the meal entry)
 - Create different calorie and macronutrient goals (so, a 2500 calorie, a 1500 calorie, or a 1750 calorie goals, with their different macronutrient goals)
 - Calories are required in a goal, macronutrient targets are optional (a user may only track calories, or only some macronutrients). If calories are left empty, they are calculated from the macronutrients (4 kcal per g of protein or carbs, 9 kcal per g of fat)
-- Macronutrient targets can be entered in grams or as a percentage of the calories, switchable per macronutrient. They are always saved as grams. A "kcal left" line shows what the macronutrients don't cover yet, with a button to fill the one empty macronutrient with it
+- Macronutrient targets can be entered in grams or as a percentage of the calories, switchable per macronutrient. They are always saved as grams (whole grams when entered as a percentage), and switching a field converts its value. Percentages need calories to be entered. A "kcal left" line shows what the macronutrients don't cover yet, with a button to fill the one empty macronutrient with it. Macronutrients can't add up to more than the calories
 - When deleting a goal used by weekdays, the confirmation says which weekdays will lose their goal
 - Set the calorie goals to different days of the week (so monday-tuesday can have the 2500 calorie one, thursday the 1750 calorie one, saturday the 1500 calorie one, and so on for each day of the week).
 - See today's total calories and macronutrients vs today's goal
