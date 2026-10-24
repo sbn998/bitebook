@@ -84,9 +84,10 @@ export default function Goals() {
           <Pressable key={goal.id} onPress={() => router.push({ pathname: "/goal-form", params: { id: goal.id } })}>
             <Card style={styles.goal}>
               <Text style={styles.name}>{goal.name}</Text>
+              {/* Macros first and calories on the right, like the totals on a meal card. */}
               <View style={styles.nutrition}>
-                <Text style={styles.calories}>{goal.calories} kcal</Text>
                 <Text style={styles.macros}>{macroSummary(goal, t)}</Text>
+                <Text style={styles.calories}>{goal.calories} kcal</Text>
               </View>
             </Card>
           </Pressable>
@@ -139,9 +140,11 @@ const styles = StyleSheet.create({
   },
   nutrition: {
     flexDirection: "row",
+    alignItems: "baseline",
     gap: spacing.md,
   },
   calories: {
+    marginLeft: "auto", // Pushes the calories to the right end
     fontSize: fontSize.medium,
     fontFamily: fonts.number,
     color: colors.primaryText,

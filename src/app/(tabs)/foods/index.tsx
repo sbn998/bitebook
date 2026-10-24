@@ -132,8 +132,8 @@ export default function Foods() {
               <Text style={styles.details}>
                 {[food.brand, t.foods.per(String(food.reference_amount), unitName(t, food.unit, food.reference_amount))].filter(Boolean).join(" · ")}
               </Text>
+              {/* Macros first and calories on the right, like the totals on a meal card. */}
               <View style={styles.nutrition}>
-                <Text style={styles.calories}>{food.calories} kcal</Text>
                 <Text style={styles.macro}>
                   {t.macros.proteinShort} {food.protein}
                 </Text>
@@ -143,6 +143,7 @@ export default function Foods() {
                 <Text style={styles.macro}>
                   {t.macros.fatShort} {food.fat}
                 </Text>
+                <Text style={styles.calories}>{food.calories} kcal</Text>
               </View>
             </Card>
           </Pressable>
@@ -226,10 +227,12 @@ const styles = StyleSheet.create({
   },
   nutrition: {
     flexDirection: "row",
+    alignItems: "baseline",
     gap: spacing.md,
     marginTop: spacing.xs,
   },
   calories: {
+    marginLeft: "auto", // Pushes the calories to the right end
     fontSize: fontSize.medium,
     fontFamily: fonts.number,
     color: colors.primaryText,
