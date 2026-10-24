@@ -31,9 +31,13 @@ export type MealEntry = {
 
 export type Nutrition = { calories: number; protein: number; carbs: number; fat: number };
 
+// Anything with an amount and nutrition values per reference amount: a saved food entry,
+// or a food with an amount that hasn't been saved yet (in the Add meal form).
+type Portion = Nutrition & { quantity: number; reference_amount: number };
+
 // What a food entry adds up to: its values scaled from the reference amount to the quantity eaten.
 // e.g. 150 g of a food with 165 kcal per 100 g = 150 / 100 × 165 = 247.5 kcal
-export function foodEntryNutrition(entry: FoodEntry): Nutrition {
+export function foodEntryNutrition(entry: Portion): Nutrition {
   const scale = entry.quantity / entry.reference_amount;
   return {
     calories: entry.calories * scale,
@@ -44,7 +48,7 @@ export function foodEntryNutrition(entry: FoodEntry): Nutrition {
 }
 
 // The sum of several food entries, e.g. a meal or a whole day.
-export function sumNutrition(entries: FoodEntry[]): Nutrition {
+export function sumNutrition(entries: Portion[]): Nutrition {
   return entries.reduce(
     (total, entry) => {
       const nutrition = foodEntryNutrition(entry);

@@ -11,11 +11,7 @@ import { Select } from "@/components/select";
 import { FOOD_TYPES, type FoodType, foodTypeLabel, unitLabel } from "@/constants/food";
 import { colors, fontSize, inputBox, radius, spacing } from "@/constants/theme";
 import { type Food, getFoods } from "@/db/foods";
-
-// Lowercase and without accents, so "platano" matches "Plátano".
-function normalize(text: string) {
-  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-}
+import { normalize } from "@/utils/search";
 
 export default function Foods() {
   const db = useSQLiteContext();
