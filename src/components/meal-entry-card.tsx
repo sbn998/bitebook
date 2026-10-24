@@ -2,59 +2,74 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Card } from "@/components/card";
+import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { unitLabel } from "@/constants/food";
 import { colors, fontSize, spacing } from "@/constants/theme";
-import { foodEntryNutrition, type MealEntry, type Nutrition, sumNutrition } from "@/db/entries";
-import { formatNumber } from "@/utils/nutrition";
-
-function macroLine(nutrition: Nutrition) {
-  return `P ${formatNumber(nutrition.protein)} g · C ${formatNumber(nutrition.carbs)} g · F ${formatNumber(nutrition.fat)} g`;
-}
+import { type FoodEntry, foodEntryNutrition, type MealEntry, sumNutrition } from "@/db/entries";
+import { formatNumber, macroLine } from "@/utils/nutrition";
 
 // One meal on a day: its name, each food with its amount and calories, and the meal's totals at the bottom.
 // Tapping the name row expands the card to also show each food's macros.
-export function MealEntryCard({ entry }: { entry: MealEntry }) {
+// The card only reports taps (add a food, tap a food, delete the meal); the screen does the rest.
+export function MealEntryCard({
+  entry,
+  onAddFood,
+  onEditFood,
+  onDelete,
+}: {
+  entry: MealEntry;
+  onAddFood: () => void;
+  onEditFood: (food: FoodEntry) => void;
+  onDelete: () => void;
+}) {
   const [expanded, setExpanded] = useState(false);
   const total = sumNutrition(entry.foods);
   const hasFoods = entry.foods.length > 0;
 
   return (
     <Card style={styles.card}>
-      <Pressable
-        style={styles.header}
-        onPress={() => setExpanded(!expanded)}
-        disabled={!hasFoods}
-        accessibilityLabel={expanded ? "Hide food details" : "Show food details"}
-      >
-        <Text style={styles.name} numberOfLines={1}>
-          {entry.meal_name}
-        </Text>
-        {hasFoods && <Icon name={expanded ? "chevronUp" : "chevronDown"} color={colors.textMuted} />}
-      </Pressable>
+      <View style={styles.header}>
+        <Pressable
+          style={styles.headerToggle}
+          onPress={() => setExpanded(!expanded)}
+          disabled={!hasFoods}
+          accessibilityLabel={expanded ? "Hide food details" : "Show food details"}
+        >
+          <Text style={styles.name} numberOfLines={1}>
+            {entry.meal_name}
+          </Text>
+          {hasFoods && <Icon name={expanded ? "chevronUp" : "chevronDown"} color={colors.textMuted} />}
+        </Pressable>
+        <Pressable onPress={onDelete} hitSlop={spacing.sm} accessibilityLabel={`Delete ${entry.meal_name}`}>
+          <Icon name="trash" size={18} color={colors.textMuted} />
+        </Pressable>
+      </View>
 
-      {!hasFoods ? (
-        <Text style={styles.empty}>No foods yet</Text>
-      ) : (
-        entry.foods.map((food) => {
-          const nutrition = foodEntryNutrition(food);
-          return (
-            <View key={food.id}>
-              <View style={styles.food}>
-                <Text style={styles.foodName} numberOfLines={1}>
-                  {food.name}
-                  <Text style={styles.secondary}>
-                    {" "}
-                    · {formatNumber(food.quantity, 1)} {unitLabel(food.unit)}
-                  </Text>
+      {!hasFoods && <Text style={styles.empty}>No foods yet</Text>}
+
+      {entry.foods.map((food) => {
+        const nutrition = foodEntryNutrition(food);
+        return (
+          <Pressable key={food.id} onPress={() => onEditFood(food)} style={({ pressed }) => pressed && styles.pressed}>
+            <View style={styles.food}>
+              <Text style={styles.foodName} numberOfLines={1}>
+                {food.name}
+                <Text style={styles.secondary}>
+                  {" "}
+                  · {formatNumber(food.quantity, 1)} {unitLabel(food.unit)}
                 </Text>
-                <Text style={styles.secondary}>{formatNumber(nutrition.calories)} kcal</Text>
-              </View>
-              {expanded && <Text style={styles.foodMacros}>{macroLine(nutrition)}</Text>}
+              </Text>
+              <Text style={styles.secondary}>{formatNumber(nutrition.calories)} kcal</Text>
             </View>
-          );
-        })
-      )}
+            {expanded && <Text style={styles.foodMacros}>{macroLine(nutrition)}</Text>}
+          </Pressable>
+        );
+      })}
+
+      <View style={styles.addFood}>
+        <HeaderButton title="+ Add food" onPress={onAddFood} />
+      </View>
 
       {hasFoods && (
         <View style={styles.totals}>
@@ -72,6 +87,12 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  headerToggle: {
+    flex: 1,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     gap: spacing.sm,
@@ -81,6 +102,9 @@ const styles = StyleSheet.create({
     fontSize: fontSize.medium,
     fontWeight: "600",
     color: colors.text,
+  },
+  pressed: {
+    opacity: 0.6,
   },
   food: {
     flexDirection: "row",
@@ -103,6 +127,9 @@ const styles = StyleSheet.create({
   empty: {
     fontSize: fontSize.body,
     color: colors.textMuted,
+  },
+  addFood: {
+    alignItems: "flex-start",
   },
   // A thin line separates the foods from the meal's totals, like on a receipt.
   totals: {

@@ -7,12 +7,24 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/components/button";
 import { DaySummary } from "@/components/day-summary";
-import { Dialog } from "@/components/dialog";
+import { ConfirmDialog, Dialog } from "@/components/dialog";
+import { FoodEntryDialog } from "@/components/food-entry-dialog";
+import { FoodPicker } from "@/components/food-picker";
 import { Icon } from "@/components/icon";
 import { MealEntryCard } from "@/components/meal-entry-card";
 import { colors, fontSize, spacing } from "@/constants/theme";
 import { type DayGoal, getDayGoal } from "@/db/days";
-import { getDayEntries, type MealEntry, sumNutrition } from "@/db/entries";
+import {
+  addFoodEntry,
+  deleteFoodEntry,
+  deleteMealEntry,
+  type FoodEntry,
+  getDayEntries,
+  type MealEntry,
+  sumNutrition,
+  updateFoodEntryQuantity,
+} from "@/db/entries";
+import type { Food } from "@/db/foods";
 import { addDays, dayTitle, longDate, parseDateString, toDateString, todayString, weekdayOf } from "@/utils/date";
 
 export default function Main() {
@@ -23,6 +35,10 @@ export default function Main() {
   const [goal, setGoal] = useState<DayGoal | null>(null);
   // iOS shows the calendar inside our own dialog; Android opens the phone's calendar popup.
   const [showIosCalendar, setShowIosCalendar] = useState(false);
+  // The meal cards only report taps; these say which meal or food the open picker or popup is for.
+  const [pickingForMealId, setPickingForMealId] = useState<number | null>(null);
+  const [editingFood, setEditingFood] = useState<FoodEntry | null>(null);
+  const [deletingMeal, setDeletingMeal] = useState<MealEntry | null>(null);
   const today = todayString();
 
   const load = useCallback(() => {
@@ -47,6 +63,44 @@ export default function Main() {
     }
   }
 
+  // Foods picked from a meal card are added right away at their reference amount; tap them to adjust.
+  async function addFoodToMeal(food: Food) {
+    if (pickingForMealId === null) return;
+    await addFoodEntry(db, pickingForMealId, food, food.reference_amount);
+    load();
+  }
+
+  async function saveFoodAmount(quantity: number) {
+    if (!editingFood) return;
+    await updateFoodEntryQuantity(db, editingFood.id, quantity);
+    setEditingFood(null);
+    load();
+  }
+
+  async function deleteFood() {
+    if (!editingFood) return;
+    await deleteFoodEntry(db, editingFood.id);
+    setEditingFood(null);
+    load();
+  }
+
+  async function deleteMeal() {
+    if (!deletingMeal) return;
+    await deleteMealEntry(db, deletingMeal.id);
+    setDeletingMeal(null);
+    load();
+  }
+
+  // Foods already in the meal the picker is open for, for its "✓ added" marks.
+  const pickingFor = entries.find((entry) => entry.id === pickingForMealId);
+  const pickedCounts: Record<number, number> = {};
+  for (const food of pickingFor?.foods ?? []) {
+    if (food.food_id !== null) pickedCounts[food.food_id] = (pickedCounts[food.food_id] ?? 0) + 1;
+  }
+
+  const foodCount = deletingMeal?.foods.length ?? 0;
+  const deleteMealMessage =
+    foodCount === 0 ? "This can't be undone." : `Its ${foodCount} ${foodCount === 1 ? "food" : "foods"} will be removed too.`;
 
   const goalName = goal ? ` · ${goal.name}` : "";
   const dayTotals = sumNutrition(entries.flatMap((entry) => entry.foods));
@@ -83,7 +137,15 @@ export default function Main() {
         {entries.length === 0 ? (
           <Text style={styles.empty}>No meals yet</Text>
         ) : (
-          entries.map((entry) => <MealEntryCard key={entry.id} entry={entry} />)
+          entries.map((entry) => (
+            <MealEntryCard
+              key={entry.id}
+              entry={entry}
+              onAddFood={() => setPickingForMealId(entry.id)}
+              onEditFood={setEditingFood}
+              onDelete={() => setDeletingMeal(entry)}
+            />
+          ))
         )}
 
         <Button title="Add meal" onPress={() => router.push({ pathname: "/meal-entry-form", params: { date } })} />
@@ -101,6 +163,32 @@ export default function Main() {
           }}
         />
       </Dialog>
+
+      <FoodPicker
+        visible={pickingForMealId !== null}
+        onPick={addFoodToMeal}
+        onClose={() => setPickingForMealId(null)}
+        pickedCounts={pickedCounts}
+      />
+
+      {editingFood && (
+        <FoodEntryDialog
+          key={editingFood.id}
+          entry={editingFood}
+          onSave={saveFoodAmount}
+          onDelete={deleteFood}
+          onClose={() => setEditingFood(null)}
+        />
+      )}
+
+      <ConfirmDialog
+        visible={deletingMeal !== null}
+        title={`Delete ${deletingMeal?.meal_name ?? ""}?`}
+        message={deleteMealMessage}
+        confirmTitle="Delete"
+        onConfirm={deleteMeal}
+        onCancel={() => setDeletingMeal(null)}
+      />
     </View>
   );
 }

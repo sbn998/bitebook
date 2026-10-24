@@ -15,6 +15,7 @@ const ICONS = {
   calendar: { ios: "calendar", android: "calendar_month" },
   close: { ios: "xmark", android: "close" },
   check: { ios: "checkmark", android: "check" },
+  trash: { ios: "trash", android: "delete" },
 } satisfies Record<string, SymbolViewProps["name"]>;
 
 export type IconName = keyof typeof ICONS;

@@ -37,3 +37,8 @@ export function formatNumber(value: number, decimals = 0) {
   const factor = 10 ** decimals;
   return String(Math.round(value * factor) / factor);
 }
+
+// "P 47 g · C 0 g · F 5 g"
+export function macroLine(macros: Record<MacroKey, number>) {
+  return `P ${formatNumber(macros.protein)} g · C ${formatNumber(macros.carbs)} g · F ${formatNumber(macros.fat)} g`;
+}
