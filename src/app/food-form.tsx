@@ -10,7 +10,7 @@ import { ConfirmDialog } from "@/components/dialog";
 import { Select } from "@/components/select";
 import { fieldStyles, TextField } from "@/components/text-field";
 import { FOOD_TYPE_KEYS, type FoodType, UNIT_KEYS, type Unit } from "@/constants/food";
-import { colors, fontSize, inputBox, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, inputBox, spacing } from "@/constants/theme";
 import { addFood, deleteFood, getFood, updateFood } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
 import { caloriesFromMacros, MACRO_FIELDS, type MacroKey, parseNumber } from "@/utils/nutrition";
@@ -249,11 +249,13 @@ const styles = StyleSheet.create({
   },
   hint: {
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   input: {
     ...inputBox,
     fontSize: fontSize.medium,
+    fontFamily: fonts.body,
     color: colors.text,
   },
   inputError: {

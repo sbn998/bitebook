@@ -6,7 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Button } from "@/components/button";
 import { Dialog } from "@/components/dialog";
 import { HeaderButton } from "@/components/header-button";
-import { colors, fontSize, radius, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, radius, spacing } from "@/constants/theme";
 import { type Goal, getGoals, getWeekdayGoals, setWeekdayGoal } from "@/db/goals";
 import { useTranslation } from "@/i18n";
 import { weekdayOf } from "@/utils/date";
@@ -99,6 +99,7 @@ export function WeekdayGoalDialog({
 const styles = StyleSheet.create({
   note: {
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   list: {
@@ -120,11 +121,12 @@ const styles = StyleSheet.create({
   },
   goalName: {
     fontSize: fontSize.medium,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
     color: colors.text,
   },
   goalDetails: {
     fontSize: fontSize.small,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   goalCurrentText: {

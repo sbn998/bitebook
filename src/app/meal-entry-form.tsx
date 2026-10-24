@@ -11,7 +11,7 @@ import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
 import { fieldStyles } from "@/components/text-field";
-import { colors, fontSize, inputBox, radius, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, inputBox, radius, spacing } from "@/constants/theme";
 import { addMealEntry, sumNutrition } from "@/db/entries";
 import type { Food } from "@/db/foods";
 import { getMeals, type Meal } from "@/db/meals";
@@ -206,11 +206,13 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
     textAlign: "center",
   },
   hint: {
     fontSize: fontSize.small,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   rowWrapper: {
@@ -227,7 +229,7 @@ const styles = StyleSheet.create({
   },
   foodName: {
     fontSize: fontSize.body,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
     color: colors.text,
   },
   amount: {
@@ -236,6 +238,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     textAlign: "right",
     fontSize: fontSize.medium,
+    fontFamily: fonts.body,
     color: colors.text,
   },
   amountError: {
@@ -244,6 +247,7 @@ const styles = StyleSheet.create({
   unit: {
     width: 44,
     fontSize: fontSize.small,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   addFood: {
@@ -261,12 +265,13 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontSize: fontSize.body,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
     color: colors.primaryText,
   },
   totalValues: {
     flexShrink: 1,
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.primaryText,
   },
 });

@@ -8,7 +8,7 @@ import { Card } from "@/components/card";
 import { ConfirmBody, Dialog } from "@/components/dialog";
 import { HeaderButton } from "@/components/header-button";
 import { TextField } from "@/components/text-field";
-import { colors, fontSize, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, spacing } from "@/constants/theme";
 import { addMeal, deleteMeal, getMeals, type Meal, renameMeal } from "@/db/meals";
 import { useTranslation } from "@/i18n";
 
@@ -151,17 +151,18 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: fontSize.medium,
-    fontWeight: "600",
+    fontFamily: fonts.title,
     color: colors.text,
   },
   emptyText: {
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
     textAlign: "center",
   },
   name: {
     fontSize: fontSize.medium,
-    fontWeight: "600",
+    fontFamily: fonts.title,
     color: colors.text,
   },
 });

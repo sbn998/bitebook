@@ -8,7 +8,7 @@ import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
 import { ConfirmDialog } from "@/components/dialog";
 import { TextField } from "@/components/text-field";
-import { colors, fontSize, radius, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, radius, spacing } from "@/constants/theme";
 import { addGoal, deleteGoal, getGoal, getWeekdayGoals, setWeekdayGoal, updateGoal } from "@/db/goals";
 import { useTranslation } from "@/i18n";
 import { todayString } from "@/utils/date";
@@ -338,6 +338,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   left: {
@@ -353,7 +354,7 @@ const styles = StyleSheet.create({
   },
   leftTitle: {
     fontSize: fontSize.body,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
     color: colors.primaryText,
   },
   overText: {
@@ -361,6 +362,7 @@ const styles = StyleSheet.create({
   },
   leftDetail: {
     fontSize: fontSize.small,
+    fontFamily: fonts.body,
     color: colors.primaryText,
   },
   fillButton: {
@@ -371,7 +373,7 @@ const styles = StyleSheet.create({
   },
   fillText: {
     fontSize: fontSize.body,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
     color: colors.onPrimary,
   },
   switch: {
@@ -390,10 +392,11 @@ const styles = StyleSheet.create({
   },
   switchText: {
     fontSize: fontSize.small,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   switchTextOn: {
     color: colors.onPrimary,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
   },
 });

@@ -9,7 +9,7 @@ import { Icon } from "@/components/icon";
 import { IconButton } from "@/components/icon-button";
 import { Select } from "@/components/select";
 import { FOOD_TYPE_KEYS, type FoodType } from "@/constants/food";
-import { colors, fontSize, inputBox, radius, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, inputBox, radius, spacing } from "@/constants/theme";
 import { type Food, getFoods } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
 import { normalize } from "@/utils/search";
@@ -180,6 +180,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     fontSize: fontSize.medium,
+    fontFamily: fonts.body,
     color: colors.text,
   },
   list: {
@@ -188,6 +189,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   empty: {
+    fontFamily: fonts.body,
     textAlign: "center",
     marginTop: spacing.xxl,
     color: colors.textSecondary,
@@ -204,12 +206,12 @@ const styles = StyleSheet.create({
   name: {
     flexShrink: 1,
     fontSize: fontSize.medium,
-    fontWeight: "600",
+    fontFamily: fonts.title,
     color: colors.text,
   },
   badge: {
     fontSize: fontSize.small,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
     color: colors.primaryText,
     backgroundColor: colors.primaryTint,
     borderRadius: radius.pill,
@@ -219,6 +221,7 @@ const styles = StyleSheet.create({
   },
   details: {
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   nutrition: {
@@ -227,12 +230,13 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   calories: {
-    fontSize: fontSize.body,
-    fontWeight: "600",
+    fontSize: fontSize.medium,
+    fontFamily: fonts.number,
     color: colors.primaryText,
   },
   macro: {
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
 });

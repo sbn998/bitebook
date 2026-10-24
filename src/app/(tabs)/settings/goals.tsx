@@ -6,7 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Card } from "@/components/card";
 import { HeaderButton } from "@/components/header-button";
 import { Select } from "@/components/select";
-import { colors, fontSize, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, spacing } from "@/constants/theme";
 import { WEEKDAY_NUMBERS } from "@/constants/weekdays";
 import { type Goal, getGoals, getWeekdayGoals, setWeekdayGoal, type WeekdayGoal } from "@/db/goals";
 import { type Strings, useTranslation } from "@/i18n";
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: fontSize.large,
-    fontWeight: "600",
+    fontFamily: fonts.title,
     color: colors.text,
     marginTop: spacing.sm,
   },
@@ -120,10 +120,12 @@ const styles = StyleSheet.create({
   weekday: {
     width: 96,
     fontSize: fontSize.medium,
+    fontFamily: fonts.body,
     color: colors.text,
   },
   hint: {
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   goal: {
@@ -131,7 +133,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: fontSize.medium,
-    fontWeight: "600",
+    fontFamily: fonts.title,
     color: colors.text,
   },
   nutrition: {
@@ -139,13 +141,14 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   calories: {
-    fontSize: fontSize.body,
-    fontWeight: "600",
+    fontSize: fontSize.medium,
+    fontFamily: fonts.number,
     color: colors.primaryText,
   },
   macros: {
     flexShrink: 1,
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
 });

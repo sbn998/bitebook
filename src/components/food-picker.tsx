@@ -7,7 +7,7 @@ import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
 import { FOOD_TYPE_KEYS, type FoodType } from "@/constants/food";
-import { colors, fontSize, inputBox, radius, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, inputBox, radius, spacing } from "@/constants/theme";
 import { type Food, getFoods } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
 import { formatNumber } from "@/utils/nutrition";
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: fontSize.large,
-    fontWeight: "600",
+    fontFamily: fonts.title,
     color: colors.text,
   },
   filters: {
@@ -180,6 +180,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     fontSize: fontSize.medium,
+    fontFamily: fonts.body,
     color: colors.text,
   },
   list: {
@@ -188,6 +189,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   empty: {
+    fontFamily: fonts.body,
     textAlign: "center",
     marginTop: spacing.xxl,
     color: colors.textSecondary,
@@ -209,11 +211,12 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: fontSize.medium,
-    fontWeight: "600",
+    fontFamily: fonts.title,
     color: colors.text,
   },
   details: {
     fontSize: fontSize.small,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   added: {
@@ -227,7 +230,7 @@ const styles = StyleSheet.create({
   },
   addedText: {
     fontSize: fontSize.small,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
     color: colors.primaryText,
   },
 });

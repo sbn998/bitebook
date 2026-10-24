@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Button, buttonRowStyles } from "@/components/button";
 import { ConfirmBody, Dialog } from "@/components/dialog";
 import { TextField } from "@/components/text-field";
-import { colors, fontSize, radius, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, radius, spacing } from "@/constants/theme";
 import { type FoodEntry, foodEntryNutrition } from "@/db/entries";
 import { useTranslation } from "@/i18n";
 import { formatNumber, macroLine, parseNumber } from "@/utils/nutrition";
@@ -89,12 +89,13 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   calories: {
-    fontSize: fontSize.medium,
-    fontWeight: "600",
+    fontSize: fontSize.large,
+    fontFamily: fonts.number,
     color: colors.primaryText,
   },
   macros: {
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.primaryText,
   },
 });

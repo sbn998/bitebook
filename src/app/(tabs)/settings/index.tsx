@@ -9,7 +9,7 @@ import { Dialog } from "@/components/dialog";
 import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
-import { colors, fontSize, radius, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, radius, spacing } from "@/constants/theme";
 import {
   type Backup,
   type BackupCounts,
@@ -177,6 +177,7 @@ const styles = StyleSheet.create({
   },
   rowText: {
     fontSize: fontSize.medium,
+    fontFamily: fonts.body,
     color: colors.text,
   },
   rowTextBlock: {
@@ -185,6 +186,7 @@ const styles = StyleSheet.create({
   },
   rowHint: {
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   counts: {
@@ -195,16 +197,18 @@ const styles = StyleSheet.create({
   },
   countsLabel: {
     fontSize: fontSize.small,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
     color: colors.textSecondary,
   },
   countsText: {
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.text,
     marginBottom: spacing.xs,
   },
   warning: {
     fontSize: fontSize.body,
+    fontFamily: fonts.body,
     color: colors.danger,
   },
   exportFirst: {
@@ -212,7 +216,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: fontSize.large,
-    fontWeight: "600",
+    fontFamily: fonts.title,
     color: colors.text,
     marginBottom: -spacing.sm, // Sits close to its card
   },
