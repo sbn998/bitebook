@@ -32,15 +32,20 @@ export function weekdayOf(date: string) {
   return ((sundayFirst + 6) % 7) + 1;
 }
 
-// "Today", "Yesterday", "Tomorrow", or the date in the phone's own format (e.g. 24/10/2026).
-export function dayTitle(date: string, today: string) {
-  if (date === today) return "Today";
-  if (date === addDays(today, -1)) return "Yesterday";
-  if (date === addDays(today, 1)) return "Tomorrow";
-  return parseDateString(date).toLocaleDateString();
+// "Today", "Yesterday", "Tomorrow" (in `words`, the app's language), or the short date in `locale`'s format.
+export function dayTitle(
+  date: string,
+  today: string,
+  words: { today: string; yesterday: string; tomorrow: string },
+  locale: string
+) {
+  if (date === today) return words.today;
+  if (date === addDays(today, -1)) return words.yesterday;
+  if (date === addDays(today, 1)) return words.tomorrow;
+  return parseDateString(date).toLocaleDateString(locale);
 }
 
-// The weekday and date in the phone's language, e.g. "Saturday, 24 October".
-export function longDate(date: string) {
-  return parseDateString(date).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
+// The weekday and date in `locale`'s language, e.g. "Saturday, October 24" or "sábado, 24 de octubre".
+export function longDate(date: string, locale: string) {
+  return parseDateString(date).toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" });
 }

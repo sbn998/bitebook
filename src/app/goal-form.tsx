@@ -9,7 +9,6 @@ import { Card } from "@/components/card";
 import { ConfirmDialog } from "@/components/dialog";
 import { TextField } from "@/components/text-field";
 import { colors, fontSize, radius, spacing } from "@/constants/theme";
-import { weekdayLabel } from "@/constants/weekdays";
 import { addGoal, deleteGoal, getGoal, getWeekdayGoals, setWeekdayGoal, updateGoal } from "@/db/goals";
 import { useTranslation } from "@/i18n";
 import { todayString } from "@/utils/date";
@@ -29,14 +28,6 @@ type MacroUnit = "g" | "%";
 
 // Small rounding differences (e.g. 112.5 g rounded to 113 g) shouldn't count as "over the goal".
 const KCAL_TOLERANCE = 0.5;
-
-// "This will remove Monday's and Tuesday's goals." for the weekdays that use the goal being deleted.
-function deleteMessage(weekdays: number[]) {
-  if (weekdays.length === 0) return "This can't be undone.";
-  const names = weekdays.map((weekday) => `${weekdayLabel(weekday)}'s`);
-  const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
-  return `This will remove ${list} ${weekdays.length === 1 ? "goal" : "goals"}.`;
-}
 
 export default function GoalForm() {
   const db = useSQLiteContext();
@@ -101,7 +92,7 @@ export default function GoalForm() {
 
   // The value in the other unit, shown under each macro field.
   function hintFor(key: MacroKey) {
-    if (units[key] === "%" && kcal === null) return "Enter calories first";
+    if (units[key] === "%" && kcal === null) return t.goalForm.enterCaloriesFirst;
     const value = parseNumber(macros[key]);
     if (value === null || kcal === null) return undefined;
     return units[key] === "g"
@@ -137,16 +128,16 @@ export default function GoalForm() {
   async function save() {
     const newErrors: Record<string, string> = {};
 
-    if (name.trim() === "") newErrors.name = "Required";
+    if (name.trim() === "") newErrors.name = t.common.required;
 
     // Empty calories are calculated from the macros, unless any macro is a percentage of them.
     let goalKcal = typedCalories;
     if (calories.trim() === "") {
-      if (anyPercent) newErrors.calories = "Enter calories to use percentages";
+      if (anyPercent) newErrors.calories = t.goalForm.caloriesForPercent;
       else if (hasMacros) goalKcal = calculatedCalories;
-      else newErrors.calories = "Enter calories or at least one macronutrient";
-    } else if (goalKcal === null) newErrors.calories = "Enter a valid number";
-    else if (goalKcal <= 0) newErrors.calories = "Must be more than 0";
+      else newErrors.calories = t.foodForm.caloriesOrMacro;
+    } else if (goalKcal === null) newErrors.calories = t.common.validNumber;
+    else if (goalKcal <= 0) newErrors.calories = t.common.moreThanZero;
 
     // Empty macros mean "no target" and are saved as null. Percentages are saved as whole grams.
     const macroValues: Record<MacroKey, number | null> = { protein: null, carbs: null, fat: null };
@@ -154,9 +145,9 @@ export default function GoalForm() {
     for (const { key } of MACRO_FIELDS) {
       if (macros[key].trim() === "") continue;
       const value = parseNumber(macros[key]);
-      if (value === null) newErrors[key] = "Enter a valid number";
-      else if (value < 0) newErrors[key] = "Can't be negative";
-      else if (units[key] === "%" && value > 100) newErrors[key] = "Can't be more than 100%";
+      if (value === null) newErrors[key] = t.common.validNumber;
+      else if (value < 0) newErrors[key] = t.common.notNegative;
+      else if (units[key] === "%" && value > 100) newErrors[key] = t.goalForm.maxPercent;
       else if (units[key] === "g") {
         macroValues[key] = value;
         exactMacroKcal += value * KCAL_PER_GRAM[key];
@@ -169,7 +160,7 @@ export default function GoalForm() {
 
     // Typed-in calories can't be less than the macros add up to. (The red line under the macros says why.)
     if (calories.trim() !== "" && goalKcal !== null && exactMacroKcal > goalKcal + KCAL_TOLERANCE) {
-      newErrors.total = "Macros over the goal";
+      newErrors.total = "over"; // Never shown: it only blocks saving.
     }
 
     setErrors(newErrors);
@@ -194,7 +185,7 @@ export default function GoalForm() {
     router.back();
   }
 
-  const title = <Stack.Screen options={{ title: id === null ? "Add goal" : "Edit goal" }} />;
+  const title = <Stack.Screen options={{ title: id === null ? t.goalForm.addTitle : t.goalForm.editTitle }} />;
 
   // Show nothing until the goal has loaded, so the empty form doesn't flash first.
   if (!loaded) return title;
@@ -214,16 +205,22 @@ export default function GoalForm() {
         contentContainerStyle={styles.form}
       >
         <Card style={styles.section}>
-          <TextField label="Name" value={name} onChangeText={setName} placeholder="Training day" error={errors.name} />
+          <TextField
+            label={t.common.name}
+            value={name}
+            onChangeText={setName}
+            placeholder={t.goalForm.namePlaceholder}
+            error={errors.name}
+          />
         </Card>
 
         <Card style={styles.section}>
           <TextField
-            label="Calories (kcal)"
+            label={t.foodForm.calories}
             value={calories}
             onChangeText={setCalories}
             keyboardType="decimal-pad"
-            placeholder={hasMacros && !anyPercent ? `${calculatedCalories} (calculated)` : undefined}
+            placeholder={hasMacros && !anyPercent ? t.foodForm.calculated(calculatedCalories) : undefined}
             error={errors.calories}
           />
 
@@ -236,7 +233,7 @@ export default function GoalForm() {
                 value={macros[key]}
                 onChangeText={(text) => setMacros({ ...macros, [key]: text })}
                 keyboardType="decimal-pad"
-                placeholder="None"
+                placeholder={t.goalForm.none}
                 hint={hintFor(key)}
                 error={errors[key]}
                 containerStyle={styles.flex}
@@ -249,45 +246,45 @@ export default function GoalForm() {
               <View style={styles.flex}>
                 <Text style={[styles.leftTitle, isOver && styles.overText]}>
                   {isOver
-                    ? `Your macros add up to ${formatNumber(macroKcal)} kcal, ${formatNumber(-kcalLeft)} more than the goal`
-                    : `${formatNumber(Math.max(kcalLeft, 0))} kcal left`}
+                    ? t.goalForm.over(formatNumber(macroKcal), formatNumber(-kcalLeft))
+                    : t.goalForm.kcalLeft(formatNumber(Math.max(kcalLeft, 0)))}
                 </Text>
                 {fillTarget && (
                   <Text style={styles.leftDetail}>
-                    ≈ {Math.floor(kcalLeft / KCAL_PER_GRAM[fillTarget.key])} g {t.macros[fillTarget.key].toLowerCase()}
+                    {t.goalForm.approxGrams(Math.floor(kcalLeft / KCAL_PER_GRAM[fillTarget.key]), t.macros[fillTarget.key])}
                   </Text>
                 )}
               </View>
               {fillTarget && (
                 <Pressable style={styles.fillButton} onPress={fillRemaining}>
-                  <Text style={styles.fillText}>Use for {t.macros[fillTarget.key].toLowerCase()}</Text>
+                  <Text style={styles.fillText}>{t.goalForm.useFor(t.macros[fillTarget.key])}</Text>
                 </Pressable>
               )}
             </View>
           )}
 
-          <Text style={styles.hint}>Macro targets are optional. Leave one empty to not track it.</Text>
+          <Text style={styles.hint}>{t.goalForm.macroHint}</Text>
         </Card>
 
         <View style={buttonRowStyles.row}>
           {id !== null && (
             <Button
-              title="Delete"
+              title={t.common.delete}
               variant="danger"
               onPress={() => setConfirmingDelete(true)}
               style={buttonRowStyles.button}
             />
           )}
           {/* Greyed out while the macros are over the goal; the red box above explains why. */}
-          <Button title="Save" onPress={save} disabled={isOver} style={buttonRowStyles.button} />
+          <Button title={t.common.save} onPress={save} disabled={isOver} style={buttonRowStyles.button} />
         </View>
       </ScrollView>
 
       <ConfirmDialog
         visible={confirmingDelete}
-        title={`Delete ${name}?`}
-        message={deleteMessage(usedOnWeekdays)}
-        confirmTitle="Delete"
+        title={t.common.deleteTitle(name)}
+        message={t.goalForm.deleteWeekdays(usedOnWeekdays.map((weekday) => t.weekdays[weekday - 1]))}
+        confirmTitle={t.common.delete}
         onConfirm={deleteAndClose}
         onCancel={() => setConfirmingDelete(false)}
       />
@@ -297,6 +294,8 @@ export default function GoalForm() {
 
 // A small "g | %" switch shown next to each macro's label.
 function UnitSwitch({ value, onChange }: { value: MacroUnit; onChange: (unit: MacroUnit) => void }) {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.switch}>
       {(["g", "%"] as const).map((unit) => {
@@ -307,7 +306,7 @@ function UnitSwitch({ value, onChange }: { value: MacroUnit; onChange: (unit: Ma
             style={[styles.switchOption, isOn && styles.switchOptionOn]}
             onPress={() => onChange(unit)}
             hitSlop={4}
-            accessibilityLabel={unit === "g" ? "Grams" : "Percent"}
+            accessibilityLabel={unit === "g" ? t.goalForm.grams : t.goalForm.percent}
           >
             <Text style={[styles.switchText, isOn && styles.switchTextOn]}>{unit}</Text>
           </Pressable>

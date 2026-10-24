@@ -24,7 +24,7 @@ type Row = { key: number; food: Food; quantity: string };
 
 export default function MealEntryForm() {
   const db = useSQLiteContext();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   // The day the meal is added to (YYYY-MM-DD), passed by the Main screen.
   const { date } = useLocalSearchParams<{ date: string }>();
   const [meals, setMeals] = useState<Meal[] | null>(null);
@@ -65,14 +65,14 @@ export default function MealEntryForm() {
   async function save() {
     const newErrors: Record<string, string> = {};
     const meal = meals?.find((m) => String(m.id) === mealId);
-    if (!meal) newErrors.meal = "Choose a meal";
+    if (!meal) newErrors.meal = t.mealForm.chooseMeal;
 
     const foods: { food: Food; quantity: number }[] = [];
     for (const row of rows) {
       const quantity = parseNumber(row.quantity);
-      if (row.quantity.trim() === "") newErrors[row.key] = "Required";
-      else if (quantity === null) newErrors[row.key] = "Enter a valid number";
-      else if (quantity <= 0) newErrors[row.key] = "Must be more than 0";
+      if (row.quantity.trim() === "") newErrors[row.key] = t.common.required;
+      else if (quantity === null) newErrors[row.key] = t.common.validNumber;
+      else if (quantity <= 0) newErrors[row.key] = t.common.moreThanZero;
       else foods.push({ food: row.food, quantity });
     }
 
@@ -84,7 +84,7 @@ export default function MealEntryForm() {
   }
 
   // Set from inside the screen, like the other forms.
-  const title = <Stack.Screen options={{ title: "Add meal" }} />;
+  const title = <Stack.Screen options={{ title: t.mealForm.title }} />;
 
   // Wait for the meal labels to load.
   if (meals === null) return title;
@@ -94,8 +94,8 @@ export default function MealEntryForm() {
       <View style={[styles.screen, styles.form]}>
         {title}
         <Card style={styles.section}>
-          <Text style={styles.hint}>Add meal labels in Settings first, like Breakfast or Lunch.</Text>
-          <Button title="Go to meal labels" onPress={() => router.navigate("/settings/meals")} />
+          <Text style={styles.hint}>{t.mealForm.needLabels}</Text>
+          <Button title={t.mealForm.goToLabels} onPress={() => router.navigate("/settings/meals")} />
         </Card>
       </View>
     );
@@ -115,17 +115,17 @@ export default function MealEntryForm() {
         automaticallyAdjustKeyboardInsets
         contentContainerStyle={styles.form}
       >
-        <Text style={styles.date}>{longDate(date)}</Text>
+        <Text style={styles.date}>{longDate(date, locale)}</Text>
 
         <Card style={styles.section}>
           <View style={fieldStyles.field}>
-            <Text style={fieldStyles.label}>Meal</Text>
+            <Text style={fieldStyles.label}>{t.mealForm.meal}</Text>
             <Select
-              title="Meal"
+              title={t.mealForm.meal}
               options={meals.map((meal) => ({ key: String(meal.id), label: meal.name }))}
               value={mealId}
               onChange={setMealId}
-              placeholder="Choose a meal"
+              placeholder={t.mealForm.chooseMeal}
               hasError={!!errors.meal}
             />
             {!!errors.meal && <Text style={fieldStyles.error}>{errors.meal}</Text>}
@@ -133,9 +133,9 @@ export default function MealEntryForm() {
         </Card>
 
         <Card style={styles.section}>
-          <Text style={fieldStyles.label}>Foods</Text>
+          <Text style={fieldStyles.label}>{t.mealForm.foods}</Text>
 
-          {rows.length === 0 && <Text style={styles.hint}>No foods yet. You can also add them later.</Text>}
+          {rows.length === 0 && <Text style={styles.hint}>{t.mealForm.noFoods}</Text>}
 
           {rows.map((row) => (
             <View key={row.key} style={styles.rowWrapper}>
@@ -145,8 +145,11 @@ export default function MealEntryForm() {
                     {row.food.name}
                   </Text>
                   <Text style={styles.hint} numberOfLines={1}>
-                    {formatNumber(row.food.calories)} kcal per {formatNumber(row.food.reference_amount, 1)}{" "}
-                    {unitName(t, row.food.unit, row.food.reference_amount)}
+                    {t.foodPicker.kcalPer(
+                      formatNumber(row.food.calories),
+                      formatNumber(row.food.reference_amount, 1),
+                      unitName(t, row.food.unit, row.food.reference_amount)
+                    )}
                   </Text>
                 </View>
                 <TextInput
@@ -159,7 +162,7 @@ export default function MealEntryForm() {
                 <Text style={styles.unit} numberOfLines={1}>
                   {unitName(t, row.food.unit, parseNumber(row.quantity) ?? 0)}
                 </Text>
-                <Pressable onPress={() => removeRow(row.key)} hitSlop={spacing.sm} accessibilityLabel="Remove food">
+                <Pressable onPress={() => removeRow(row.key)} hitSlop={spacing.sm} accessibilityLabel={t.mealForm.removeFood}>
                   <Icon name="close" color={colors.textMuted} />
                 </Pressable>
               </View>
@@ -168,19 +171,20 @@ export default function MealEntryForm() {
           ))}
 
           <View style={styles.addFood}>
-            <HeaderButton title="+ Add food" onPress={() => setPicking(true)} />
+            <HeaderButton title={t.mealCard.addFood} onPress={() => setPicking(true)} />
           </View>
         </Card>
 
         <View style={styles.total}>
-          <Text style={styles.totalLabel}>This meal</Text>
+          <Text style={styles.totalLabel}>{t.mealForm.thisMeal}</Text>
           <Text style={styles.totalValues}>
-            <Text style={styles.totalLabel}>{formatNumber(total.calories)} kcal</Text> · P{" "}
-            {formatNumber(total.protein)} · C {formatNumber(total.carbs)} · F {formatNumber(total.fat)}
+            <Text style={styles.totalLabel}>{formatNumber(total.calories)} kcal</Text> · {t.macros.proteinShort}{" "}
+            {formatNumber(total.protein)} · {t.macros.carbsShort} {formatNumber(total.carbs)} · {t.macros.fatShort}{" "}
+            {formatNumber(total.fat)}
           </Text>
         </View>
 
-        <Button title="Save meal" onPress={save} />
+        <Button title={t.mealForm.save} onPress={save} />
       </ScrollView>
 
       <FoodPicker visible={picking} onPick={addFood} onClose={() => setPicking(false)} pickedCounts={pickedCounts} />

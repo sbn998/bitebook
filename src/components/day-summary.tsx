@@ -8,9 +8,9 @@ import type { Nutrition } from "@/db/entries";
 import { useTranslation } from "@/i18n";
 import { MACRO_FIELDS } from "@/utils/nutrition";
 
-// Whole numbers with the phone's thousands separator, e.g. 1,240 or 1.240.
-function format(value: number) {
-  return Math.round(value).toLocaleString();
+// Whole numbers with the thousands separator of the app's language, e.g. 1,240 or 1.240.
+function format(value: number, locale: string) {
+  return Math.round(value).toLocaleString(locale);
 }
 
 // A thin rounded bar filled up to `value / target`. It turns red when over the target.
@@ -37,22 +37,22 @@ export function DaySummary({
   setGoalLabel: string;
   onSetGoal: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const kcalLeft = goal ? goal.calories - totals.calories : 0;
 
   return (
     <Card style={styles.card}>
       <View style={styles.caloriesRow}>
-        <Text style={styles.calories}>{format(totals.calories)}</Text>
+        <Text style={styles.calories}>{format(totals.calories, locale)}</Text>
         <Text style={[styles.secondary, goal && kcalLeft < 0 && styles.overText]}>
-          {goal ? `of ${format(goal.calories)} kcal · ${format(Math.abs(kcalLeft))} ${kcalLeft < 0 ? "over" : "left"}` : "kcal"}
+          {goal ? t.summary.ofGoal(format(goal.calories, locale), format(Math.abs(kcalLeft), locale), kcalLeft < 0) : "kcal"}
         </Text>
       </View>
       {goal ? (
         <ProgressBar value={totals.calories} target={goal.calories} />
       ) : (
         <View style={styles.noGoal}>
-          <Text style={styles.secondary}>No goal for this day</Text>
+          <Text style={styles.secondary}>{t.summary.noGoal}</Text>
           <HeaderButton title={setGoalLabel} onPress={onSetGoal} />
         </View>
       )}
@@ -65,13 +65,15 @@ export function DaySummary({
               <View style={styles.macroRow}>
                 <Text style={styles.macroName}>{t.macros[key]}</Text>
                 <Text style={[styles.secondary, target !== null && totals[key] > target && styles.overText]}>
-                  {target !== null ? `${format(totals[key])}/${format(target)} g` : `${format(totals[key])} g`}
+                  {target !== null
+                    ? `${format(totals[key], locale)}/${format(target, locale)} g`
+                    : `${format(totals[key], locale)} g`}
                 </Text>
               </View>
               {target !== null ? (
                 <ProgressBar value={totals[key]} target={target} thin />
               ) : (
-                goal && <Text style={styles.noTarget}>no target</Text>
+                goal && <Text style={styles.noTarget}>{t.summary.noTarget}</Text>
               )}
             </View>
           );

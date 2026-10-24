@@ -14,7 +14,6 @@ import { Icon } from "@/components/icon";
 import { MealEntryCard } from "@/components/meal-entry-card";
 import { WeekdayGoalDialog } from "@/components/weekday-goal-dialog";
 import { colors, fontSize, spacing } from "@/constants/theme";
-import { weekdayLabel } from "@/constants/weekdays";
 import { type DayGoal, getDayGoal } from "@/db/days";
 import {
   addFoodEntry,
@@ -27,10 +26,12 @@ import {
   updateFoodEntryQuantity,
 } from "@/db/entries";
 import type { Food } from "@/db/foods";
+import { useTranslation } from "@/i18n";
 import { addDays, dayTitle, longDate, parseDateString, toDateString, todayString, weekdayOf } from "@/utils/date";
 
 export default function Main() {
   const db = useSQLiteContext();
+  const { t, locale } = useTranslation();
   const insets = useSafeAreaInsets();
   const [date, setDate] = useState(todayString);
   const [entries, setEntries] = useState<MealEntry[]>([]);
@@ -102,8 +103,7 @@ export default function Main() {
   }
 
   const foodCount = deletingMeal?.foods.length ?? 0;
-  const deleteMealMessage =
-    foodCount === 0 ? "This can't be undone." : `Its ${foodCount} ${foodCount === 1 ? "food" : "foods"} will be removed too.`;
+  const deleteMealMessage = foodCount === 0 ? t.common.cantUndo : t.main.deleteMealFoods(foodCount);
 
   const goalName = goal ? ` · ${goal.name}` : "";
   const dayTotals = sumNutrition(entries.flatMap((entry) => entry.foods));
@@ -111,24 +111,24 @@ export default function Main() {
   return (
     <View style={styles.screen}>
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <Pressable onPress={() => setDate(addDays(date, -1))} hitSlop={spacing.sm} accessibilityLabel="Previous day">
+        <Pressable onPress={() => setDate(addDays(date, -1))} hitSlop={spacing.sm} accessibilityLabel={t.main.previousDay}>
           <Icon name="chevronLeft" size={24} />
         </Pressable>
 
         {/* Tapping the title jumps back to today. */}
-        <Pressable style={styles.title} onPress={() => setDate(today)} accessibilityLabel="Go to today">
-          <Text style={styles.titleText}>{dayTitle(date, today)}</Text>
+        <Pressable style={styles.title} onPress={() => setDate(today)} accessibilityLabel={t.main.goToToday}>
+          <Text style={styles.titleText}>{dayTitle(date, today, t.dates, locale)}</Text>
           <Text style={styles.subtitle} numberOfLines={1}>
-            {longDate(date)}
+            {longDate(date, locale)}
             {goalName}
           </Text>
         </Pressable>
 
         <View style={styles.headerRight}>
-          <Pressable onPress={openCalendar} hitSlop={spacing.sm} accessibilityLabel="Pick a date">
+          <Pressable onPress={openCalendar} hitSlop={spacing.sm} accessibilityLabel={t.main.pickDate}>
             <Icon name="calendar" size={22} color={colors.primaryText} />
           </Pressable>
-          <Pressable onPress={() => setDate(addDays(date, 1))} hitSlop={spacing.sm} accessibilityLabel="Next day">
+          <Pressable onPress={() => setDate(addDays(date, 1))} hitSlop={spacing.sm} accessibilityLabel={t.main.nextDay}>
             <Icon name="chevronRight" size={24} />
           </Pressable>
         </View>
@@ -138,12 +138,12 @@ export default function Main() {
         <DaySummary
           goal={goal}
           totals={dayTotals}
-          setGoalLabel={`Set a goal for ${weekdayLabel(weekdayOf(date))}s`}
+          setGoalLabel={t.main.setGoalFor(t.weekdaysPlural[weekdayOf(date) - 1])}
           onSetGoal={() => setChoosingGoal(true)}
         />
 
         {entries.length === 0 ? (
-          <Text style={styles.empty}>No meals yet</Text>
+          <Text style={styles.empty}>{t.main.noMeals}</Text>
         ) : (
           entries.map((entry) => (
             <MealEntryCard
@@ -156,10 +156,10 @@ export default function Main() {
           ))
         )}
 
-        <Button title="Add meal" onPress={() => router.push({ pathname: "/meal-entry-form", params: { date } })} />
+        <Button title={t.main.addMeal} onPress={() => router.push({ pathname: "/meal-entry-form", params: { date } })} />
       </ScrollView>
 
-      <Dialog visible={showIosCalendar} title="Pick a date" onClose={() => setShowIosCalendar(false)}>
+      <Dialog visible={showIosCalendar} title={t.main.pickDate} onClose={() => setShowIosCalendar(false)}>
         <DateTimePicker
           value={parseDateString(date)}
           mode="date"
@@ -191,9 +191,9 @@ export default function Main() {
 
       <ConfirmDialog
         visible={deletingMeal !== null}
-        title={`Delete ${deletingMeal?.meal_name ?? ""}?`}
+        title={t.common.deleteTitle(deletingMeal?.meal_name ?? "")}
         message={deleteMealMessage}
-        confirmTitle="Delete"
+        confirmTitle={t.common.delete}
         onConfirm={deleteMeal}
         onCancel={() => setDeletingMeal(null)}
       />

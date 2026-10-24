@@ -35,19 +35,19 @@ export function MealEntryCard({
           style={styles.headerToggle}
           onPress={() => setExpanded(!expanded)}
           disabled={!hasFoods}
-          accessibilityLabel={expanded ? "Hide food details" : "Show food details"}
+          accessibilityLabel={expanded ? t.mealCard.hideDetails : t.mealCard.showDetails}
         >
           <Text style={styles.name} numberOfLines={1}>
             {entry.meal_name}
           </Text>
           {hasFoods && <Icon name={expanded ? "chevronUp" : "chevronDown"} color={colors.textMuted} />}
         </Pressable>
-        <Pressable onPress={onDelete} hitSlop={spacing.sm} accessibilityLabel={`Delete ${entry.meal_name}`}>
+        <Pressable onPress={onDelete} hitSlop={spacing.sm} accessibilityLabel={t.common.deleteTitle(entry.meal_name)}>
           <Icon name="trash" size={18} color={colors.textMuted} />
         </Pressable>
       </View>
 
-      {!hasFoods && <Text style={styles.empty}>No foods yet</Text>}
+      {!hasFoods && <Text style={styles.empty}>{t.mealCard.noFoods}</Text>}
 
       {entry.foods.map((food) => {
         const nutrition = foodEntryNutrition(food);
@@ -63,18 +63,18 @@ export function MealEntryCard({
               </Text>
               <Text style={styles.secondary}>{formatNumber(nutrition.calories)} kcal</Text>
             </View>
-            {expanded && <Text style={styles.foodMacros}>{macroLine(nutrition)}</Text>}
+            {expanded && <Text style={styles.foodMacros}>{macroLine(nutrition, t.macros)}</Text>}
           </Pressable>
         );
       })}
 
       <View style={styles.addFood}>
-        <HeaderButton title="+ Add food" onPress={onAddFood} />
+        <HeaderButton title={t.mealCard.addFood} onPress={onAddFood} />
       </View>
 
       {hasFoods && (
         <View style={styles.totals}>
-          <Text style={styles.macros}>{macroLine(total)}</Text>
+          <Text style={styles.macros}>{macroLine(total, t.macros)}</Text>
           <Text style={styles.total}>{formatNumber(total.calories)} kcal</Text>
         </View>
       )}

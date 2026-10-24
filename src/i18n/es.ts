@@ -105,6 +105,8 @@ export const es: Strings = {
     fatShort: "G",
   },
   weekdays: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+  // Lowercase, since they go in the middle of sentences: "Objetivo para los sábados".
+  weekdaysPlural: ["los lunes", "los martes", "los miércoles", "los jueves", "los viernes", "los sábados", "los domingos"],
   meals: {
     title: "Comidas",
     emptyTitle: "Aún no hay comidas",
@@ -122,5 +124,80 @@ export const es: Strings = {
     planHint: "Añade un objetivo abajo para planificar tu semana.",
     empty: "Aún no hay objetivos. Pulsa Añadir para crear el primero.",
     caloriesOnly: "Solo calorías",
+  },
+  dates: {
+    today: "Hoy",
+    yesterday: "Ayer",
+    tomorrow: "Mañana",
+  },
+  main: {
+    previousDay: "Día anterior",
+    nextDay: "Día siguiente",
+    goToToday: "Ir a hoy",
+    pickDate: "Elegir una fecha",
+    noMeals: "Aún no hay comidas",
+    addMeal: "Añadir comida",
+    setGoalFor: (weekdays: string) => `Elegir un objetivo para ${weekdays}`,
+    deleteMealFoods: (count: number) =>
+      count === 1 ? "También se eliminará su alimento." : `También se eliminarán sus ${count} alimentos.`,
+  },
+  summary: {
+    ofGoal: (goal: string, amount: string, isOver: boolean) =>
+      isOver ? `de ${goal} kcal · ${amount} de más` : `de ${goal} kcal · quedan ${amount}`,
+    noGoal: "Sin objetivo para este día",
+    noTarget: "sin objetivo",
+  },
+  mealCard: {
+    showDetails: "Mostrar detalles de los alimentos",
+    hideDetails: "Ocultar detalles de los alimentos",
+    noFoods: "Aún no hay alimentos",
+    addFood: "+ Añadir alimento",
+  },
+  foodEntry: {
+    amount: (unit: string) => `Cantidad (${unit})`,
+    deleteMessage: "Solo se quita de esta comida.",
+  },
+  weekdayGoal: {
+    title: (weekdays: string) => `Objetivo para ${weekdays}`,
+    noteFuture: (weekdays: string) => `Será el objetivo de todos ${weekdays} a partir de hoy.`,
+    notePast: (weekdays: string) => `Será el objetivo de este día y de todos ${weekdays} a partir de hoy.`,
+    current: (weekdays: string) => `actual para ${weekdays}`,
+    noGoals: "Aún no hay objetivos.",
+    createGoal: "+ Crear un objetivo nuevo",
+  },
+  goalForm: {
+    addTitle: "Añadir objetivo",
+    editTitle: "Editar objetivo",
+    namePlaceholder: "Día de entreno",
+    none: "Ninguno",
+    grams: "Gramos",
+    percent: "Porcentaje",
+    enterCaloriesFirst: "Introduce primero las calorías",
+    caloriesForPercent: "Introduce las calorías para usar porcentajes",
+    maxPercent: "No puede ser más del 100%",
+    kcalLeft: (kcal: string) => `Quedan ${kcal} kcal`,
+    over: (total: string, extra: string) => `Tus macros suman ${total} kcal, ${extra} más que el objetivo`,
+    approxGrams: (grams: number, macro: string) => `≈ ${grams} g de ${macro.toLowerCase()}`,
+    useFor: (macro: string) => `Usar para ${macro.toLowerCase()}`,
+    macroHint: "Los objetivos de macros son opcionales. Deja uno vacío para no seguirlo.",
+    // weekdays: e.g. ["Lunes", "Martes"] -> "Se eliminarán los objetivos del lunes y del martes."
+    deleteWeekdays: (weekdays: string[]) => {
+      if (weekdays.length === 0) return "Esta acción no se puede deshacer.";
+      const names = weekdays.map((weekday) => `del ${weekday.toLowerCase()}`);
+      const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]}`;
+      return weekdays.length === 1 ? `Se eliminará el objetivo ${list}.` : `Se eliminarán los objetivos ${list}.`;
+    },
+  },
+  mealForm: {
+    title: "Añadir comida",
+    needLabels: "Primero añade comidas en Ajustes, como Desayuno o Comida.",
+    goToLabels: "Ir a Comidas",
+    meal: "Comida",
+    chooseMeal: "Elige una comida",
+    foods: "Alimentos",
+    noFoods: "Aún no hay alimentos. También puedes añadirlos más tarde.",
+    removeFood: "Quitar alimento",
+    thisMeal: "Esta comida",
+    save: "Guardar comida",
   },
 };

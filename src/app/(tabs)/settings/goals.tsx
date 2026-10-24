@@ -7,7 +7,7 @@ import { Card } from "@/components/card";
 import { HeaderButton } from "@/components/header-button";
 import { Select } from "@/components/select";
 import { colors, fontSize, spacing } from "@/constants/theme";
-import { WEEKDAYS } from "@/constants/weekdays";
+import { WEEKDAY_NUMBERS } from "@/constants/weekdays";
 import { type Goal, getGoals, getWeekdayGoals, setWeekdayGoal, type WeekdayGoal } from "@/db/goals";
 import { type Strings, useTranslation } from "@/i18n";
 import { todayString } from "@/utils/date";
@@ -56,16 +56,16 @@ export default function Goals() {
         {goals.length === 0 ? (
           <Text style={styles.hint}>{t.goals.planHint}</Text>
         ) : (
-          WEEKDAYS.map((weekday) => {
-            const goalId = weekdayGoals.find((w) => w.weekday === weekday.number)?.goal_id;
+          WEEKDAY_NUMBERS.map((weekday) => {
+            const goalId = weekdayGoals.find((w) => w.weekday === weekday)?.goal_id;
             return (
-              <View key={weekday.number} style={styles.planRow}>
-                <Text style={styles.weekday}>{t.weekdays[weekday.number - 1]}</Text>
+              <View key={weekday} style={styles.planRow}>
+                <Text style={styles.weekday}>{t.weekdays[weekday - 1]}</Text>
                 <Select
-                  title={t.weekdays[weekday.number - 1]}
+                  title={t.weekdays[weekday - 1]}
                   options={goalOptions}
                   value={goalId === undefined ? null : String(goalId)}
-                  onChange={(key) => changeWeekday(weekday.number, key)}
+                  onChange={(key) => changeWeekday(weekday, key)}
                   placeholder={t.goals.noGoal}
                   style={styles.flex}
                 />

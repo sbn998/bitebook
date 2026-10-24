@@ -21,11 +21,20 @@ function startingLanguage(): Language {
   return getLocales()[0]?.languageCode === "es" ? "es" : "en";
 }
 
+// The locale used to format dates and numbers, so they match the app's language. If the phone is in the
+// same language, its own regional format is kept (e.g. "en-GB" writes 24/10/2026); otherwise a default.
+function dateLocale(language: Language) {
+  const phone = getLocales()[0];
+  if (phone?.languageCode === language && phone.languageTag) return phone.languageTag;
+  return language === "es" ? "es-ES" : "en-US";
+}
+
 const LanguageContext = createContext<{
   language: Language;
   setLanguage: (language: Language) => void;
   t: Strings;
-}>({ language: "en", setLanguage: () => {}, t: en });
+  locale: string;
+}>({ language: "en", setLanguage: () => {}, t: en, locale: "en-US" });
 
 // Wraps the app so every screen can read the texts in the current language. Changing the language
 // redraws every screen that uses them, right away.
@@ -37,10 +46,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setLanguageState(next);
   }
 
-  return <LanguageContext value={{ language, setLanguage, t: STRINGS[language] }}>{children}</LanguageContext>;
+  return (
+    <LanguageContext value={{ language, setLanguage, t: STRINGS[language], locale: dateLocale(language) }}>
+      {children}
+    </LanguageContext>
+  );
 }
 
-// `t` holds the texts in the current language, e.g. t.common.save.
+// `t` holds the texts in the current language, e.g. t.common.save; `locale` formats dates and numbers.
 export function useTranslation() {
   return useContext(LanguageContext);
 }

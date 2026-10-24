@@ -32,25 +32,25 @@ export function FoodEntryDialog({
 
   function save() {
     const quantity = parseNumber(amount);
-    if (amount.trim() === "") setError("Required");
-    else if (quantity === null) setError("Enter a valid number");
-    else if (quantity <= 0) setError("Must be more than 0");
+    if (amount.trim() === "") setError(t.common.required);
+    else if (quantity === null) setError(t.common.validNumber);
+    else if (quantity <= 0) setError(t.common.moreThanZero);
     else onSave(quantity);
   }
 
   return (
-    <Dialog visible title={confirmingDelete ? `Delete ${entry.name}?` : entry.name} onClose={onClose}>
+    <Dialog visible title={confirmingDelete ? t.common.deleteTitle(entry.name) : entry.name} onClose={onClose}>
       {confirmingDelete ? (
         <ConfirmBody
-          message="This only removes it from this meal."
-          confirmTitle="Delete"
+          message={t.foodEntry.deleteMessage}
+          confirmTitle={t.common.delete}
           onConfirm={onDelete}
           onCancel={() => setConfirmingDelete(false)}
         />
       ) : (
         <>
           <TextField
-            label={`Amount (${t.units[entry.unit].other})`}
+            label={t.foodEntry.amount(t.units[entry.unit].other)}
             value={amount}
             onChangeText={(text) => {
               setAmount(text);
@@ -63,17 +63,17 @@ export function FoodEntryDialog({
           />
           <View style={styles.nutrition}>
             <Text style={styles.calories}>{formatNumber(nutrition.calories)} kcal</Text>
-            <Text style={styles.macros}>{macroLine(nutrition)}</Text>
+            <Text style={styles.macros}>{macroLine(nutrition, t.macros)}</Text>
           </View>
           <View style={buttonRowStyles.row}>
-            <Button title="Cancel" variant="secondary" onPress={onClose} style={buttonRowStyles.button} />
+            <Button title={t.common.cancel} variant="secondary" onPress={onClose} style={buttonRowStyles.button} />
             <Button
-              title="Delete"
+              title={t.common.delete}
               variant="danger"
               onPress={() => setConfirmingDelete(true)}
               style={buttonRowStyles.button}
             />
-            <Button title="Save" onPress={save} style={buttonRowStyles.button} />
+            <Button title={t.common.save} onPress={save} style={buttonRowStyles.button} />
           </View>
         </>
       )}

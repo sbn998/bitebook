@@ -34,7 +34,14 @@ export function formatNumber(value: number, decimals = 0) {
   return String(Math.round(value * factor) / factor);
 }
 
-// "P 47 g · C 0 g · F 5 g"
-export function macroLine(macros: Record<MacroKey, number>) {
-  return `P ${formatNumber(macros.protein)} g · C ${formatNumber(macros.carbs)} g · F ${formatNumber(macros.fat)} g`;
+// "P 47 g · C 0 g · F 5 g", with the short macro letters of the app's language (t.macros).
+export function macroLine(
+  macros: Record<MacroKey, number>,
+  letters: { proteinShort: string; carbsShort: string; fatShort: string }
+) {
+  return [
+    `${letters.proteinShort} ${formatNumber(macros.protein)} g`,
+    `${letters.carbsShort} ${formatNumber(macros.carbs)} g`,
+    `${letters.fatShort} ${formatNumber(macros.fat)} g`,
+  ].join(" · ");
 }

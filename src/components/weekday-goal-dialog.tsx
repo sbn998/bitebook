@@ -7,8 +7,8 @@ import { Button } from "@/components/button";
 import { Dialog } from "@/components/dialog";
 import { HeaderButton } from "@/components/header-button";
 import { colors, fontSize, radius, spacing } from "@/constants/theme";
-import { weekdayLabel } from "@/constants/weekdays";
 import { type Goal, getGoals, getWeekdayGoals, setWeekdayGoal } from "@/db/goals";
+import { useTranslation } from "@/i18n";
 import { weekdayOf } from "@/utils/date";
 
 // The popup behind "Set a goal for Saturdays" on a day without a goal: pick an existing goal or create one.
@@ -27,10 +27,12 @@ export function WeekdayGoalDialog({
   onChanged: () => void;
 }) {
   const db = useSQLiteContext();
+  const { t } = useTranslation();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [currentGoalId, setCurrentGoalId] = useState<number | null>(null);
   const weekday = weekdayOf(date);
-  const weekdayName = `${weekdayLabel(weekday)}s`;
+  // e.g. "Saturdays" / "los sábados"
+  const weekdayName = t.weekdaysPlural[weekday - 1];
   const isPast = date < today;
   // Only a past day needs filling in; today and future days follow the weekday anyway.
   const fillDay = isPast ? date : undefined;
@@ -59,15 +61,15 @@ export function WeekdayGoalDialog({
   }
 
   return (
-    <Dialog visible={visible} title={`Goal for ${weekdayName}`} onClose={onClose}>
+    <Dialog visible={visible} title={t.weekdayGoal.title(weekdayName)} onClose={onClose}>
       <Text style={styles.note}>
         {isPast
-          ? `This will be the goal for this day, and for every ${weekdayLabel(weekday)} from today on.`
-          : `This will be the goal for every ${weekdayLabel(weekday)} from today on.`}
+          ? t.weekdayGoal.notePast(weekdayName)
+          : t.weekdayGoal.noteFuture(weekdayName)}
       </Text>
 
       {goals.length === 0 ? (
-        <Text style={styles.note}>No goals yet.</Text>
+        <Text style={styles.note}>{t.weekdayGoal.noGoals}</Text>
       ) : (
         <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
           {goals.map((goal) => {
@@ -78,7 +80,7 @@ export function WeekdayGoalDialog({
                   {goal.name}
                 </Text>
                 <Text style={[styles.goalDetails, isCurrent && styles.goalCurrentText]}>
-                  {goal.calories} kcal{isCurrent ? ` · current for ${weekdayName}` : ""}
+                  {goal.calories} kcal{isCurrent ? ` · ${t.weekdayGoal.current(weekdayName)}` : ""}
                 </Text>
               </Pressable>
             );
@@ -87,9 +89,9 @@ export function WeekdayGoalDialog({
       )}
 
       <View style={styles.actions}>
-        <HeaderButton title="+ Create a new goal" onPress={createGoal} />
+        <HeaderButton title={t.weekdayGoal.createGoal} onPress={createGoal} />
       </View>
-      <Button title="Cancel" variant="secondary" onPress={onClose} />
+      <Button title={t.common.cancel} variant="secondary" onPress={onClose} />
     </Dialog>
   );
 }
