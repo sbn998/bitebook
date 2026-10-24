@@ -3,6 +3,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeInDown, FadeOut, LayoutAnimationConfig, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/components/button";
@@ -35,6 +36,9 @@ export default function Main() {
   const insets = useSafeAreaInsets();
   const [date, setDate] = useState(todayString);
   const [entries, setEntries] = useState<MealEntry[]>([]);
+  // The date `entries` belong to. It changes only once the new day has loaded, so the old day's
+  // cards never animate in again while waiting.
+  const [entriesDate, setEntriesDate] = useState(date);
   const [goal, setGoal] = useState<DayGoal | null>(null);
   // iOS shows the calendar inside our own dialog; Android opens the phone's calendar popup.
   const [showIosCalendar, setShowIosCalendar] = useState(false);
@@ -46,7 +50,10 @@ export default function Main() {
   const today = todayString();
 
   const load = useCallback(() => {
-    getDayEntries(db, date).then(setEntries);
+    getDayEntries(db, date).then((loaded) => {
+      setEntries(loaded);
+      setEntriesDate(date);
+    });
     getDayGoal(db, date, weekdayOf(date)).then(setGoal);
   }, [db, date]);
 
@@ -142,21 +149,37 @@ export default function Main() {
           onSetGoal={() => setChoosingGoal(true)}
         />
 
-        {entries.length === 0 ? (
-          <Text style={styles.empty}>{t.main.noMeals}</Text>
-        ) : (
-          entries.map((entry) => (
-            <MealEntryCard
-              key={entry.id}
-              entry={entry}
-              onAddFood={() => setPickingForMealId(entry.id)}
-              onEditFood={setEditingFood}
-              onDelete={() => setDeletingMeal(entry)}
-            />
-          ))
-        )}
+        {/* A new day's meals slide in one after another, and the previous day's just disappear.
+            Within a day, added meals slide in, deleted ones fade out, and the rest glide into place. */}
+        <LayoutAnimationConfig key={entriesDate} skipExiting>
+          <View style={styles.meals}>
+            {entries.length === 0 ? (
+              <Animated.Text style={styles.empty} entering={FadeInDown} exiting={FadeOut}>
+                {t.main.noMeals}
+              </Animated.Text>
+            ) : (
+              entries.map((entry, index) => (
+                <Animated.View
+                  key={entry.id}
+                  entering={FadeInDown.delay(index * 60)}
+                  exiting={FadeOut.duration(200)}
+                  layout={LinearTransition}
+                >
+                  <MealEntryCard
+                    entry={entry}
+                    onAddFood={() => setPickingForMealId(entry.id)}
+                    onEditFood={setEditingFood}
+                    onDelete={() => setDeletingMeal(entry)}
+                  />
+                </Animated.View>
+              ))
+            )}
+          </View>
+        </LayoutAnimationConfig>
 
-        <Button title={t.main.addMeal} onPress={() => router.push({ pathname: "/meal-entry-form", params: { date } })} />
+        <Animated.View layout={LinearTransition}>
+          <Button title={t.main.addMeal} onPress={() => router.push({ pathname: "/meal-entry-form", params: { date } })} />
+        </Animated.View>
       </ScrollView>
 
       <Dialog visible={showIosCalendar} title={t.main.pickDate} onClose={() => setShowIosCalendar(false)}>
@@ -243,6 +266,9 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.lg,
+    gap: spacing.md,
+  },
+  meals: {
     gap: spacing.md,
   },
   empty: {
