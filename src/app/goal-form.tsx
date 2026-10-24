@@ -263,7 +263,6 @@ export default function GoalForm() {
             </View>
           )}
 
-          <Text style={styles.hint}>{t.goalForm.macroHint}</Text>
         </Card>
 
         <View style={buttonRowStyles.row}>
@@ -335,11 +334,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: spacing.sm,
-  },
-  hint: {
-    fontSize: fontSize.body,
-    fontFamily: fonts.body,
-    color: colors.textSecondary,
   },
   left: {
     flexDirection: "row",

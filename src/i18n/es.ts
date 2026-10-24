@@ -68,7 +68,6 @@ export const es: Strings = {
     chooseType: "Elige un tipo",
     referenceAmount: "Cantidad de referencia",
     unit: "Unidad",
-    perReference: "Los valores nutricionales son por cantidad de referencia.",
     calories: "Calorías (kcal)",
     calculated: (kcal: number) => `${kcal} (calculado)`,
     caloriesOrMacro: "Introduce las calorías o al menos un macronutriente",
@@ -94,12 +93,10 @@ export const es: Strings = {
   },
   backup: {
     export: "Exportar datos",
-    exportHint: "Guarda una copia de todos tus datos en un archivo.",
     shareTitle: "Guardar tus datos",
     exportFailed: "No se han podido exportar tus datos. Inténtalo de nuevo.",
     ok: "Aceptar",
     import: "Importar datos",
-    importHint: "Sustituye todos tus datos por los de un archivo exportado.",
     replaceTitle: "¿Sustituir todos tus datos?",
     summary: (counts: { foods: number; meals: number; goals: number; days: number }) => {
       const part = (n: number, one: string, other: string) => `${n} ${n === 1 ? one : other}`;
@@ -134,7 +131,6 @@ export const es: Strings = {
   meals: {
     title: "Comidas",
     emptyTitle: "Aún no hay comidas",
-    emptyText: "Añade las comidas que haces, como Desayuno o Comida.",
     addTitle: "Añadir comida",
     editTitle: "Editar comida",
     duplicate: "Ya existe una comida con este nombre",
@@ -145,8 +141,7 @@ export const es: Strings = {
     weeklyPlan: "Plan semanal",
     presets: "Objetivos guardados",
     noGoal: "Sin objetivo",
-    planHint: "Añade un objetivo abajo para planificar tu semana.",
-    empty: "Aún no hay objetivos. Pulsa Añadir para crear el primero.",
+    empty: "Aún no hay objetivos",
     caloriesOnly: "Solo calorías",
   },
   dates: {
@@ -185,8 +180,8 @@ export const es: Strings = {
   },
   weekdayGoal: {
     title: (weekdays: string) => `Objetivo para ${weekdays}`,
-    noteFuture: (weekdays: string) => `Será el objetivo de todos ${weekdays} a partir de hoy.`,
-    notePast: (weekdays: string) => `Será el objetivo de este día y de todos ${weekdays} a partir de hoy.`,
+    noteFuture: "A partir de hoy",
+    notePast: (weekdays: string) => `Este día, y todos ${weekdays} a partir de hoy`,
     current: (weekdays: string) => `actual para ${weekdays}`,
     noGoals: "Aún no hay objetivos.",
     createGoal: "+ Crear un objetivo nuevo",
@@ -205,7 +200,6 @@ export const es: Strings = {
     over: (total: string, extra: string) => `Tus macros suman ${total} kcal, ${extra} más que el objetivo`,
     approxGrams: (grams: number, macro: string) => `≈ ${grams} g de ${macro.toLowerCase()}`,
     useFor: (macro: string) => `Usar para ${macro.toLowerCase()}`,
-    macroHint: "Los objetivos de macros son opcionales. Deja uno vacío para no seguirlo.",
     // weekdays: e.g. ["Lunes", "Martes"] -> "Se eliminarán los objetivos del lunes y del martes."
     deleteWeekdays: (weekdays: string[]) => {
       if (weekdays.length === 0) return "Esta acción no se puede deshacer.";
@@ -221,7 +215,7 @@ export const es: Strings = {
     meal: "Comida",
     chooseMeal: "Elige una comida",
     foods: "Alimentos",
-    noFoods: "Aún no hay alimentos. También puedes añadirlos más tarde.",
+    noFoods: "Aún no hay alimentos",
     removeFood: "Quitar alimento",
     thisMeal: "Esta comida",
     save: "Guardar comida",

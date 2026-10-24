@@ -72,7 +72,6 @@ export const en = {
     chooseType: "Choose a type",
     referenceAmount: "Reference amount",
     unit: "Unit",
-    perReference: "Nutrition values are per reference amount.",
     calories: "Calories (kcal)",
     calculated: (kcal: number) => `${kcal} (calculated)`,
     caloriesOrMacro: "Enter calories or at least one macronutrient",
@@ -98,12 +97,10 @@ export const en = {
   },
   backup: {
     export: "Export data",
-    exportHint: "Save a copy of all your data as a file.",
     shareTitle: "Save your data",
     exportFailed: "Couldn't export your data. Try again.",
     ok: "OK",
     import: "Import data",
-    importHint: "Replace all your data with a file you exported.",
     replaceTitle: "Replace all your data?",
     // e.g. "42 foods, 4 meal labels, 3 goals and 120 days"
     summary: (counts: { foods: number; meals: number; goals: number; days: number }) => {
@@ -140,7 +137,6 @@ export const en = {
   meals: {
     title: "Meal labels",
     emptyTitle: "No meal labels yet",
-    emptyText: "Add the meals you eat, like Breakfast or Lunch.",
     addTitle: "Add meal",
     editTitle: "Edit meal",
     duplicate: "A meal with this name already exists",
@@ -151,8 +147,7 @@ export const en = {
     weeklyPlan: "Weekly plan",
     presets: "Goal presets",
     noGoal: "No goal",
-    planHint: "Add a goal below to plan your week.",
-    empty: "No goals yet. Tap Add to create your first one.",
+    empty: "No goals yet",
     caloriesOnly: "Calories only",
   },
   dates: {
@@ -190,8 +185,8 @@ export const en = {
   },
   weekdayGoal: {
     title: (weekdays: string) => `Goal for ${weekdays}`,
-    noteFuture: (weekdays: string) => `This will be the goal for ${weekdays} from today on.`,
-    notePast: (weekdays: string) => `This will be the goal for this day, and for ${weekdays} from today on.`,
+    noteFuture: "From today on",
+    notePast: (weekdays: string) => `This day, and ${weekdays} from today on`,
     current: (weekdays: string) => `current for ${weekdays}`,
     noGoals: "No goals yet.",
     createGoal: "+ Create a new goal",
@@ -210,7 +205,6 @@ export const en = {
     over: (total: string, extra: string) => `Your macros add up to ${total} kcal, ${extra} more than the goal`,
     approxGrams: (grams: number, macro: string) => `≈ ${grams} g ${macro.toLowerCase()}`,
     useFor: (macro: string) => `Use for ${macro.toLowerCase()}`,
-    macroHint: "Macro targets are optional. Leave one empty to not track it.",
     // weekdays: e.g. ["Monday", "Tuesday"] -> "This will remove Monday's and Tuesday's goals."
     deleteWeekdays: (weekdays: string[]) => {
       if (weekdays.length === 0) return "This can't be undone.";
@@ -226,7 +220,7 @@ export const en = {
     meal: "Meal",
     chooseMeal: "Choose a meal",
     foods: "Foods",
-    noFoods: "No foods yet. You can also add them later.",
+    noFoods: "No foods yet",
     removeFood: "Remove food",
     thisMeal: "This meal",
     save: "Save meal",

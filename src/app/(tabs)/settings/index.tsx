@@ -111,17 +111,11 @@ export default function Settings() {
       <Text style={styles.sectionTitle}>{t.settings.yourData}</Text>
       <Card style={styles.menu}>
         <Pressable style={styles.row} onPress={exportData}>
-          <View style={styles.rowTextBlock}>
-            <Text style={styles.rowText}>{t.backup.export}</Text>
-            <Text style={styles.rowHint}>{t.backup.exportHint}</Text>
-          </View>
+          <Text style={styles.rowText}>{t.backup.export}</Text>
           <Icon name="chevronRight" color={colors.textMuted} />
         </Pressable>
         <Pressable style={styles.row} onPress={importData}>
-          <View style={styles.rowTextBlock}>
-            <Text style={styles.rowText}>{t.backup.import}</Text>
-            <Text style={styles.rowHint}>{t.backup.importHint}</Text>
-          </View>
+          <Text style={styles.rowText}>{t.backup.import}</Text>
           <Icon name="chevronRight" color={colors.textMuted} />
         </Pressable>
       </Card>
@@ -179,10 +173,6 @@ const styles = StyleSheet.create({
     fontSize: fontSize.medium,
     fontFamily: fonts.body,
     color: colors.text,
-  },
-  rowTextBlock: {
-    flex: 1,
-    gap: 2,
   },
   rowHint: {
     fontSize: fontSize.body,

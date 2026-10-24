@@ -63,9 +63,7 @@ export function WeekdayGoalDialog({
   return (
     <Dialog visible={visible} title={t.weekdayGoal.title(weekdayName)} onClose={onClose}>
       <Text style={styles.note}>
-        {isPast
-          ? t.weekdayGoal.notePast(weekdayName)
-          : t.weekdayGoal.noteFuture(weekdayName)}
+        {isPast ? t.weekdayGoal.notePast(weekdayName) : t.weekdayGoal.noteFuture}
       </Text>
 
       {goals.length === 0 ? (

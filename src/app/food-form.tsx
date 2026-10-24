@@ -170,8 +170,6 @@ export default function FoodForm() {
         </Card>
 
         <Card style={styles.section}>
-          <Text style={styles.hint}>{t.foodForm.perReference}</Text>
-
           <TextField
             label={t.foodForm.calories}
             value={calories}
@@ -246,11 +244,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: spacing.sm,
-  },
-  hint: {
-    fontSize: fontSize.body,
-    fontFamily: fonts.body,
-    color: colors.textSecondary,
   },
   input: {
     ...inputBox,

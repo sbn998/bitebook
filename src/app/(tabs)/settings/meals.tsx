@@ -83,7 +83,6 @@ export default function MealLabels() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>{t.meals.emptyTitle}</Text>
-            <Text style={styles.emptyText}>{t.meals.emptyText}</Text>
           </View>
         }
         renderItem={({ item: meal }) => (
@@ -153,12 +152,6 @@ const styles = StyleSheet.create({
     fontSize: fontSize.medium,
     fontFamily: fonts.title,
     color: colors.text,
-  },
-  emptyText: {
-    fontSize: fontSize.body,
-    fontFamily: fonts.body,
-    color: colors.textSecondary,
-    textAlign: "center",
   },
   name: {
     fontSize: fontSize.medium,

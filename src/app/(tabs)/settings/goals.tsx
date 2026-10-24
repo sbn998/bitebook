@@ -51,29 +51,30 @@ export default function Goals() {
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.screen}>
       <Stack.Screen options={{ headerRight: () => <HeaderButton title={t.common.add} onPress={() => router.push("/goal-form")} /> }} />
 
-      <Text style={styles.sectionTitle}>{t.goals.weeklyPlan}</Text>
-      <Card style={styles.plan}>
-        {goals.length === 0 ? (
-          <Text style={styles.hint}>{t.goals.planHint}</Text>
-        ) : (
-          WEEKDAY_NUMBERS.map((weekday) => {
-            const goalId = weekdayGoals.find((w) => w.weekday === weekday)?.goal_id;
-            return (
-              <View key={weekday} style={styles.planRow}>
-                <Text style={styles.weekday}>{t.weekdays[weekday - 1]}</Text>
-                <Select
-                  title={t.weekdays[weekday - 1]}
-                  options={goalOptions}
-                  value={goalId === undefined ? null : String(goalId)}
-                  onChange={(key) => changeWeekday(weekday, key)}
-                  placeholder={t.goals.noGoal}
-                  style={styles.flex}
-                />
-              </View>
-            );
-          })
-        )}
-      </Card>
+      {/* The weekly plan only makes sense once there are goals to pick from. */}
+      {goals.length > 0 && (
+        <>
+          <Text style={styles.sectionTitle}>{t.goals.weeklyPlan}</Text>
+          <Card style={styles.plan}>
+            {WEEKDAY_NUMBERS.map((weekday) => {
+              const goalId = weekdayGoals.find((w) => w.weekday === weekday)?.goal_id;
+              return (
+                <View key={weekday} style={styles.planRow}>
+                  <Text style={styles.weekday}>{t.weekdays[weekday - 1]}</Text>
+                  <Select
+                    title={t.weekdays[weekday - 1]}
+                    options={goalOptions}
+                    value={goalId === undefined ? null : String(goalId)}
+                    onChange={(key) => changeWeekday(weekday, key)}
+                    placeholder={t.goals.noGoal}
+                    style={styles.flex}
+                  />
+                </View>
+              );
+            })}
+          </Card>
+        </>
+      )}
 
       <Text style={styles.sectionTitle}>{t.goals.presets}</Text>
       {goals.length === 0 ? (
