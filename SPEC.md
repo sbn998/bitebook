@@ -30,6 +30,10 @@ A simple app that will let users log what they eat each day, so they can track h
 - Export and import saved data, so a user can keep their data if they switch phones/have to format etc. Importing will replace all existing data. Exporting will be done in a JSON file.
 - If a day doesn't have a calorie goal, the screen will show a button to add a new one or select one from the already existing ones, which will be set for the weekday goal
 - Meal entries will be manually added, order does not matter so they will just be shown in the order they were added in
+- A meal entry can be saved without foods (e.g. to plan a day and fill it in later)
+- When picking a food for a meal, its amount starts at the food's reference amount (e.g. 100 for "per 100 g")
+- When a total goes over its goal, its progress bar turns red
+- On a past day without a goal, the "no goal" button sets the weekday's goal and also gives that day the chosen goal
 
 ## Not in v1
 
