@@ -5,7 +5,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
-import { unitLabel } from "@/constants/food";
+import { Select } from "@/components/select";
+import { FOOD_TYPES, type FoodType, unitLabel } from "@/constants/food";
 import { colors, fontSize, inputBox, radius, spacing } from "@/constants/theme";
 import { type Food, getFoods } from "@/db/foods";
 import { formatNumber } from "@/utils/nutrition";
@@ -29,6 +30,7 @@ export function FoodPicker({
   const insets = useSafeAreaInsets();
   const [foods, setFoods] = useState<Food[]>([]);
   const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState<FoodType | null>(null);
 
   // Load the foods each time the picker opens.
   useEffect(() => {
@@ -38,14 +40,23 @@ export function FoodPicker({
     );
   }, [db, visible]);
 
-  // Clear the search when closing, so the picker starts fresh next time.
+  // Clear the search and filter when closing, so the picker starts fresh next time.
   function close() {
     setSearch("");
+    setTypeFilter(null);
     onClose();
   }
 
+  // Like the Foods list: only offer types that at least one saved food has, in the fixed list order.
+  const typeOptions = [
+    { key: "all" as const, label: "All types" },
+    ...FOOD_TYPES.filter((type) => foods.some((food) => food.type === type.key)),
+  ];
+
   const query = normalize(search.trim());
-  const visibleFoods = foods.filter((food) => normalize(`${food.name} ${food.brand ?? ""}`).includes(query));
+  const visibleFoods = foods
+    .filter((food) => typeFilter === null || food.type === typeFilter)
+    .filter((food) => normalize(`${food.name} ${food.brand ?? ""}`).includes(query));
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={close}>
@@ -56,15 +67,27 @@ export function FoodPicker({
           <HeaderButton title="Done" onPress={close} />
         </View>
 
-        <View style={styles.search}>
-          <Icon name="search" color={colors.textMuted} />
-          <TextInput
-            style={styles.searchInput}
-            value={search}
-            onChangeText={setSearch}
-            placeholder="Search by name or brand"
-            placeholderTextColor={colors.textMuted}
-            clearButtonMode="while-editing"
+        {/* Search and type filter share one row, half the width each. */}
+        <View style={styles.filters}>
+          <View style={[styles.search, styles.flex]}>
+            <Icon name="search" color={colors.textMuted} />
+            <TextInput
+              style={styles.searchInput}
+              value={search}
+              onChangeText={setSearch}
+              placeholder="Search"
+              placeholderTextColor={colors.textMuted}
+              clearButtonMode="while-editing"
+            />
+          </View>
+          <Select
+            title="Type"
+            options={typeOptions}
+            value={typeFilter}
+            // "All types" clears the filter, showing the placeholder again.
+            onChange={(key) => setTypeFilter(key === "all" ? null : key)}
+            placeholder="Filter by type"
+            style={styles.flex}
           />
         </View>
 
@@ -75,7 +98,7 @@ export function FoodPicker({
           contentContainerStyle={styles.list}
           ListEmptyComponent={
             <Text style={styles.empty}>
-              {foods.length === 0 ? "No foods yet. Add them in the Foods tab." : "No foods match your search"}
+              {foods.length === 0 ? "No foods yet. Add them in the Foods tab." : "No foods match your filters"}
             </Text>
           }
           renderItem={({ item: food }) => {
@@ -128,14 +151,21 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: colors.text,
   },
+  filters: {
+    flexDirection: "row",
+    gap: spacing.sm,
+    padding: spacing.lg,
+    paddingBottom: 0,
+  },
+  flex: {
+    flex: 1,
+  },
   search: {
     ...inputBox,
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
     paddingVertical: 0,
-    margin: spacing.lg,
-    marginBottom: spacing.sm,
   },
   searchInput: {
     flex: 1,
