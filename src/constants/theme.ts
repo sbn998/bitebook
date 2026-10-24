@@ -13,6 +13,7 @@ export const colors = {
   textMuted: "#9AA0A6", // Placeholders, inactive icons
   border: "#E3E5E8",
   danger: "#D64545",
+  dangerTint: "#FDECEC", // Light red background, e.g. "over the goal"
   overlay: "rgba(0, 0, 0, 0.4)", // Dims the screen behind popups
 };
 

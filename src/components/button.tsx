@@ -4,15 +4,18 @@ import { colors, fontSize, radius, spacing } from "@/constants/theme";
 
 // "primary": filled orange pill for the main action. "secondary": grey text, e.g. Cancel.
 // "danger": red text for destructive actions.
+// `disabled` greys the button out and ignores taps; show the reason nearby so the user knows why.
 export function Button({
   title,
   onPress,
   variant = "primary",
+  disabled = false,
   style,
 }: {
   title: string;
   onPress: () => void;
   variant?: "primary" | "secondary" | "danger";
+  disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 }) {
   return (
@@ -21,9 +24,12 @@ export function Button({
         styles.button,
         variant === "primary" && styles.primary,
         pressed && styles.pressed,
+        disabled && styles.disabled,
         style,
       ]}
       onPress={onPress}
+      disabled={disabled}
+      accessibilityState={{ disabled }}
     >
       <Text style={[styles.text, textStyles[variant]]}>{title}</Text>
     </Pressable>
@@ -41,6 +47,9 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.7,
+  },
+  disabled: {
+    opacity: 0.4,
   },
   text: {
     fontSize: fontSize.medium,
