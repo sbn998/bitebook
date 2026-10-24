@@ -1,7 +1,8 @@
 // Design tokens: every color, font, size and shadow used by the app, named once.
 // Screens and components use these names instead of raw values.
 
-export const colors = {
+// The light palette isn't used yet: it's kept for when the app gets a light/dark option (SPEC "Not in v1").
+export const lightColors = {
   primary: "#E8700F", // Orange: buttons, active tab, progress
   primaryText: "#B85509", // Darker orange, readable as text on white or on primaryTint
   primaryTint: "#FCEBDC", // Light orange background, e.g. type badges
@@ -17,8 +18,30 @@ export const colors = {
   overlay: "rgba(28, 25, 22, 0.45)", // Dims the screen behind popups
   // The day's calorie card: a warm orange tint, so it stands out from the white cards below.
   hero: "#FFF4E9",
-  heroTrack: "#F8DFC8", // Empty part of its progress arc and bars
+  heroTrack: "#F8DFC8", // Empty part of its progress arc and bars, and the selected tab's pill
 };
+
+// The same names with warm dark values. The orange stays the same; the colors made from it
+// (text, tints) change, because pale oranges would glow and dark orange text would disappear on dark.
+const darkColors: typeof lightColors = {
+  primary: "#E8700F",
+  primaryText: "#FF9A4A", // Lighter orange, readable as text on dark or on primaryTint
+  primaryTint: "#3A2515", // Deep orange-brown background, e.g. type badges
+  onPrimary: "#FFFFFF",
+  background: "#14110F", // Warm near-black screen background
+  surface: "#1F1B18", // Cards stand out by being lighter, since shadows barely show on dark
+  text: "#F3EEE8",
+  textSecondary: "#A89F96",
+  textMuted: "#6F675F",
+  border: "#2E2925",
+  danger: "#F06A5E", // Brighter red, readable on dark
+  dangerTint: "#3A1C1A",
+  overlay: "rgba(0, 0, 0, 0.6)",
+  hero: "#2A1E15",
+  heroTrack: "#4A3220",
+};
+
+export const colors = darkColors;
 
 // Each font has one job: Archivo for titles, Barlow Condensed for numbers, DM Sans for everything else.
 // Custom fonts come in one file per weight, so pick the weight here instead of using fontWeight.
@@ -55,9 +78,16 @@ export const fontSize = {
   title: 22,
 };
 
-export const shadow = {
+// Like the palettes: the light shadow is kept for the future light/dark option.
+export const lightShadow = {
   card: "0px 1px 2px rgba(28, 25, 22, 0.04), 0px 6px 20px rgba(28, 25, 22, 0.06)",
 };
+
+const darkShadow: typeof lightShadow = {
+  card: "0px 1px 2px rgba(0, 0, 0, 0.3), 0px 6px 20px rgba(0, 0, 0, 0.25)",
+};
+
+export const shadow = darkShadow;
 
 // Header and background look for every Stack navigator in the app.
 export const stackScreenOptions = {
