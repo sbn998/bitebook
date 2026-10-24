@@ -2,10 +2,11 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
-import { Button } from "@/components/button";
+import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
+import { ConfirmDialog } from "@/components/dialog";
 import { Select } from "@/components/select";
 import { fieldStyles, TextField } from "@/components/text-field";
 import { FOOD_TYPES, type FoodType, UNITS, type Unit } from "@/constants/food";
@@ -47,6 +48,7 @@ export default function FoodForm() {
   const [calories, setCalories] = useState("");
   const [macros, setMacros] = useState<Record<MacroKey, string>>({ protein: "", carbs: "", fat: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const headerHeight = useHeaderHeight();
 
   // In edit mode, load the food once and fill in the fields.
@@ -119,19 +121,11 @@ export default function FoodForm() {
     router.back();
   }
 
-  function confirmDelete() {
+  async function deleteAndClose() {
     if (id === null) return;
-    Alert.alert(`Delete ${name}?`, "This can't be undone.", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          await deleteFood(db, id);
-          router.back();
-        },
-      },
-    ]);
+    setConfirmingDelete(false);
+    await deleteFood(db, id);
+    router.back();
   }
 
   const title = <Stack.Screen options={{ title: id === null ? "Add food" : "Edit food" }} />;
@@ -215,9 +209,27 @@ export default function FoodForm() {
           </View>
         </Card>
 
-        <Button title="Save" onPress={save} />
-        {id !== null && <Button title="Delete" variant="danger" onPress={confirmDelete} />}
+        <View style={buttonRowStyles.row}>
+          {id !== null && (
+            <Button
+              title="Delete"
+              variant="danger"
+              onPress={() => setConfirmingDelete(true)}
+              style={buttonRowStyles.button}
+            />
+          )}
+          <Button title="Save" onPress={save} style={buttonRowStyles.button} />
+        </View>
       </ScrollView>
+
+      <ConfirmDialog
+        visible={confirmingDelete}
+        title={`Delete ${name}?`}
+        message="This can't be undone."
+        confirmTitle="Delete"
+        onConfirm={deleteAndClose}
+        onCancel={() => setConfirmingDelete(false)}
+      />
     </KeyboardAvoidingView>
   );
 }
