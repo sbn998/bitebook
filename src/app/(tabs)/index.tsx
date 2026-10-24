@@ -1,20 +1,159 @@
-import { Text, View, StyleSheet } from "react-native";
+import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import { useFocusEffect } from "expo-router";
+import { useSQLiteContext } from "expo-sqlite";
+import { useCallback, useState } from "react";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { colors } from "@/constants/theme";
+import { Button } from "@/components/button";
+import { DaySummary } from "@/components/day-summary";
+import { Dialog } from "@/components/dialog";
+import { Icon } from "@/components/icon";
+import { MealEntryCard } from "@/components/meal-entry-card";
+import { colors, fontSize, spacing } from "@/constants/theme";
+import { type DayGoal, getDayGoal } from "@/db/days";
+import { addMealEntry, getDayEntries, type MealEntry, sumNutrition } from "@/db/entries";
+import { getFoods } from "@/db/foods";
+import { getMeals } from "@/db/meals";
+import { addDays, dayTitle, longDate, parseDateString, toDateString, todayString, weekdayOf } from "@/utils/date";
 
-export default function Index() {
+export default function Main() {
+  const db = useSQLiteContext();
+  const insets = useSafeAreaInsets();
+  const [date, setDate] = useState(todayString);
+  const [entries, setEntries] = useState<MealEntry[]>([]);
+  const [goal, setGoal] = useState<DayGoal | null>(null);
+  // iOS shows the calendar inside our own dialog; Android opens the phone's calendar popup.
+  const [showIosCalendar, setShowIosCalendar] = useState(false);
+  const today = todayString();
+
+  const load = useCallback(() => {
+    getDayEntries(db, date).then(setEntries);
+    getDayGoal(db, date, weekdayOf(date)).then(setGoal);
+  }, [db, date]);
+
+  // Reload when the screen comes into view (e.g. after changing goals) and when the date changes.
+  useFocusEffect(load);
+
+  function openCalendar() {
+    if (Platform.OS === "android") {
+      DateTimePickerAndroid.open({
+        value: parseDateString(date),
+        mode: "date",
+        onChange: (event, picked) => {
+          if (event.type === "set" && picked) setDate(toDateString(picked));
+        },
+      });
+    } else {
+      setShowIosCalendar(true);
+    }
+  }
+
+  // TEMPORARY: adds a meal with up to two foods, until the Add meal screen exists (part C).
+  async function addSampleMeal() {
+    const [meals, foods] = await Promise.all([getMeals(db), getFoods(db)]);
+    if (meals.length === 0) return;
+    const sampleFoods = foods.slice(0, 2).map((food) => ({ food, quantity: food.reference_amount }));
+    await addMealEntry(db, date, weekdayOf(date), meals[0], sampleFoods);
+    load();
+  }
+
+  const goalName = goal ? ` · ${goal.name}` : "";
+  const dayTotals = sumNutrition(entries.flatMap((entry) => entry.foods));
+
   return (
-    <View style={styles.container}>
-      <Text>Main</Text>
+    <View style={styles.screen}>
+      <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
+        <Pressable onPress={() => setDate(addDays(date, -1))} hitSlop={spacing.sm} accessibilityLabel="Previous day">
+          <Icon name="chevronLeft" size={24} />
+        </Pressable>
+
+        {/* Tapping the title jumps back to today. */}
+        <Pressable style={styles.title} onPress={() => setDate(today)} accessibilityLabel="Go to today">
+          <Text style={styles.titleText}>{dayTitle(date, today)}</Text>
+          <Text style={styles.subtitle} numberOfLines={1}>
+            {longDate(date)}
+            {goalName}
+          </Text>
+        </Pressable>
+
+        <View style={styles.headerRight}>
+          <Pressable onPress={openCalendar} hitSlop={spacing.sm} accessibilityLabel="Pick a date">
+            <Icon name="calendar" size={22} color={colors.primaryText} />
+          </Pressable>
+          <Pressable onPress={() => setDate(addDays(date, 1))} hitSlop={spacing.sm} accessibilityLabel="Next day">
+            <Icon name="chevronRight" size={24} />
+          </Pressable>
+        </View>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.content}>
+        <DaySummary goal={goal} totals={dayTotals} />
+
+        {entries.length === 0 ? (
+          <Text style={styles.empty}>No meals yet</Text>
+        ) : (
+          entries.map((entry) => <MealEntryCard key={entry.id} entry={entry} />)
+        )}
+
+        {/* TEMPORARY: replaced by the Add meal button in part C. */}
+        <Button title="Add sample meal (temporary)" variant="secondary" onPress={addSampleMeal} />
+      </ScrollView>
+
+      <Dialog visible={showIosCalendar} title="Pick a date" onClose={() => setShowIosCalendar(false)}>
+        <DateTimePicker
+          value={parseDateString(date)}
+          mode="date"
+          display="inline"
+          accentColor={colors.primary}
+          onChange={(_event, picked) => {
+            if (picked) setDate(toDateString(picked));
+            setShowIosCalendar(false);
+          }}
+        />
+      </Dialog>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+  },
+  title: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.background,
+  },
+  titleText: {
+    fontSize: fontSize.large,
+    fontWeight: "600",
+    color: colors.text,
+  },
+  subtitle: {
+    fontSize: fontSize.small,
+    color: colors.textSecondary,
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.lg,
+  },
+  content: {
+    padding: spacing.lg,
+    gap: spacing.md,
+  },
+  empty: {
+    textAlign: "center",
+    marginTop: spacing.lg,
+    color: colors.textSecondary,
   },
 });
