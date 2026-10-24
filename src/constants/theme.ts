@@ -1,20 +1,36 @@
-// Design tokens: every color, size and shadow used by the app, named once.
+// Design tokens: every color, font, size and shadow used by the app, named once.
 // Screens and components use these names instead of raw values.
 
 export const colors = {
-  primary: "#E8700F", // Orange: buttons, active tab
+  primary: "#E8700F", // Orange: buttons, active tab, progress
   primaryText: "#B85509", // Darker orange, readable as text on white or on primaryTint
-  primaryTint: "#FFF0E3", // Light orange background, e.g. type badges
+  primaryTint: "#FCEBDC", // Light orange background, e.g. type badges
   onPrimary: "#FFFFFF", // Text on a primary background
-  background: "#F4F5F7", // Screen background, so white cards stand out
+  background: "#F5F2ED", // Warm off-white screen background, so white cards stand out
   surface: "#FFFFFF", // Cards, inputs, headers
-  text: "#1F2328",
-  textSecondary: "#6B7280",
-  textMuted: "#9AA0A6", // Placeholders, inactive icons
-  border: "#E3E5E8",
+  text: "#1C1916", // Warm near-black
+  textSecondary: "#6E6760",
+  textMuted: "#A39C94", // Placeholders, inactive icons
+  border: "#E8E3DC",
   danger: "#D64545",
   dangerTint: "#FDECEC", // Light red background, e.g. "over the goal"
-  overlay: "rgba(0, 0, 0, 0.4)", // Dims the screen behind popups
+  overlay: "rgba(28, 25, 22, 0.45)", // Dims the screen behind popups
+  // The dark "ink" card that holds the day's calorie goal, so it stands out from every other card.
+  ink: "#1C1916",
+  onInk: "#F5F2ED",
+  onInkMuted: "rgba(245, 242, 237, 0.55)",
+  inkTrack: "rgba(245, 242, 237, 0.12)", // Empty part of a progress ring or bar on ink
+};
+
+// Each font has one job: Archivo for titles, Barlow Condensed for numbers, DM Sans for everything else.
+// Custom fonts come in one file per weight, so pick the weight here instead of using fontWeight.
+export const fonts = {
+  title: "Archivo_700Bold",
+  number: "BarlowCondensed_700Bold", // Big numbers, like the day's calories
+  numberMedium: "BarlowCondensed_500Medium", // Small numbers next to text
+  body: "DMSans_400Regular",
+  bodyMedium: "DMSans_500Medium",
+  bodyBold: "DMSans_600SemiBold",
 };
 
 export const spacing = {
@@ -28,7 +44,8 @@ export const spacing = {
 
 export const radius = {
   input: 12,
-  card: 16,
+  button: 14,
+  card: 20,
   pill: 999, // Fully rounded ends
 };
 
@@ -37,17 +54,18 @@ export const fontSize = {
   body: 14,
   medium: 16,
   large: 18,
+  title: 22,
 };
 
 export const shadow = {
-  card: "0px 2px 8px rgba(16, 24, 40, 0.08)",
+  card: "0px 1px 2px rgba(28, 25, 22, 0.04), 0px 6px 20px rgba(28, 25, 22, 0.06)",
 };
 
 // Header and background look for every Stack navigator in the app.
 export const stackScreenOptions = {
-  headerStyle: { backgroundColor: colors.surface },
-  headerTintColor: colors.primaryText, // Back button
-  headerTitleStyle: { color: colors.text },
+  headerStyle: { backgroundColor: colors.background },
+  headerTintColor: colors.text, // Back button
+  headerTitleStyle: { color: colors.text, fontFamily: fonts.title, fontSize: fontSize.title },
   headerShadowVisible: false,
   contentStyle: { backgroundColor: colors.background },
 };

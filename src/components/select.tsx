@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { Icon } from "@/components/icon";
-import { colors, fontSize, inputBox, radius, shadow, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, inputBox, radius, shadow, spacing } from "@/constants/theme";
 
 // A box that looks like a text field and opens a list of options when tapped.
 export function Select<K extends string>({
@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: fontSize.medium,
+    fontFamily: fonts.body,
     color: colors.text,
   },
   // Long labels are cut off with "…" instead of wrapping onto a second line.
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
   },
   sheetTitle: {
     fontSize: fontSize.large,
-    fontWeight: "600",
+    fontFamily: fonts.title,
     color: colors.text,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
@@ -129,6 +130,6 @@ const styles = StyleSheet.create({
   },
   optionSelectedText: {
     color: colors.primaryText,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
   },
 });

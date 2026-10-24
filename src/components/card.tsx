@@ -2,7 +2,7 @@ import { StyleSheet, View, type ViewProps } from "react-native";
 
 import { colors, radius, shadow, spacing } from "@/constants/theme";
 
-// A white, rounded box with a soft shadow, used for list items and form sections.
+// A white, rounded box with a soft, layered shadow, used for list items and form sections.
 export function Card({ style, ...props }: ViewProps) {
   return <View style={[styles.card, style]} {...props} />;
 }

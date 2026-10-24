@@ -1,6 +1,6 @@
 import { NativeTabs } from "expo-router/native-tabs";
 
-import { colors } from "@/constants/theme";
+import { colors, fonts } from "@/constants/theme";
 import { useTranslation } from "@/i18n";
 
 // Tabs appear in the order listed here, so Main sits in the middle.
@@ -9,9 +9,12 @@ export default function TabsLayout() {
 
   return (
     <NativeTabs
-      backgroundColor={colors.surface}
+      backgroundColor={colors.background}
       iconColor={{ default: colors.textMuted, selected: colors.primary }}
-      labelStyle={{ default: { color: colors.textMuted }, selected: { color: colors.primaryText } }}
+      labelStyle={{
+        default: { color: colors.textMuted, fontFamily: fonts.bodyMedium },
+        selected: { color: colors.text, fontFamily: fonts.bodyBold },
+      }}
       indicatorColor={colors.primaryTint}
       // No ripple "pulse" when tapping a tab on Android.
       rippleColor="transparent"

@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, Vie
 
 import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
-import { colors, fontSize, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, spacing } from "@/constants/theme";
 import { useTranslation } from "@/i18n";
 
 // A small popup card in the middle of the screen, over a dimmed background.
@@ -75,6 +75,7 @@ export function ConfirmDialog({
 const styles = StyleSheet.create({
   message: {
     fontSize: fontSize.medium,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   overlay: {
@@ -87,8 +88,8 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
   },
   title: {
-    fontSize: fontSize.large,
-    fontWeight: "600",
+    fontSize: fontSize.title,
+    fontFamily: fonts.title,
     color: colors.text,
   },
 });

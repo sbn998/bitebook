@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-import { colors, fontSize, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, spacing } from "@/constants/theme";
 
 // Orange text button for a screen's header, e.g. "Add".
 export function HeaderButton({ title, onPress }: { title: string; onPress: () => void }) {
@@ -14,7 +14,7 @@ export function HeaderButton({ title, onPress }: { title: string; onPress: () =>
 const styles = StyleSheet.create({
   text: {
     fontSize: fontSize.medium,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
     color: colors.primaryText,
   },
 });

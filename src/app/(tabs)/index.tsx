@@ -13,7 +13,7 @@ import { FoodPicker } from "@/components/food-picker";
 import { Icon } from "@/components/icon";
 import { MealEntryCard } from "@/components/meal-entry-card";
 import { WeekdayGoalDialog } from "@/components/weekday-goal-dialog";
-import { colors, fontSize, spacing } from "@/constants/theme";
+import { colors, fontSize, fonts, spacing } from "@/constants/theme";
 import { type DayGoal, getDayGoal } from "@/db/days";
 import {
   addFoodEntry,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
   },
@@ -227,12 +227,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   titleText: {
-    fontSize: fontSize.large,
-    fontWeight: "600",
+    fontSize: fontSize.title,
+    fontFamily: fonts.title,
     color: colors.text,
   },
   subtitle: {
     fontSize: fontSize.small,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
   headerRight: {
@@ -247,6 +248,7 @@ const styles = StyleSheet.create({
   empty: {
     textAlign: "center",
     marginTop: spacing.lg,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
 });

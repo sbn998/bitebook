@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { type StyleProp, StyleSheet, Text, TextInput, type TextInputProps, View, type ViewStyle } from "react-native";
 
-import { colors, fontSize, inputBox } from "@/constants/theme";
+import { colors, fontSize, fonts, inputBox } from "@/constants/theme";
 
 // A label, a text input and an optional error message below it.
 // `labelRight` shows something next to the label (e.g. a unit switch), `hint` a grey note under the input.
@@ -43,11 +43,12 @@ export const fieldStyles = StyleSheet.create({
   },
   label: {
     fontSize: fontSize.body,
-    fontWeight: "600",
-    color: colors.text,
+    fontFamily: fonts.bodyMedium,
+    color: colors.textSecondary,
   },
   error: {
     fontSize: fontSize.small,
+    fontFamily: fonts.body,
     color: colors.danger,
   },
 });
@@ -62,6 +63,7 @@ const styles = StyleSheet.create({
   input: {
     ...inputBox,
     fontSize: fontSize.medium,
+    fontFamily: fonts.body,
     color: colors.text,
   },
   inputError: {
@@ -69,6 +71,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     fontSize: fontSize.small,
+    fontFamily: fonts.body,
     color: colors.textSecondary,
   },
 });
