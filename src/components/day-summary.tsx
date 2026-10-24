@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { Card } from "@/components/card";
+import { HeaderButton } from "@/components/header-button";
 import { colors, fontSize, radius, spacing } from "@/constants/theme";
 import type { DayGoal } from "@/db/days";
 import type { Nutrition } from "@/db/entries";
@@ -23,7 +24,18 @@ function ProgressBar({ value, target, thin }: { value: number; target: number; t
 }
 
 // The day's totals compared with its goal: calories first, then each macro.
-export function DaySummary({ goal, totals }: { goal: DayGoal | null; totals: Nutrition }) {
+// Without a goal, it shows `setGoalLabel` (e.g. "Set a goal for Saturdays") as a link calling `onSetGoal`.
+export function DaySummary({
+  goal,
+  totals,
+  setGoalLabel,
+  onSetGoal,
+}: {
+  goal: DayGoal | null;
+  totals: Nutrition;
+  setGoalLabel: string;
+  onSetGoal: () => void;
+}) {
   const kcalLeft = goal ? goal.calories - totals.calories : 0;
 
   return (
@@ -31,12 +43,17 @@ export function DaySummary({ goal, totals }: { goal: DayGoal | null; totals: Nut
       <View style={styles.caloriesRow}>
         <Text style={styles.calories}>{format(totals.calories)}</Text>
         <Text style={[styles.secondary, goal && kcalLeft < 0 && styles.overText]}>
-          {goal
-            ? `of ${format(goal.calories)} kcal · ${format(Math.abs(kcalLeft))} ${kcalLeft < 0 ? "over" : "left"}`
-            : "kcal · no goal for this day"}
+          {goal ? `of ${format(goal.calories)} kcal · ${format(Math.abs(kcalLeft))} ${kcalLeft < 0 ? "over" : "left"}` : "kcal"}
         </Text>
       </View>
-      {goal && <ProgressBar value={totals.calories} target={goal.calories} />}
+      {goal ? (
+        <ProgressBar value={totals.calories} target={goal.calories} />
+      ) : (
+        <View style={styles.noGoal}>
+          <Text style={styles.secondary}>No goal for this day</Text>
+          <HeaderButton title={setGoalLabel} onPress={onSetGoal} />
+        </View>
+      )}
 
       <View style={styles.macros}>
         {MACRO_FIELDS.map(({ key, name }) => {
@@ -84,6 +101,13 @@ const styles = StyleSheet.create({
   },
   overText: {
     color: colors.danger,
+  },
+  noGoal: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: spacing.sm,
   },
   bar: {
     height: 8,

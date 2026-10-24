@@ -87,7 +87,15 @@ export function getWeekdayGoals(db: SQLiteDatabase) {
 }
 
 // Sets (or with null, removes) a weekday's goal, and updates today and future days of that weekday.
-export function setWeekdayGoal(db: SQLiteDatabase, weekday: number, goalId: number | null, today: string) {
+// `fillDay` (YYYY-MM-DD, optional) also gives that one day the goal, but only if it has none,
+// so a past day without a goal can get one without any past goal ever being overwritten.
+export function setWeekdayGoal(
+  db: SQLiteDatabase,
+  weekday: number,
+  goalId: number | null,
+  today: string,
+  fillDay?: string
+) {
   return db.withTransactionAsync(async () => {
     if (goalId === null) {
       await db.runAsync("DELETE FROM weekday_goals WHERE weekday = ?", weekday);
@@ -109,5 +117,15 @@ export function setWeekdayGoal(db: SQLiteDatabase, weekday: number, goalId: numb
       today,
       weekday
     );
+    if (fillDay) {
+      await db.runAsync(
+        `UPDATE days
+         SET (goal_id, goal_name, goal_calories, goal_protein, goal_carbs, goal_fat) =
+             (SELECT id, name, calories, protein, carbs, fat FROM goals WHERE id = ?)
+         WHERE date = ? AND goal_name IS NULL`,
+        goalId,
+        fillDay
+      );
+    }
   });
 }

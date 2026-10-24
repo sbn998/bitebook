@@ -12,7 +12,9 @@ import { FoodEntryDialog } from "@/components/food-entry-dialog";
 import { FoodPicker } from "@/components/food-picker";
 import { Icon } from "@/components/icon";
 import { MealEntryCard } from "@/components/meal-entry-card";
+import { WeekdayGoalDialog } from "@/components/weekday-goal-dialog";
 import { colors, fontSize, spacing } from "@/constants/theme";
+import { weekdayLabel } from "@/constants/weekdays";
 import { type DayGoal, getDayGoal } from "@/db/days";
 import {
   addFoodEntry,
@@ -39,6 +41,7 @@ export default function Main() {
   const [pickingForMealId, setPickingForMealId] = useState<number | null>(null);
   const [editingFood, setEditingFood] = useState<FoodEntry | null>(null);
   const [deletingMeal, setDeletingMeal] = useState<MealEntry | null>(null);
+  const [choosingGoal, setChoosingGoal] = useState(false);
   const today = todayString();
 
   const load = useCallback(() => {
@@ -132,7 +135,12 @@ export default function Main() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <DaySummary goal={goal} totals={dayTotals} />
+        <DaySummary
+          goal={goal}
+          totals={dayTotals}
+          setGoalLabel={`Set a goal for ${weekdayLabel(weekdayOf(date))}s`}
+          onSetGoal={() => setChoosingGoal(true)}
+        />
 
         {entries.length === 0 ? (
           <Text style={styles.empty}>No meals yet</Text>
@@ -188,6 +196,14 @@ export default function Main() {
         confirmTitle="Delete"
         onConfirm={deleteMeal}
         onCancel={() => setDeletingMeal(null)}
+      />
+
+      <WeekdayGoalDialog
+        visible={choosingGoal}
+        date={date}
+        today={today}
+        onClose={() => setChoosingGoal(false)}
+        onChanged={load}
       />
     </View>
   );

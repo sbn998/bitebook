@@ -10,7 +10,7 @@ import { ConfirmDialog } from "@/components/dialog";
 import { TextField } from "@/components/text-field";
 import { colors, fontSize, radius, spacing } from "@/constants/theme";
 import { weekdayLabel } from "@/constants/weekdays";
-import { addGoal, deleteGoal, getGoal, getWeekdayGoals, updateGoal } from "@/db/goals";
+import { addGoal, deleteGoal, getGoal, getWeekdayGoals, setWeekdayGoal, updateGoal } from "@/db/goals";
 import { todayString } from "@/utils/date";
 import {
   caloriesFromMacros,
@@ -40,7 +40,9 @@ function deleteMessage(weekdays: number[]) {
 export default function GoalForm() {
   const db = useSQLiteContext();
   // With an id (/goal-form?id=3) the form edits that goal; without one it adds a new goal.
-  const params = useLocalSearchParams<{ id?: string }>();
+  // From the Main screen's "Set a goal" popup, a new goal is also assigned to `assignWeekday`,
+  // and `fillDay` (a past day without a goal) gets it too.
+  const params = useLocalSearchParams<{ id?: string; assignWeekday?: string; fillDay?: string }>();
   const id = params.id ? Number(params.id) : null;
   const [loaded, setLoaded] = useState(id === null);
   const [name, setName] = useState("");
@@ -172,8 +174,14 @@ export default function GoalForm() {
     if (Object.keys(newErrors).length > 0 || goalKcal === null) return;
 
     const goal = { name: name.trim(), calories: goalKcal, ...macroValues };
-    if (id === null) await addGoal(db, goal);
-    else await updateGoal(db, id, goal, todayString());
+    if (id === null) {
+      const result = await addGoal(db, goal);
+      if (params.assignWeekday) {
+        await setWeekdayGoal(db, Number(params.assignWeekday), result.lastInsertRowId, todayString(), params.fillDay);
+      }
+    } else {
+      await updateGoal(db, id, goal, todayString());
+    }
     router.back();
   }
 
