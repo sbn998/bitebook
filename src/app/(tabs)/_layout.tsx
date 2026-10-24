@@ -15,7 +15,8 @@ export default function TabsLayout() {
         default: { color: colors.textMuted, fontFamily: fonts.bodyMedium },
         selected: { color: colors.text, fontFamily: fonts.bodyBold },
       }}
-      indicatorColor={colors.primaryTint}
+      // The pill behind the selected icon has the same color as the empty part of the calorie gauge on Main.
+      indicatorColor={colors.heroTrack}
       // No ripple "pulse" when tapping a tab on Android.
       rippleColor="transparent"
     >
