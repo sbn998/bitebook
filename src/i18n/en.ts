@@ -102,6 +102,23 @@ export const en = {
     shareTitle: "Save your data",
     exportFailed: "Couldn't export your data. Try again.",
     ok: "OK",
+    import: "Import data",
+    importHint: "Replace all your data with a file you exported.",
+    replaceTitle: "Replace all your data?",
+    // e.g. "42 foods, 4 meal labels, 3 goals and 120 days"
+    summary: (counts: { foods: number; meals: number; goals: number; days: number }) => {
+      const part = (n: number, one: string, other: string) => `${n} ${n === 1 ? one : other}`;
+      return `${part(counts.foods, "food", "foods")}, ${part(counts.meals, "meal label", "meal labels")}, ${part(counts.goals, "goal", "goals")} and ${part(counts.days, "day", "days")}`;
+    },
+    yourDataNow: "Your data now",
+    inTheFile: "In the file",
+    replaceWarning: "Everything you have now will be replaced. This can't be undone.",
+    exportFirst: "Export my current data first",
+    replace: "Replace",
+    imported: "Your data was imported.",
+    importFailed: "This file couldn't be imported. Your data wasn't changed.",
+    invalidFile: "This isn't a Macro Tracker backup file.",
+    newerFile: "This file was made with a newer version of the app. Update the app to import it.",
   },
   // Shown in their own language in both files, so each is recognizable.
   languages: {

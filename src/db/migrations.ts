@@ -1,6 +1,7 @@
 import type { SQLiteDatabase } from "expo-sqlite";
 
-const DATABASE_VERSION = 2;
+// Also used to refuse backup files made by a newer version of the app.
+export const DATABASE_VERSION = 2;
 
 // Runs every time the app opens the database, before any screen is shown.
 export async function migrateDbIfNeeded(db: SQLiteDatabase) {

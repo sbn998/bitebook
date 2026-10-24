@@ -24,3 +24,14 @@ export async function shareBackup(db: SQLiteDatabase, dialogTitle: string) {
     ...(Platform.OS === "android" ? { mimeType: "application/json" } : {}),
   });
 }
+
+// Opens the phone's file picker and returns the chosen file's text, or null if the user cancels.
+// Any file type is allowed: cloud drives don't always label .json files as JSON, and the content
+// is checked afterwards anyway (parseBackup).
+// The file system's own picker is used because the file it returns comes with permission to read it.
+// (A copy made by expo-document-picker lands in Expo Go's shared cache, which the app isn't allowed to read.)
+export async function pickBackupFile() {
+  const picked = await File.pickFileAsync({ mimeTypes: "*/*" });
+  if (picked.canceled) return null;
+  return picked.result.text();
+}

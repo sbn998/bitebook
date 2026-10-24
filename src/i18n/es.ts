@@ -98,6 +98,22 @@ export const es: Strings = {
     shareTitle: "Guardar tus datos",
     exportFailed: "No se han podido exportar tus datos. Inténtalo de nuevo.",
     ok: "Aceptar",
+    import: "Importar datos",
+    importHint: "Sustituye todos tus datos por los de un archivo exportado.",
+    replaceTitle: "¿Sustituir todos tus datos?",
+    summary: (counts: { foods: number; meals: number; goals: number; days: number }) => {
+      const part = (n: number, one: string, other: string) => `${n} ${n === 1 ? one : other}`;
+      return `${part(counts.foods, "alimento", "alimentos")}, ${part(counts.meals, "comida", "comidas")}, ${part(counts.goals, "objetivo", "objetivos")} y ${part(counts.days, "día", "días")}`;
+    },
+    yourDataNow: "Tus datos ahora",
+    inTheFile: "En el archivo",
+    replaceWarning: "Se sustituirá todo lo que tienes ahora. Esta acción no se puede deshacer.",
+    exportFirst: "Exportar primero mis datos actuales",
+    replace: "Sustituir",
+    imported: "Tus datos se han importado.",
+    importFailed: "No se ha podido importar este archivo. Tus datos no han cambiado.",
+    invalidFile: "Este archivo no es una copia de seguridad de Macro Tracker.",
+    newerFile: "Este archivo se creó con una versión más reciente de la app. Actualiza la app para importarlo.",
   },
   languages: {
     en: "English",
