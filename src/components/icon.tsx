@@ -9,6 +9,7 @@ const ICONS = {
   sortDescending: { ios: "arrow.up", android: "arrow_upward" },
   reset: { ios: "arrow.counterclockwise", android: "refresh" },
   chevronDown: { ios: "chevron.down", android: "expand_more" },
+  chevronRight: { ios: "chevron.right", android: "chevron_right" },
 } satisfies Record<string, SymbolViewProps["name"]>;
 
 export type IconName = keyof typeof ICONS;

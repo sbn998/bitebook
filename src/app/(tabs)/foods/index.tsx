@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Card } from "@/components/card";
+import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { IconButton } from "@/components/icon-button";
 import { Select } from "@/components/select";
@@ -76,15 +77,7 @@ export default function Foods() {
 
   return (
     <View style={styles.screen}>
-      <Stack.Screen
-        options={{
-          headerRight: () => (
-            <Pressable onPress={() => openForm()} hitSlop={spacing.sm}>
-              <Text style={styles.headerButton}>Add</Text>
-            </Pressable>
-          ),
-        }}
-      />
+      <Stack.Screen options={{ headerRight: () => <HeaderButton title="Add" onPress={() => openForm()} /> }} />
 
       <View style={styles.filters}>
         <View style={styles.search}>
@@ -159,11 +152,6 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
-  },
-  headerButton: {
-    fontSize: fontSize.medium,
-    fontWeight: "600",
-    color: colors.primaryText,
   },
   filters: {
     padding: spacing.lg,
