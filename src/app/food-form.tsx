@@ -2,21 +2,14 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import {
-  Alert,
-  Button,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  type TextInputProps,
-  View,
-} from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
+import { Button } from "@/components/button";
+import { Card } from "@/components/card";
 import { Select } from "@/components/select";
+import { fieldStyles, TextField } from "@/components/text-field";
 import { FOOD_TYPES, type FoodType, UNITS, type Unit } from "@/constants/food";
+import { colors, fontSize, inputBox, spacing } from "@/constants/theme";
 import { addFood, deleteFood, getFood, updateFood } from "@/db/foods";
 
 type MacroKey = "protein" | "carbs" | "fat";
@@ -151,7 +144,7 @@ export default function FoodForm() {
     // The offset accounts for the header above the form.
     // iOS handles this with automaticallyAdjustKeyboardInsets on the ScrollView.
     <KeyboardAvoidingView
-      style={styles.flex}
+      style={styles.screen}
       behavior={Platform.OS === "android" ? "height" : undefined}
       keyboardVerticalOffset={headerHeight}
     >
@@ -162,110 +155,108 @@ export default function FoodForm() {
         automaticallyAdjustKeyboardInsets
         contentContainerStyle={styles.form}
       >
-        <Field label="Name" value={name} onChangeText={setName} error={errors.name} />
-        <Field label="Brand (optional)" value={brand} onChangeText={setBrand} />
+        <Card style={styles.section}>
+          <TextField label="Name" value={name} onChangeText={setName} error={errors.name} />
+          <TextField label="Brand (optional)" value={brand} onChangeText={setBrand} />
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Type</Text>
-          <Select
-            title="Type"
-            options={FOOD_TYPES}
-            value={type}
-            onChange={setType}
-            placeholder="Choose a type"
-            hasError={!!errors.type}
-          />
-          {!!errors.type && <Text style={styles.error}>{errors.type}</Text>}
-        </View>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>Reference amount</Text>
-          <View style={styles.row}>
-            <TextInput
-              style={[styles.input, styles.flex, !!errors.reference_amount && styles.inputError]}
-              value={referenceAmount}
-              onChangeText={setReferenceAmount}
-              keyboardType="decimal-pad"
+          <View style={fieldStyles.field}>
+            <Text style={fieldStyles.label}>Type</Text>
+            <Select
+              title="Type"
+              options={FOOD_TYPES}
+              value={type}
+              onChange={setType}
+              placeholder="Choose a type"
+              hasError={!!errors.type}
             />
-            <Select title="Unit" options={UNITS} value={unit} onChange={setUnit} style={styles.flex} />
+            {!!errors.type && <Text style={fieldStyles.error}>{errors.type}</Text>}
           </View>
-          {!!errors.reference_amount && <Text style={styles.error}>{errors.reference_amount}</Text>}
-        </View>
 
-        <Text style={styles.hint}>Nutrition values are per reference amount.</Text>
+          <View style={fieldStyles.field}>
+            <Text style={fieldStyles.label}>Reference amount</Text>
+            <View style={styles.row}>
+              <TextInput
+                style={[styles.input, styles.flex, !!errors.reference_amount && styles.inputError]}
+                value={referenceAmount}
+                onChangeText={setReferenceAmount}
+                keyboardType="decimal-pad"
+              />
+              <Select title="Unit" options={UNITS} value={unit} onChange={setUnit} style={styles.flex} />
+            </View>
+            {!!errors.reference_amount && <Text style={fieldStyles.error}>{errors.reference_amount}</Text>}
+          </View>
+        </Card>
 
-        <Field
-          label="Calories (kcal)"
-          value={calories}
-          onChangeText={setCalories}
-          keyboardType="decimal-pad"
-          placeholder={hasMacros ? `${calculatedCalories} (calculated)` : undefined}
-          error={errors.calories}
-        />
+        <Card style={styles.section}>
+          <Text style={styles.hint}>Nutrition values are per reference amount.</Text>
 
-        {MACRO_FIELDS.map(({ key, label }) => (
-          <Field
-            key={key}
-            label={label}
-            value={macros[key]}
-            onChangeText={(text) => setMacros({ ...macros, [key]: text })}
+          <TextField
+            label="Calories (kcal)"
+            value={calories}
+            onChangeText={setCalories}
             keyboardType="decimal-pad"
-            placeholder="0"
-            error={errors[key]}
+            placeholder={hasMacros ? `${calculatedCalories} (calculated)` : undefined}
+            error={errors.calories}
           />
-        ))}
+
+          <View style={styles.macros}>
+            {MACRO_FIELDS.map(({ key, label }) => (
+              <TextField
+                key={key}
+                label={label}
+                value={macros[key]}
+                onChangeText={(text) => setMacros({ ...macros, [key]: text })}
+                keyboardType="decimal-pad"
+                placeholder="0"
+                error={errors[key]}
+                containerStyle={styles.flex}
+              />
+            ))}
+          </View>
+        </Card>
 
         <Button title="Save" onPress={save} />
-        {id !== null && <Button title="Delete" color="#d32f2f" onPress={confirmDelete} />}
+        {id !== null && <Button title="Delete" variant="danger" onPress={confirmDelete} />}
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-function Field({ label, error, ...inputProps }: { label: string; error?: string } & TextInputProps) {
-  return (
-    <View style={styles.field}>
-      <Text style={styles.label}>{label}</Text>
-      <TextInput style={[styles.input, !!error && styles.inputError]} {...inputProps} />
-      {!!error && <Text style={styles.error}>{error}</Text>}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   flex: {
     flex: 1,
   },
   form: {
-    padding: 16,
-    gap: 16,
+    padding: spacing.lg,
+    gap: spacing.lg,
   },
-  field: {
-    gap: 6,
+  section: {
+    gap: spacing.lg,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: spacing.md,
   },
-  label: {
-    fontWeight: "600",
+  macros: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.sm,
   },
   hint: {
-    color: "#666",
+    fontSize: fontSize.body,
+    color: colors.textSecondary,
   },
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
+    ...inputBox,
+    fontSize: fontSize.medium,
+    color: colors.text,
   },
   inputError: {
-    borderColor: "#d32f2f",
-  },
-  error: {
-    color: "#d32f2f",
+    borderColor: colors.danger,
   },
 });

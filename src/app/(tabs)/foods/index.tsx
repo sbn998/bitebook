@@ -1,10 +1,14 @@
 import { router, Stack, useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useRef, useState } from "react";
-import { Button, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
+import { Card } from "@/components/card";
+import { Icon } from "@/components/icon";
+import { IconButton } from "@/components/icon-button";
 import { Select } from "@/components/select";
 import { FOOD_TYPES, type FoodType, foodTypeLabel, unitLabel } from "@/constants/food";
+import { colors, fontSize, inputBox, radius, spacing } from "@/constants/theme";
 import { type Food, getFoods } from "@/db/foods";
 
 // Lowercase and without accents, so "platano" matches "Plátano".
@@ -73,18 +77,27 @@ export default function Foods() {
   return (
     <View style={styles.screen}>
       <Stack.Screen
-        options={{ headerRight: () => <Button title="Add" onPress={() => openForm()} /> }}
+        options={{
+          headerRight: () => (
+            <Pressable onPress={() => openForm()} hitSlop={spacing.sm}>
+              <Text style={styles.headerButton}>Add</Text>
+            </Pressable>
+          ),
+        }}
       />
 
       <View style={styles.filters}>
-        <TextInput
-          style={styles.search}
-          value={search}
-          onChangeText={setSearch}
-          placeholder="Search by name or brand"
-          placeholderTextColor="#999"
-          clearButtonMode="while-editing"
-        />
+        <View style={styles.search}>
+          <Icon name="search" color={colors.textMuted} />
+          <TextInput
+            style={styles.searchInput}
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Search by name or brand"
+            placeholderTextColor={colors.textMuted}
+            clearButtonMode="while-editing"
+          />
+        </View>
         <View style={styles.row}>
           <Select
             title="Type"
@@ -95,17 +108,13 @@ export default function Foods() {
             placeholder="Filter by type"
             style={styles.flex}
           />
-          <Pressable
-            style={styles.iconButton}
+          {/* Down arrow = A to Z (the alphabet runs down the list), up arrow = Z to A */}
+          <IconButton
+            icon={ascending ? "sortAscending" : "sortDescending"}
             onPress={() => setAscending(!ascending)}
             accessibilityLabel={ascending ? "Sorted A to Z" : "Sorted Z to A"}
-          >
-            {/* ↓ = A to Z (the alphabet runs down the list), ↑ = Z to A */}
-            <Text style={styles.iconText}>{ascending ? "↓" : "↑"}</Text>
-          </Pressable>
-          <Pressable style={styles.iconButton} onPress={resetFilters} accessibilityLabel="Reset filters">
-            <Text style={styles.iconText}>↺</Text>
-          </Pressable>
+          />
+          <IconButton icon="reset" onPress={resetFilters} accessibilityLabel="Reset filters" />
         </View>
       </View>
 
@@ -118,18 +127,24 @@ export default function Foods() {
           <Text style={styles.empty}>{foods.length === 0 ? "No foods yet" : "No foods match your filters"}</Text>
         }
         renderItem={({ item: food }) => (
-          <Pressable
-            style={styles.foodRow}
-            onPress={() => openForm(food.id)}
-          >
-            <Text style={styles.name}>{food.name}</Text>
-            <Text style={styles.details}>
-              {[food.brand, foodTypeLabel(food.type)].filter(Boolean).join(" · ")}
-            </Text>
-            <Text style={styles.details}>
-              {food.calories} kcal · P {food.protein} · C {food.carbs} · F {food.fat} per{" "}
-              {food.reference_amount} {unitLabel(food.unit)}
-            </Text>
+          <Pressable onPress={() => openForm(food.id)}>
+            <Card style={styles.card}>
+              <View style={styles.cardTop}>
+                <Text style={styles.name} numberOfLines={1}>
+                  {food.name}
+                </Text>
+                <Text style={styles.badge}>{foodTypeLabel(food.type)}</Text>
+              </View>
+              <Text style={styles.details}>
+                {[food.brand, `per ${food.reference_amount} ${unitLabel(food.unit)}`].filter(Boolean).join(" · ")}
+              </Text>
+              <View style={styles.nutrition}>
+                <Text style={styles.calories}>{food.calories} kcal</Text>
+                <Text style={styles.macro}>P {food.protein}</Text>
+                <Text style={styles.macro}>C {food.carbs}</Text>
+                <Text style={styles.macro}>F {food.fat}</Text>
+              </View>
+            </Card>
           </Pressable>
         )}
       />
@@ -140,54 +155,89 @@ export default function Foods() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    backgroundColor: colors.background,
   },
   flex: {
     flex: 1,
   },
+  headerButton: {
+    fontSize: fontSize.medium,
+    fontWeight: "600",
+    color: colors.primaryText,
+  },
   filters: {
-    padding: 16,
-    paddingBottom: 8,
-    gap: 8,
+    padding: spacing.lg,
+    paddingBottom: spacing.sm,
+    gap: spacing.sm,
   },
   row: {
     flexDirection: "row",
-    gap: 8,
+    gap: spacing.sm,
   },
   search: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    paddingHorizontal: 12,
+    ...inputBox,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingVertical: 0,
+  },
+  searchInput: {
+    flex: 1,
     paddingVertical: 10,
-    fontSize: 16,
-  },
-  iconButton: {
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-  },
-  iconText: {
-    fontSize: 18,
+    fontSize: fontSize.medium,
+    color: colors.text,
   },
   list: {
-    padding: 16,
-    paddingTop: 8,
-    gap: 12,
+    padding: spacing.lg,
+    paddingTop: spacing.sm,
+    gap: spacing.md,
   },
   empty: {
     textAlign: "center",
-    marginTop: 32,
+    marginTop: spacing.xxl,
+    color: colors.textSecondary,
   },
-  foodRow: {
-    gap: 2,
+  card: {
+    gap: spacing.xs,
+  },
+  cardTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: spacing.sm,
   },
   name: {
-    fontSize: 16,
+    flexShrink: 1,
+    fontSize: fontSize.medium,
     fontWeight: "600",
+    color: colors.text,
+  },
+  badge: {
+    fontSize: fontSize.small,
+    fontWeight: "600",
+    color: colors.primaryText,
+    backgroundColor: colors.primaryTint,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    overflow: "hidden",
   },
   details: {
-    color: "#666",
+    fontSize: fontSize.body,
+    color: colors.textSecondary,
+  },
+  nutrition: {
+    flexDirection: "row",
+    gap: spacing.md,
+    marginTop: spacing.xs,
+  },
+  calories: {
+    fontSize: fontSize.body,
+    fontWeight: "600",
+    color: colors.primaryText,
+  },
+  macro: {
+    fontSize: fontSize.body,
+    color: colors.textSecondary,
   },
 });

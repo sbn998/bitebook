@@ -1,5 +1,7 @@
 import { Text, View, StyleSheet } from "react-native";
 
+import { colors } from "@/constants/theme";
+
 export default function Settings() {
   return (
     <View style={styles.container}>
@@ -13,5 +15,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: colors.background,
   },
 });
