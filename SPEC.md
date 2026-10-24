@@ -35,6 +35,10 @@ A simple app that will let users log what they eat each day, so they can track h
 - When a total goes over its goal, its progress bar turns red
 - On a past day without a goal, the "no goal" button sets the weekday's goal and also gives that day the chosen goal
 
+## Before release
+
+- Splash screen: use the app's dark background (#14110F) and the app's own icon, instead of the Expo template's blue (#208AEF) and logo
+
 ## Not in v1
 
 - Option to add optional micronutrients to food entries
