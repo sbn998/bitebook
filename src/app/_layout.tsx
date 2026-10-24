@@ -12,6 +12,7 @@ export default function RootLayout() {
       <Stack screenOptions={stackScreenOptions}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="food-form" options={{ title: "Add food" }} />
+        <Stack.Screen name="goal-form" options={{ title: "Add goal" }} />
       </Stack>
     </SQLiteProvider>
   );
