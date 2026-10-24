@@ -10,6 +10,9 @@ import {
   type ViewStyle,
 } from "react-native";
 
+import { Icon } from "@/components/icon";
+import { colors, fontSize, inputBox, radius, shadow, spacing } from "@/constants/theme";
+
 // A box that looks like a text field and opens a list of options when tapped.
 export function Select<K extends string>({
   title,
@@ -40,7 +43,7 @@ export function Select<K extends string>({
         <Text style={[styles.text, styles.shrink, !selected && styles.placeholder]} numberOfLines={1}>
           {selected?.label ?? placeholder}
         </Text>
-        <Text style={styles.placeholder}>▾</Text>
+        <Icon name="chevronDown" color={colors.textMuted} />
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
@@ -52,19 +55,20 @@ export function Select<K extends string>({
             <FlatList
               data={options}
               keyExtractor={(option) => option.key}
-              renderItem={({ item: option }) => (
-                <Pressable
-                  style={styles.option}
-                  onPress={() => {
-                    onChange(option.key);
-                    setOpen(false);
-                  }}
-                >
-                  <Text style={[styles.text, option.key === value && styles.optionSelected]}>
-                    {option.label}
-                  </Text>
-                </Pressable>
-              )}
+              renderItem={({ item: option }) => {
+                const isSelected = option.key === value;
+                return (
+                  <Pressable
+                    style={[styles.option, isSelected && styles.optionSelected]}
+                    onPress={() => {
+                      onChange(option.key);
+                      setOpen(false);
+                    }}
+                  >
+                    <Text style={[styles.text, isSelected && styles.optionSelectedText]}>{option.label}</Text>
+                  </Pressable>
+                );
+              }}
             />
           </View>
         </View>
@@ -74,54 +78,57 @@ export function Select<K extends string>({
 }
 
 const styles = StyleSheet.create({
-  // Matches the text field style in the food form.
   select: {
+    ...inputBox,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    gap: spacing.xs,
   },
   selectError: {
-    borderColor: "#d32f2f",
+    borderColor: colors.danger,
   },
   text: {
-    fontSize: 16,
+    fontSize: fontSize.medium,
+    color: colors.text,
   },
   // Long labels are cut off with "…" instead of wrapping onto a second line.
   shrink: {
     flexShrink: 1,
   },
   placeholder: {
-    color: "#999",
+    color: colors.textMuted,
   },
   overlay: {
     flex: 1,
     justifyContent: "center",
-    padding: 32,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    padding: spacing.xxl,
+    backgroundColor: colors.overlay,
   },
   sheet: {
     maxHeight: "70%",
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    paddingVertical: 8,
+    backgroundColor: colors.surface,
+    borderRadius: radius.card,
+    padding: spacing.sm,
+    boxShadow: shadow.card,
   },
   sheetTitle: {
-    fontSize: 18,
+    fontSize: fontSize.large,
     fontWeight: "600",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    color: colors.text,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   option: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    borderRadius: radius.input,
   },
   optionSelected: {
-    color: "#208AEF",
+    backgroundColor: colors.primaryTint,
+  },
+  optionSelectedText: {
+    color: colors.primaryText,
     fontWeight: "600",
   },
 });
