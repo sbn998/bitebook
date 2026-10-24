@@ -15,11 +15,9 @@ export const colors = {
   danger: "#D64545",
   dangerTint: "#FDECEC", // Light red background, e.g. "over the goal"
   overlay: "rgba(28, 25, 22, 0.45)", // Dims the screen behind popups
-  // The dark "ink" card that holds the day's calorie goal, so it stands out from every other card.
-  ink: "#1C1916",
-  onInk: "#F5F2ED",
-  onInkMuted: "rgba(245, 242, 237, 0.55)",
-  inkTrack: "rgba(245, 242, 237, 0.12)", // Empty part of a progress ring or bar on ink
+  // The day's calorie card: a warm orange tint, so it stands out from the white cards below.
+  hero: "#FFF4E9",
+  heroTrack: "#F8DFC8", // Empty part of its progress arc and bars
 };
 
 // Each font has one job: Archivo for titles, Barlow Condensed for numbers, DM Sans for everything else.

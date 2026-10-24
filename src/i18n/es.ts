@@ -166,8 +166,10 @@ export const es: Strings = {
       count === 1 ? "También se eliminará su alimento." : `También se eliminarán sus ${count} alimentos.`,
   },
   summary: {
-    ofGoal: (goal: string, amount: string, isOver: boolean) =>
-      isOver ? `de ${goal} kcal · ${amount} de más` : `de ${goal} kcal · quedan ${amount}`,
+    kcalLeft: "kcal restantes",
+    kcalOver: "kcal de más",
+    eaten: "Consumidas",
+    goal: "Objetivo",
     noGoal: "Sin objetivo para este día",
     noTarget: "sin objetivo",
   },

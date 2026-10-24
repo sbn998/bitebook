@@ -171,7 +171,10 @@ export const en = {
     deleteMealFoods: (count: number) => `Its ${count} ${count === 1 ? "food" : "foods"} will be removed too.`,
   },
   summary: {
-    ofGoal: (goal: string, amount: string, isOver: boolean) => `of ${goal} kcal · ${amount} ${isOver ? "over" : "left"}`,
+    kcalLeft: "kcal left",
+    kcalOver: "kcal over",
+    eaten: "Eaten",
+    goal: "Goal",
     noGoal: "No goal for this day",
     noTarget: "no target",
   },
