@@ -10,9 +10,11 @@ import { HeaderButton } from "@/components/header-button";
 import { TextField } from "@/components/text-field";
 import { colors, fontSize, spacing } from "@/constants/theme";
 import { addMeal, deleteMeal, getMeals, type Meal, renameMeal } from "@/db/meals";
+import { useTranslation } from "@/i18n";
 
 export default function MealLabels() {
   const db = useSQLiteContext();
+  const { t } = useTranslation();
   const [meals, setMeals] = useState<Meal[]>([]);
   // Which dialog is open: null = closed, "new" = adding, a Meal = renaming that meal.
   const [editing, setEditing] = useState<Meal | "new" | null>(null);
@@ -41,7 +43,7 @@ export default function MealLabels() {
   async function save() {
     const trimmed = name.trim();
     if (trimmed === "") {
-      setError("Required");
+      setError(t.common.required);
       return;
     }
     // The database also rejects duplicates; checking here lets us show a clear message.
@@ -49,7 +51,7 @@ export default function MealLabels() {
       (meal) => meal !== editing && meal.name.toLocaleLowerCase() === trimmed.toLocaleLowerCase()
     );
     if (duplicate) {
-      setError("A meal with this name already exists");
+      setError(t.meals.duplicate);
       return;
     }
 
@@ -67,12 +69,12 @@ export default function MealLabels() {
   }
 
   const isEditingMeal = editing !== null && editing !== "new";
-  let dialogTitle = editing === "new" ? "Add meal" : "Edit meal";
-  if (isEditingMeal && confirmingDelete) dialogTitle = `Delete ${editing.name}?`;
+  let dialogTitle = editing === "new" ? t.meals.addTitle : t.meals.editTitle;
+  if (isEditingMeal && confirmingDelete) dialogTitle = t.common.deleteTitle(editing.name);
 
   return (
     <View style={styles.screen}>
-      <Stack.Screen options={{ headerRight: () => <HeaderButton title="Add" onPress={() => openDialog("new")} /> }} />
+      <Stack.Screen options={{ headerRight: () => <HeaderButton title={t.common.add} onPress={() => openDialog("new")} /> }} />
 
       <FlatList
         data={meals}
@@ -80,8 +82,8 @@ export default function MealLabels() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>No meal labels yet</Text>
-            <Text style={styles.emptyText}>Add the meals you eat, like Breakfast or Lunch.</Text>
+            <Text style={styles.emptyTitle}>{t.meals.emptyTitle}</Text>
+            <Text style={styles.emptyText}>{t.meals.emptyText}</Text>
           </View>
         }
         renderItem={({ item: meal }) => (
@@ -96,15 +98,15 @@ export default function MealLabels() {
       <Dialog visible={editing !== null} title={dialogTitle} onClose={closeDialog}>
         {confirmingDelete ? (
           <ConfirmBody
-            message="Meals already added to a day keep their name."
-            confirmTitle="Delete"
+            message={t.meals.deleteMessage}
+            confirmTitle={t.common.delete}
             onConfirm={deleteEditing}
             onCancel={() => setConfirmingDelete(false)}
           />
         ) : (
           <>
             <TextField
-              label="Name"
+              label={t.common.name}
               value={name}
               onChangeText={(text) => {
                 setName(text);
@@ -115,16 +117,16 @@ export default function MealLabels() {
               onSubmitEditing={save}
             />
             <View style={buttonRowStyles.row}>
-              <Button title="Cancel" variant="secondary" onPress={closeDialog} style={buttonRowStyles.button} />
+              <Button title={t.common.cancel} variant="secondary" onPress={closeDialog} style={buttonRowStyles.button} />
               {isEditingMeal && (
                 <Button
-                  title="Delete"
+                  title={t.common.delete}
                   variant="danger"
                   onPress={() => setConfirmingDelete(true)}
                   style={buttonRowStyles.button}
                 />
               )}
-              <Button title="Save" onPress={save} style={buttonRowStyles.button} />
+              <Button title={t.common.save} onPress={save} style={buttonRowStyles.button} />
             </View>
           </>
         )}

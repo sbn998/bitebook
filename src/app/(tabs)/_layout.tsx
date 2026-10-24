@@ -1,9 +1,12 @@
 import { NativeTabs } from "expo-router/native-tabs";
 
 import { colors } from "@/constants/theme";
+import { useTranslation } from "@/i18n";
 
 // Tabs appear in the order listed here, so Main sits in the middle.
 export default function TabsLayout() {
+  const { t } = useTranslation();
+
   return (
     <NativeTabs
       backgroundColor={colors.surface}
@@ -14,17 +17,17 @@ export default function TabsLayout() {
       rippleColor="transparent"
     >
       <NativeTabs.Trigger name="foods">
-        <NativeTabs.Trigger.Label>Foods</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t.tabs.foods}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="fork.knife" md="restaurant" />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Label>Main</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t.tabs.main}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="settings">
-        <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t.tabs.settings}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="gearshape.fill" md="settings" />
       </NativeTabs.Trigger>
     </NativeTabs>

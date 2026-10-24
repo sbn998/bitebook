@@ -4,6 +4,7 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, Vie
 import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
 import { colors, fontSize, spacing } from "@/constants/theme";
+import { useTranslation } from "@/i18n";
 
 // A small popup card in the middle of the screen, over a dimmed background.
 export function Dialog({
@@ -45,11 +46,13 @@ export function ConfirmBody({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <>
       <Text style={styles.message}>{message}</Text>
       <View style={buttonRowStyles.row}>
-        <Button title="Cancel" variant="secondary" onPress={onCancel} style={buttonRowStyles.button} />
+        <Button title={t.common.cancel} variant="secondary" onPress={onCancel} style={buttonRowStyles.button} />
         <Button title={confirmTitle} variant="danger" onPress={onConfirm} style={buttonRowStyles.button} />
       </View>
     </>

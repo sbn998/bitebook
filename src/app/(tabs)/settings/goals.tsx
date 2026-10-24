@@ -9,20 +9,22 @@ import { Select } from "@/components/select";
 import { colors, fontSize, spacing } from "@/constants/theme";
 import { WEEKDAYS } from "@/constants/weekdays";
 import { type Goal, getGoals, getWeekdayGoals, setWeekdayGoal, type WeekdayGoal } from "@/db/goals";
+import { type Strings, useTranslation } from "@/i18n";
 import { todayString } from "@/utils/date";
 
-// "2500 kcal" plus the macro targets that are set, e.g. "P 180 g · F 70 g".
-function macroSummary(goal: Goal) {
+// The macro targets that are set, e.g. "P 180 g · F 70 g".
+function macroSummary(goal: Goal, t: Strings) {
   const parts = [
-    goal.protein !== null && `P ${goal.protein} g`,
-    goal.carbs !== null && `C ${goal.carbs} g`,
-    goal.fat !== null && `F ${goal.fat} g`,
+    goal.protein !== null && `${t.macros.proteinShort} ${goal.protein} g`,
+    goal.carbs !== null && `${t.macros.carbsShort} ${goal.carbs} g`,
+    goal.fat !== null && `${t.macros.fatShort} ${goal.fat} g`,
   ].filter(Boolean);
-  return parts.length > 0 ? parts.join(" · ") : "Calories only";
+  return parts.length > 0 ? parts.join(" · ") : t.goals.caloriesOnly;
 }
 
 export default function Goals() {
   const db = useSQLiteContext();
+  const { t } = useTranslation();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [weekdayGoals, setWeekdayGoals] = useState<WeekdayGoal[]>([]);
 
@@ -36,7 +38,7 @@ export default function Goals() {
 
   // "none" clears the weekday's goal; the other keys are goal ids.
   const goalOptions = [
-    { key: "none", label: "No goal" },
+    { key: "none", label: t.goals.noGoal },
     ...goals.map((goal) => ({ key: String(goal.id), label: goal.name })),
   ];
 
@@ -47,24 +49,24 @@ export default function Goals() {
 
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.screen}>
-      <Stack.Screen options={{ headerRight: () => <HeaderButton title="Add" onPress={() => router.push("/goal-form")} /> }} />
+      <Stack.Screen options={{ headerRight: () => <HeaderButton title={t.common.add} onPress={() => router.push("/goal-form")} /> }} />
 
-      <Text style={styles.sectionTitle}>Weekly plan</Text>
+      <Text style={styles.sectionTitle}>{t.goals.weeklyPlan}</Text>
       <Card style={styles.plan}>
         {goals.length === 0 ? (
-          <Text style={styles.hint}>Add a goal below to plan your week.</Text>
+          <Text style={styles.hint}>{t.goals.planHint}</Text>
         ) : (
           WEEKDAYS.map((weekday) => {
             const goalId = weekdayGoals.find((w) => w.weekday === weekday.number)?.goal_id;
             return (
               <View key={weekday.number} style={styles.planRow}>
-                <Text style={styles.weekday}>{weekday.label}</Text>
+                <Text style={styles.weekday}>{t.weekdays[weekday.number - 1]}</Text>
                 <Select
-                  title={weekday.label}
+                  title={t.weekdays[weekday.number - 1]}
                   options={goalOptions}
                   value={goalId === undefined ? null : String(goalId)}
                   onChange={(key) => changeWeekday(weekday.number, key)}
-                  placeholder="No goal"
+                  placeholder={t.goals.noGoal}
                   style={styles.flex}
                 />
               </View>
@@ -73,9 +75,9 @@ export default function Goals() {
         )}
       </Card>
 
-      <Text style={styles.sectionTitle}>Goal presets</Text>
+      <Text style={styles.sectionTitle}>{t.goals.presets}</Text>
       {goals.length === 0 ? (
-        <Text style={styles.hint}>No goals yet. Tap Add to create your first one.</Text>
+        <Text style={styles.hint}>{t.goals.empty}</Text>
       ) : (
         goals.map((goal) => (
           <Pressable key={goal.id} onPress={() => router.push({ pathname: "/goal-form", params: { id: goal.id } })}>
@@ -83,7 +85,7 @@ export default function Goals() {
               <Text style={styles.name}>{goal.name}</Text>
               <View style={styles.nutrition}>
                 <Text style={styles.calories}>{goal.calories} kcal</Text>
-                <Text style={styles.macros}>{macroSummary(goal)}</Text>
+                <Text style={styles.macros}>{macroSummary(goal, t)}</Text>
               </View>
             </Card>
           </Pressable>
