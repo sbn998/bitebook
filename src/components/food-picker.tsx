@@ -6,9 +6,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
-import { FOOD_TYPES, type FoodType, unitLabel } from "@/constants/food";
+import { FOOD_TYPE_KEYS, type FoodType } from "@/constants/food";
 import { colors, fontSize, inputBox, radius, spacing } from "@/constants/theme";
 import { type Food, getFoods } from "@/db/foods";
+import { unitName, useTranslation } from "@/i18n";
 import { formatNumber } from "@/utils/nutrition";
 import { normalize } from "@/utils/search";
 
@@ -27,6 +28,7 @@ export function FoodPicker({
   pickedCounts: Record<number, number>;
 }) {
   const db = useSQLiteContext();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [foods, setFoods] = useState<Food[]>([]);
   const [search, setSearch] = useState("");
@@ -49,8 +51,11 @@ export function FoodPicker({
 
   // Like the Foods list: only offer types that at least one saved food has, in the fixed list order.
   const typeOptions = [
-    { key: "all" as const, label: "All types" },
-    ...FOOD_TYPES.filter((type) => foods.some((food) => food.type === type.key)),
+    { key: "all" as const, label: t.foods.allTypes },
+    ...FOOD_TYPE_KEYS.filter((type) => foods.some((food) => food.type === type)).map((type) => ({
+      key: type,
+      label: t.foodTypes[type],
+    })),
   ];
 
   const query = normalize(search.trim());
@@ -63,8 +68,8 @@ export function FoodPicker({
       {/* On iOS the sheet already starts below the status bar; on Android the popup covers the whole screen. */}
       <View style={[styles.screen, { paddingTop: Platform.OS === "android" ? insets.top : 0 }]}>
         <View style={styles.header}>
-          <Text style={styles.title}>Add food</Text>
-          <HeaderButton title="Done" onPress={close} />
+          <Text style={styles.title}>{t.foodPicker.title}</Text>
+          <HeaderButton title={t.common.done} onPress={close} />
         </View>
 
         {/* Search and type filter share one row, half the width each. */}
@@ -75,18 +80,18 @@ export function FoodPicker({
               style={styles.searchInput}
               value={search}
               onChangeText={setSearch}
-              placeholder="Search"
+              placeholder={t.foodPicker.search}
               placeholderTextColor={colors.textMuted}
               clearButtonMode="while-editing"
             />
           </View>
           <Select
-            title="Type"
+            title={t.foods.type}
             options={typeOptions}
             value={typeFilter}
             // "All types" clears the filter, showing the placeholder again.
             onChange={(key) => setTypeFilter(key === "all" ? null : key)}
-            placeholder="Filter by type"
+            placeholder={t.foods.filterByType}
             style={styles.flex}
           />
         </View>
@@ -98,7 +103,7 @@ export function FoodPicker({
           contentContainerStyle={styles.list}
           ListEmptyComponent={
             <Text style={styles.empty}>
-              {foods.length === 0 ? "No foods yet. Add them in the Foods tab." : "No foods match your filters"}
+              {foods.length === 0 ? t.foodPicker.empty : t.foods.noMatches}
             </Text>
           }
           renderItem={({ item: food }) => {
@@ -112,7 +117,11 @@ export function FoodPicker({
                   <Text style={styles.details} numberOfLines={1}>
                     {[
                       food.brand,
-                      `${formatNumber(food.calories)} kcal per ${formatNumber(food.reference_amount, 1)} ${unitLabel(food.unit)}`,
+                      t.foodPicker.kcalPer(
+                        formatNumber(food.calories),
+                        formatNumber(food.reference_amount, 1),
+                        unitName(t, food.unit, food.reference_amount)
+                      ),
                     ]
                       .filter(Boolean)
                       .join(" · ")}
@@ -121,7 +130,7 @@ export function FoodPicker({
                 {count > 0 && (
                   <View style={styles.added}>
                     <Icon name="check" size={14} color={colors.primaryText} />
-                    <Text style={styles.addedText}>{count > 1 ? `added ×${count}` : "added"}</Text>
+                    <Text style={styles.addedText}>{t.foodPicker.added(count)}</Text>
                   </View>
                 )}
               </Pressable>

@@ -9,13 +9,15 @@ import { Card } from "@/components/card";
 import { ConfirmDialog } from "@/components/dialog";
 import { Select } from "@/components/select";
 import { fieldStyles, TextField } from "@/components/text-field";
-import { FOOD_TYPES, type FoodType, UNITS, type Unit } from "@/constants/food";
+import { FOOD_TYPE_KEYS, type FoodType, UNIT_KEYS, type Unit } from "@/constants/food";
 import { colors, fontSize, inputBox, spacing } from "@/constants/theme";
 import { addFood, deleteFood, getFood, updateFood } from "@/db/foods";
+import { unitName, useTranslation } from "@/i18n";
 import { caloriesFromMacros, MACRO_FIELDS, type MacroKey, parseNumber } from "@/utils/nutrition";
 
 export default function FoodForm() {
   const db = useSQLiteContext();
+  const { t } = useTranslation();
   // With an id (/food-form?id=3) the form edits that food; without one it adds a new food.
   const params = useLocalSearchParams<{ id?: string }>();
   const id = params.id ? Number(params.id) : null;
@@ -58,21 +60,21 @@ export default function FoodForm() {
   async function save() {
     const newErrors: Record<string, string> = {};
 
-    if (name.trim() === "") newErrors.name = "Required";
-    if (!type) newErrors.type = "Choose a type";
+    if (name.trim() === "") newErrors.name = t.common.required;
+    if (!type) newErrors.type = t.foodForm.chooseType;
 
     const amount = parseNumber(referenceAmount);
-    if (referenceAmount.trim() === "") newErrors.reference_amount = "Required";
-    else if (amount === null) newErrors.reference_amount = "Enter a valid number";
-    else if (amount <= 0) newErrors.reference_amount = "Must be more than 0";
+    if (referenceAmount.trim() === "") newErrors.reference_amount = t.common.required;
+    else if (amount === null) newErrors.reference_amount = t.common.validNumber;
+    else if (amount <= 0) newErrors.reference_amount = t.common.moreThanZero;
 
     // Empty macros count as 0.
     const macroValues = { protein: 0, carbs: 0, fat: 0 };
     for (const { key } of MACRO_FIELDS) {
       if (macros[key].trim() === "") continue;
       const value = parseNumber(macros[key]);
-      if (value === null) newErrors[key] = "Enter a valid number";
-      else if (value < 0) newErrors[key] = "Can't be negative";
+      if (value === null) newErrors[key] = t.common.validNumber;
+      else if (value < 0) newErrors[key] = t.common.notNegative;
       else macroValues[key] = value;
     }
 
@@ -80,9 +82,9 @@ export default function FoodForm() {
     let kcal = parseNumber(calories);
     if (calories.trim() === "") {
       if (hasMacros) kcal = calculatedCalories;
-      else newErrors.calories = "Enter calories or at least one macronutrient";
-    } else if (kcal === null) newErrors.calories = "Enter a valid number";
-    else if (kcal < 0) newErrors.calories = "Can't be negative";
+      else newErrors.calories = t.foodForm.caloriesOrMacro;
+    } else if (kcal === null) newErrors.calories = t.common.validNumber;
+    else if (kcal < 0) newErrors.calories = t.common.notNegative;
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0 || !type || amount === null || kcal === null) return;
@@ -108,7 +110,7 @@ export default function FoodForm() {
     router.back();
   }
 
-  const title = <Stack.Screen options={{ title: id === null ? "Add food" : "Edit food" }} />;
+  const title = <Stack.Screen options={{ title: id === null ? t.foodForm.addTitle : t.foodForm.editTitle }} />;
 
   // Show nothing until the food has loaded, so the empty form doesn't flash first.
   if (!loaded) return title;
@@ -130,24 +132,24 @@ export default function FoodForm() {
         contentContainerStyle={styles.form}
       >
         <Card style={styles.section}>
-          <TextField label="Name" value={name} onChangeText={setName} error={errors.name} />
-          <TextField label="Brand (optional)" value={brand} onChangeText={setBrand} />
+          <TextField label={t.common.name} value={name} onChangeText={setName} error={errors.name} />
+          <TextField label={t.foodForm.brand} value={brand} onChangeText={setBrand} />
 
           <View style={fieldStyles.field}>
-            <Text style={fieldStyles.label}>Type</Text>
+            <Text style={fieldStyles.label}>{t.foods.type}</Text>
             <Select
-              title="Type"
-              options={FOOD_TYPES}
+              title={t.foods.type}
+              options={FOOD_TYPE_KEYS.map((key) => ({ key, label: t.foodTypes[key] }))}
               value={type}
               onChange={setType}
-              placeholder="Choose a type"
+              placeholder={t.foodForm.chooseType}
               hasError={!!errors.type}
             />
             {!!errors.type && <Text style={fieldStyles.error}>{errors.type}</Text>}
           </View>
 
           <View style={fieldStyles.field}>
-            <Text style={fieldStyles.label}>Reference amount</Text>
+            <Text style={fieldStyles.label}>{t.foodForm.referenceAmount}</Text>
             <View style={styles.row}>
               <TextInput
                 style={[styles.input, styles.flex, !!errors.reference_amount && styles.inputError]}
@@ -155,29 +157,35 @@ export default function FoodForm() {
                 onChangeText={setReferenceAmount}
                 keyboardType="decimal-pad"
               />
-              <Select title="Unit" options={UNITS} value={unit} onChange={setUnit} style={styles.flex} />
+              <Select
+                title={t.foodForm.unit}
+                options={UNIT_KEYS.map((key) => ({ key, label: unitName(t, key, parseNumber(referenceAmount) ?? 0) }))}
+                value={unit}
+                onChange={setUnit}
+                style={styles.flex}
+              />
             </View>
             {!!errors.reference_amount && <Text style={fieldStyles.error}>{errors.reference_amount}</Text>}
           </View>
         </Card>
 
         <Card style={styles.section}>
-          <Text style={styles.hint}>Nutrition values are per reference amount.</Text>
+          <Text style={styles.hint}>{t.foodForm.perReference}</Text>
 
           <TextField
-            label="Calories (kcal)"
+            label={t.foodForm.calories}
             value={calories}
             onChangeText={setCalories}
             keyboardType="decimal-pad"
-            placeholder={hasMacros ? `${calculatedCalories} (calculated)` : undefined}
+            placeholder={hasMacros ? t.foodForm.calculated(calculatedCalories) : undefined}
             error={errors.calories}
           />
 
           <View style={styles.macros}>
-            {MACRO_FIELDS.map(({ key, label }) => (
+            {MACRO_FIELDS.map(({ key }) => (
               <TextField
                 key={key}
-                label={label}
+                label={`${t.macros[key]} (g)`}
                 value={macros[key]}
                 onChangeText={(text) => setMacros({ ...macros, [key]: text })}
                 keyboardType="decimal-pad"
@@ -192,21 +200,21 @@ export default function FoodForm() {
         <View style={buttonRowStyles.row}>
           {id !== null && (
             <Button
-              title="Delete"
+              title={t.common.delete}
               variant="danger"
               onPress={() => setConfirmingDelete(true)}
               style={buttonRowStyles.button}
             />
           )}
-          <Button title="Save" onPress={save} style={buttonRowStyles.button} />
+          <Button title={t.common.save} onPress={save} style={buttonRowStyles.button} />
         </View>
       </ScrollView>
 
       <ConfirmDialog
         visible={confirmingDelete}
-        title={`Delete ${name}?`}
-        message="This can't be undone."
-        confirmTitle="Delete"
+        title={t.common.deleteTitle(name)}
+        message={t.common.cantUndo}
+        confirmTitle={t.common.delete}
         onConfirm={deleteAndClose}
         onCancel={() => setConfirmingDelete(false)}
       />

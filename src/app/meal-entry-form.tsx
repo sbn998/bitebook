@@ -11,11 +11,11 @@ import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
 import { fieldStyles } from "@/components/text-field";
-import { unitLabel } from "@/constants/food";
 import { colors, fontSize, inputBox, radius, spacing } from "@/constants/theme";
 import { addMealEntry, sumNutrition } from "@/db/entries";
 import type { Food } from "@/db/foods";
 import { getMeals, type Meal } from "@/db/meals";
+import { unitName, useTranslation } from "@/i18n";
 import { longDate, weekdayOf } from "@/utils/date";
 import { formatNumber, parseNumber } from "@/utils/nutrition";
 
@@ -24,6 +24,7 @@ type Row = { key: number; food: Food; quantity: string };
 
 export default function MealEntryForm() {
   const db = useSQLiteContext();
+  const { t } = useTranslation();
   // The day the meal is added to (YYYY-MM-DD), passed by the Main screen.
   const { date } = useLocalSearchParams<{ date: string }>();
   const [meals, setMeals] = useState<Meal[] | null>(null);
@@ -145,7 +146,7 @@ export default function MealEntryForm() {
                   </Text>
                   <Text style={styles.hint} numberOfLines={1}>
                     {formatNumber(row.food.calories)} kcal per {formatNumber(row.food.reference_amount, 1)}{" "}
-                    {unitLabel(row.food.unit)}
+                    {unitName(t, row.food.unit, row.food.reference_amount)}
                   </Text>
                 </View>
                 <TextInput
@@ -156,7 +157,7 @@ export default function MealEntryForm() {
                   selectTextOnFocus
                 />
                 <Text style={styles.unit} numberOfLines={1}>
-                  {unitLabel(row.food.unit)}
+                  {unitName(t, row.food.unit, parseNumber(row.quantity) ?? 0)}
                 </Text>
                 <Pressable onPress={() => removeRow(row.key)} hitSlop={spacing.sm} accessibilityLabel="Remove food">
                   <Icon name="close" color={colors.textMuted} />

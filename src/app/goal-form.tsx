@@ -11,6 +11,7 @@ import { TextField } from "@/components/text-field";
 import { colors, fontSize, radius, spacing } from "@/constants/theme";
 import { weekdayLabel } from "@/constants/weekdays";
 import { addGoal, deleteGoal, getGoal, getWeekdayGoals, setWeekdayGoal, updateGoal } from "@/db/goals";
+import { useTranslation } from "@/i18n";
 import { todayString } from "@/utils/date";
 import {
   caloriesFromMacros,
@@ -39,6 +40,7 @@ function deleteMessage(weekdays: number[]) {
 
 export default function GoalForm() {
   const db = useSQLiteContext();
+  const { t } = useTranslation();
   // With an id (/goal-form?id=3) the form edits that goal; without one it adds a new goal.
   // From the Main screen's "Set a goal" popup, a new goal is also assigned to `assignWeekday`,
   // and `fillDay` (a past day without a goal) gets it too.
@@ -226,10 +228,10 @@ export default function GoalForm() {
           />
 
           <View style={styles.macros}>
-            {MACRO_FIELDS.map(({ key, name: macroName }) => (
+            {MACRO_FIELDS.map(({ key }) => (
               <TextField
                 key={key}
-                label={macroName}
+                label={t.macros[key]}
                 labelRight={<UnitSwitch value={units[key]} onChange={(unit) => switchUnit(key, unit)} />}
                 value={macros[key]}
                 onChangeText={(text) => setMacros({ ...macros, [key]: text })}
@@ -252,13 +254,13 @@ export default function GoalForm() {
                 </Text>
                 {fillTarget && (
                   <Text style={styles.leftDetail}>
-                    ≈ {Math.floor(kcalLeft / KCAL_PER_GRAM[fillTarget.key])} g {fillTarget.name.toLowerCase()}
+                    ≈ {Math.floor(kcalLeft / KCAL_PER_GRAM[fillTarget.key])} g {t.macros[fillTarget.key].toLowerCase()}
                   </Text>
                 )}
               </View>
               {fillTarget && (
                 <Pressable style={styles.fillButton} onPress={fillRemaining}>
-                  <Text style={styles.fillText}>Use for {fillTarget.name.toLowerCase()}</Text>
+                  <Text style={styles.fillText}>Use for {t.macros[fillTarget.key].toLowerCase()}</Text>
                 </Pressable>
               )}
             </View>

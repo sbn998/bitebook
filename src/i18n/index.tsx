@@ -2,6 +2,7 @@ import { getLocales } from "expo-localization";
 import Storage from "expo-sqlite/kv-store";
 import { createContext, type ReactNode, useContext, useState } from "react";
 
+import type { Unit } from "@/constants/food";
 import { en, type Strings } from "@/i18n/en";
 import { es } from "@/i18n/es";
 
@@ -42,4 +43,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 // `t` holds the texts in the current language, e.g. t.common.save.
 export function useTranslation() {
   return useContext(LanguageContext);
+}
+
+// A unit's name for an amount: singular for exactly 1, plural otherwise ("1 slice", "2 slices", "0.5 slices").
+export function unitName(t: Strings, unit: Unit, amount: number) {
+  return amount === 1 ? t.units[unit].one : t.units[unit].other;
 }

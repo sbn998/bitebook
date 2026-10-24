@@ -1,46 +1,29 @@
-// Fixed lists from DATABASE.md. The database stores the key; the app shows the label.
-// Labels are English only for now, until translations are added.
+// Fixed lists from DATABASE.md, in display order. The database stores these keys;
+// the labels shown for them are in the translation files (t.foodTypes and t.units).
 
-export const FOOD_TYPES = [
-  { key: "beef", label: "Beef" },
-  { key: "pork", label: "Pork" },
-  { key: "poultry", label: "Poultry" },
-  { key: "lamb", label: "Lamb" },
-  { key: "fish", label: "Fish" },
-  { key: "seafood", label: "Seafood" },
-  { key: "eggs", label: "Eggs" },
-  { key: "dairy", label: "Dairy" },
-  { key: "grains", label: "Grains, bread & pasta" },
-  { key: "legumes", label: "Legumes" },
-  { key: "vegetables", label: "Vegetables" },
-  { key: "fruit", label: "Fruit" },
-  { key: "nuts_seeds", label: "Nuts & seeds" },
-  { key: "fats_oils", label: "Fats & oils" },
-  { key: "sweets_snacks", label: "Sweets & snacks" },
-  { key: "drinks", label: "Drinks" },
-  { key: "sauces", label: "Sauces & condiments" },
-  { key: "prepared", label: "Prepared meals" },
-  { key: "other", label: "Other" },
+export const FOOD_TYPE_KEYS = [
+  "beef",
+  "pork",
+  "poultry",
+  "lamb",
+  "fish",
+  "seafood",
+  "eggs",
+  "dairy",
+  "grains",
+  "legumes",
+  "vegetables",
+  "fruit",
+  "nuts_seeds",
+  "fats_oils",
+  "sweets_snacks",
+  "drinks",
+  "sauces",
+  "prepared",
+  "other",
 ] as const;
 
-export const UNITS = [
-  { key: "g", label: "g" },
-  { key: "ml", label: "ml" },
-  { key: "serving", label: "serving" },
-  { key: "piece", label: "piece" },
-  { key: "slice", label: "slice" },
-  { key: "cup", label: "cup" },
-  { key: "tbsp", label: "tablespoon" },
-  { key: "tsp", label: "teaspoon" },
-] as const;
+export const UNIT_KEYS = ["g", "ml", "serving", "piece", "slice", "cup", "tbsp", "tsp"] as const;
 
-export type FoodType = (typeof FOOD_TYPES)[number]["key"];
-export type Unit = (typeof UNITS)[number]["key"];
-
-export function foodTypeLabel(key: FoodType) {
-  return FOOD_TYPES.find((type) => type.key === key)?.label ?? key;
-}
-
-export function unitLabel(key: Unit) {
-  return UNITS.find((unit) => unit.key === key)?.label ?? key;
-}
+export type FoodType = (typeof FOOD_TYPE_KEYS)[number];
+export type Unit = (typeof UNIT_KEYS)[number];

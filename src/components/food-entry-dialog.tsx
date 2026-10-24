@@ -4,9 +4,9 @@ import { StyleSheet, Text, View } from "react-native";
 import { Button, buttonRowStyles } from "@/components/button";
 import { ConfirmBody, Dialog } from "@/components/dialog";
 import { TextField } from "@/components/text-field";
-import { unitLabel } from "@/constants/food";
 import { colors, fontSize, radius, spacing } from "@/constants/theme";
 import { type FoodEntry, foodEntryNutrition } from "@/db/entries";
+import { useTranslation } from "@/i18n";
 import { formatNumber, macroLine, parseNumber } from "@/utils/nutrition";
 
 // A popup for one food in a meal: change its amount (with its calories and macros updating live)
@@ -22,6 +22,7 @@ export function FoodEntryDialog({
   onDelete: () => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState(formatNumber(entry.quantity, 1));
   const [error, setError] = useState("");
   // When true, the dialog asks "Delete …?" instead of showing the amount.
@@ -49,7 +50,7 @@ export function FoodEntryDialog({
       ) : (
         <>
           <TextField
-            label={`Amount (${unitLabel(entry.unit)})`}
+            label={`Amount (${t.units[entry.unit].other})`}
             value={amount}
             onChangeText={(text) => {
               setAmount(text);

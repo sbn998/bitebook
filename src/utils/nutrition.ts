@@ -1,11 +1,7 @@
 export type MacroKey = "protein" | "carbs" | "fat";
 
-// `label` includes the unit, for forms that only use grams; `name` is without it.
-export const MACRO_FIELDS: { key: MacroKey; label: string; name: string }[] = [
-  { key: "protein", label: "Protein (g)", name: "Protein" },
-  { key: "carbs", label: "Carbs (g)", name: "Carbs" },
-  { key: "fat", label: "Fat (g)", name: "Fat" },
-];
+// The three macros, in display order. Their names are in the translation files (t.macros).
+export const MACRO_FIELDS: { key: MacroKey }[] = [{ key: "protein" }, { key: "carbs" }, { key: "fat" }];
 
 // Accepts both "12.5" and "12,5". Returns null if the text isn't a number.
 export function parseNumber(text: string) {

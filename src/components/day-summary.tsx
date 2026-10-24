@@ -5,6 +5,7 @@ import { HeaderButton } from "@/components/header-button";
 import { colors, fontSize, radius, spacing } from "@/constants/theme";
 import type { DayGoal } from "@/db/days";
 import type { Nutrition } from "@/db/entries";
+import { useTranslation } from "@/i18n";
 import { MACRO_FIELDS } from "@/utils/nutrition";
 
 // Whole numbers with the phone's thousands separator, e.g. 1,240 or 1.240.
@@ -36,6 +37,7 @@ export function DaySummary({
   setGoalLabel: string;
   onSetGoal: () => void;
 }) {
+  const { t } = useTranslation();
   const kcalLeft = goal ? goal.calories - totals.calories : 0;
 
   return (
@@ -56,12 +58,12 @@ export function DaySummary({
       )}
 
       <View style={styles.macros}>
-        {MACRO_FIELDS.map(({ key, name }) => {
+        {MACRO_FIELDS.map(({ key }) => {
           const target = goal?.[key] ?? null;
           return (
             <View key={key} style={styles.macro}>
               <View style={styles.macroRow}>
-                <Text style={styles.macroName}>{name}</Text>
+                <Text style={styles.macroName}>{t.macros[key]}</Text>
                 <Text style={[styles.secondary, target !== null && totals[key] > target && styles.overText]}>
                   {target !== null ? `${format(totals[key])}/${format(target)} g` : `${format(totals[key])} g`}
                 </Text>

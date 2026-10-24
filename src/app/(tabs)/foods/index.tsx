@@ -8,13 +8,15 @@ import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { IconButton } from "@/components/icon-button";
 import { Select } from "@/components/select";
-import { FOOD_TYPES, type FoodType, foodTypeLabel, unitLabel } from "@/constants/food";
+import { FOOD_TYPE_KEYS, type FoodType } from "@/constants/food";
 import { colors, fontSize, inputBox, radius, spacing } from "@/constants/theme";
 import { type Food, getFoods } from "@/db/foods";
+import { unitName, useTranslation } from "@/i18n";
 import { normalize } from "@/utils/search";
 
 export default function Foods() {
   const db = useSQLiteContext();
+  const { t } = useTranslation();
   const [foods, setFoods] = useState<Food[]>([]);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<FoodType | null>(null);
@@ -57,8 +59,11 @@ export default function Foods() {
 
   // Only offer types that at least one saved food has, in the fixed list order.
   const typeOptions = [
-    { key: "all" as const, label: "All types" },
-    ...FOOD_TYPES.filter((type) => foods.some((food) => food.type === type.key)),
+    { key: "all" as const, label: t.foods.allTypes },
+    ...FOOD_TYPE_KEYS.filter((type) => foods.some((food) => food.type === type)).map((type) => ({
+      key: type,
+      label: t.foodTypes[type],
+    })),
   ];
 
   // Filtering and sorting happen in the app, since all foods are already loaded.
@@ -73,7 +78,7 @@ export default function Foods() {
 
   return (
     <View style={styles.screen}>
-      <Stack.Screen options={{ headerRight: () => <HeaderButton title="Add" onPress={() => openForm()} /> }} />
+      <Stack.Screen options={{ headerRight: () => <HeaderButton title={t.common.add} onPress={() => openForm()} /> }} />
 
       <View style={styles.filters}>
         <View style={styles.search}>
@@ -82,28 +87,28 @@ export default function Foods() {
             style={styles.searchInput}
             value={search}
             onChangeText={setSearch}
-            placeholder="Search by name or brand"
+            placeholder={t.foods.search}
             placeholderTextColor={colors.textMuted}
             clearButtonMode="while-editing"
           />
         </View>
         <View style={styles.row}>
           <Select
-            title="Type"
+            title={t.foods.type}
             options={typeOptions}
             value={typeFilter}
             // "All types" clears the filter, showing the placeholder again.
             onChange={(key) => setTypeFilter(key === "all" ? null : key)}
-            placeholder="Filter by type"
+            placeholder={t.foods.filterByType}
             style={styles.flex}
           />
           {/* Down arrow = A to Z (the alphabet runs down the list), up arrow = Z to A */}
           <IconButton
             icon={ascending ? "sortAscending" : "sortDescending"}
             onPress={() => setAscending(!ascending)}
-            accessibilityLabel={ascending ? "Sorted A to Z" : "Sorted Z to A"}
+            accessibilityLabel={ascending ? t.foods.sortedAToZ : t.foods.sortedZToA}
           />
-          <IconButton icon="reset" onPress={resetFilters} accessibilityLabel="Reset filters" />
+          <IconButton icon="reset" onPress={resetFilters} accessibilityLabel={t.foods.resetFilters} />
         </View>
       </View>
 
@@ -113,7 +118,7 @@ export default function Foods() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.list}
         ListEmptyComponent={
-          <Text style={styles.empty}>{foods.length === 0 ? "No foods yet" : "No foods match your filters"}</Text>
+          <Text style={styles.empty}>{foods.length === 0 ? t.foods.empty : t.foods.noMatches}</Text>
         }
         renderItem={({ item: food }) => (
           <Pressable onPress={() => openForm(food.id)}>
@@ -122,16 +127,22 @@ export default function Foods() {
                 <Text style={styles.name} numberOfLines={1}>
                   {food.name}
                 </Text>
-                <Text style={styles.badge}>{foodTypeLabel(food.type)}</Text>
+                <Text style={styles.badge}>{t.foodTypes[food.type]}</Text>
               </View>
               <Text style={styles.details}>
-                {[food.brand, `per ${food.reference_amount} ${unitLabel(food.unit)}`].filter(Boolean).join(" · ")}
+                {[food.brand, t.foods.per(String(food.reference_amount), unitName(t, food.unit, food.reference_amount))].filter(Boolean).join(" · ")}
               </Text>
               <View style={styles.nutrition}>
                 <Text style={styles.calories}>{food.calories} kcal</Text>
-                <Text style={styles.macro}>P {food.protein}</Text>
-                <Text style={styles.macro}>C {food.carbs}</Text>
-                <Text style={styles.macro}>F {food.fat}</Text>
+                <Text style={styles.macro}>
+                  {t.macros.proteinShort} {food.protein}
+                </Text>
+                <Text style={styles.macro}>
+                  {t.macros.carbsShort} {food.carbs}
+                </Text>
+                <Text style={styles.macro}>
+                  {t.macros.fatShort} {food.fat}
+                </Text>
               </View>
             </Card>
           </Pressable>

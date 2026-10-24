@@ -4,9 +4,9 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Card } from "@/components/card";
 import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
-import { unitLabel } from "@/constants/food";
 import { colors, fontSize, spacing } from "@/constants/theme";
 import { type FoodEntry, foodEntryNutrition, type MealEntry, sumNutrition } from "@/db/entries";
+import { unitName, useTranslation } from "@/i18n";
 import { formatNumber, macroLine } from "@/utils/nutrition";
 
 // One meal on a day: its name, each food with its amount and calories, and the meal's totals at the bottom.
@@ -23,6 +23,7 @@ export function MealEntryCard({
   onEditFood: (food: FoodEntry) => void;
   onDelete: () => void;
 }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const total = sumNutrition(entry.foods);
   const hasFoods = entry.foods.length > 0;
@@ -57,7 +58,7 @@ export function MealEntryCard({
                 {food.name}
                 <Text style={styles.secondary}>
                   {" "}
-                  · {formatNumber(food.quantity, 1)} {unitLabel(food.unit)}
+                  · {formatNumber(food.quantity, 1)} {unitName(t, food.unit, food.quantity)}
                 </Text>
               </Text>
               <Text style={styles.secondary}>{formatNumber(nutrition.calories)} kcal</Text>
