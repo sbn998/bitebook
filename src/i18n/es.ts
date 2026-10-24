@@ -90,6 +90,14 @@ export const es: Strings = {
     mealLabels: "Comidas",
     yourGoals: "Tus objetivos",
     language: "Idioma",
+    yourData: "Tus datos",
+  },
+  backup: {
+    export: "Exportar datos",
+    exportHint: "Guarda una copia de todos tus datos en un archivo.",
+    shareTitle: "Guardar tus datos",
+    exportFailed: "No se han podido exportar tus datos. Inténtalo de nuevo.",
+    ok: "Aceptar",
   },
   languages: {
     en: "English",

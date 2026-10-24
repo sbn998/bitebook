@@ -94,6 +94,14 @@ export const en = {
     mealLabels: "Meal labels",
     yourGoals: "Your goals",
     language: "Language",
+    yourData: "Your data",
+  },
+  backup: {
+    export: "Export data",
+    exportHint: "Save a copy of all your data as a file.",
+    shareTitle: "Save your data",
+    exportFailed: "Couldn't export your data. Try again.",
+    ok: "OK",
   },
   // Shown in their own language in both files, so each is recognizable.
   languages: {
