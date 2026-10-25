@@ -9,12 +9,14 @@ import { ConfirmBody, Dialog } from "@/components/dialog";
 import { HeaderButton } from "@/components/header-button";
 import { TextField } from "@/components/text-field";
 import { fontSize, fonts, spacing, type Theme } from "@/constants/theme";
+import { useBackToTopOnTabChange } from "@/hooks/use-back-to-top-on-tab-change";
 import { useStyles } from "@/hooks/use-theme";
 import { addMeal, deleteMeal, getMeals, type Meal, renameMeal } from "@/db/meals";
 import { useTranslation } from "@/i18n";
 
 export default function MealLabels() {
   const styles = useStyles(makeStyles);
+  useBackToTopOnTabChange();
   const db = useSQLiteContext();
   const { t } = useTranslation();
   const [meals, setMeals] = useState<Meal[]>([]);

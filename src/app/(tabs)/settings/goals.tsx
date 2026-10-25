@@ -7,6 +7,7 @@ import { Card } from "@/components/card";
 import { HeaderButton } from "@/components/header-button";
 import { Select } from "@/components/select";
 import { fontSize, fonts, spacing, type Theme } from "@/constants/theme";
+import { useBackToTopOnTabChange } from "@/hooks/use-back-to-top-on-tab-change";
 import { useStyles } from "@/hooks/use-theme";
 import { WEEKDAY_NUMBERS } from "@/constants/weekdays";
 import { type Goal, getGoals, getWeekdayGoals, setWeekdayGoal, type WeekdayGoal } from "@/db/goals";
@@ -25,6 +26,7 @@ function macroSummary(goal: Goal, t: Strings) {
 
 export default function Goals() {
   const styles = useStyles(makeStyles);
+  useBackToTopOnTabChange();
   const db = useSQLiteContext();
   const { t } = useTranslation();
   const [goals, setGoals] = useState<Goal[]>([]);
