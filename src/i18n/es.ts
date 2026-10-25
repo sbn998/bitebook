@@ -115,7 +115,7 @@ export const es: Strings = {
     replace: "Sustituir",
     imported: "Tus datos se han importado.",
     importFailed: "No se ha podido importar este archivo. Tus datos no han cambiado.",
-    invalidFile: "Este archivo no es una copia de seguridad de Macro Tracker.",
+    invalidFile: "Este archivo no es una copia de seguridad de Bitebook.",
     newerFile: "Este archivo se creó con una versión más reciente de la app. Actualiza la app para importarlo.",
   },
   languages: {

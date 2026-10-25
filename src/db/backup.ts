@@ -19,7 +19,8 @@ export const BACKUP_TABLES = [
 
 export type BackupTable = (typeof BACKUP_TABLES)[number];
 
-// What an exported file contains. `app` marks it as ours; `databaseVersion` is the migration
+// What an exported file contains. `app` marks it as ours (it keeps the app's first name, so files
+// exported before the rename still import); `databaseVersion` is the migration
 // version it was made with, so a newer app version can still read older files.
 export type Backup = {
   app: "macro-tracker";
@@ -46,7 +47,7 @@ export async function createBackup(db: SQLiteDatabase): Promise<Backup> {
   };
 }
 
-// Why a file can't be imported: "invalid" = not a Macro Tracker backup (or damaged),
+// Why a file can't be imported: "invalid" = not a Bitebook backup (or damaged),
 // "newer" = made by a newer version of the app than this one.
 export class BackupError extends Error {
   reason: "invalid" | "newer";

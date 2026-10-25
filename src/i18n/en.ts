@@ -120,7 +120,7 @@ export const en = {
     replace: "Replace",
     imported: "Your data was imported.",
     importFailed: "This file couldn't be imported. Your data wasn't changed.",
-    invalidFile: "This isn't a Macro Tracker backup file.",
+    invalidFile: "This isn't a Bitebook backup file.",
     newerFile: "This file was made with a newer version of the app. Update the app to import it.",
   },
   // Shown in their own language in both files, so each is recognizable.
