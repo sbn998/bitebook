@@ -43,4 +43,4 @@ yarn-error.*
 # Claude
 .claude/settings.local.json
 # Raw screenshots and recordings for the README (only the edited versions are committed)
-/media-raw
+/media_raw
