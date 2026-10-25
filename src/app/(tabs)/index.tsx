@@ -14,7 +14,8 @@ import { FoodPicker } from "@/components/food-picker";
 import { Icon } from "@/components/icon";
 import { MealEntryCard } from "@/components/meal-entry-card";
 import { WeekdayGoalDialog } from "@/components/weekday-goal-dialog";
-import { colors, fontSize, fonts, spacing } from "@/constants/theme";
+import { fontSize, fonts, spacing, type Theme } from "@/constants/theme";
+import { useStyles, useTheme } from "@/hooks/use-theme";
 import { type DayGoal, getDayGoal } from "@/db/days";
 import {
   addFoodEntry,
@@ -31,6 +32,8 @@ import { useTranslation } from "@/i18n";
 import { addDays, dayTitle, longDate, todayString, weekdayOf } from "@/utils/date";
 
 export default function Main() {
+  const { colors } = useTheme();
+  const styles = useStyles(makeStyles);
   const db = useSQLiteContext();
   const { t, locale } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -216,7 +219,7 @@ export default function Main() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.background,

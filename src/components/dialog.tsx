@@ -3,7 +3,8 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, Vie
 
 import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
-import { colors, fontSize, fonts, spacing } from "@/constants/theme";
+import { fontSize, fonts, spacing, type Theme } from "@/constants/theme";
+import { useStyles } from "@/hooks/use-theme";
 import { useTranslation } from "@/i18n";
 
 // A small popup card in the middle of the screen, over a dimmed background.
@@ -18,6 +19,7 @@ export function Dialog({
   onClose: () => void;
   children: ReactNode;
 }) {
+  const styles = useStyles(makeStyles);
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       {/* Moves the dialog up when the keyboard opens, so its buttons stay visible. */}
@@ -46,6 +48,7 @@ export function ConfirmBody({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const styles = useStyles(makeStyles);
   const { t } = useTranslation();
 
   return (
@@ -72,7 +75,7 @@ export function ConfirmDialog({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   message: {
     fontSize: fontSize.medium,
     fontFamily: fonts.body,

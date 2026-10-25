@@ -5,28 +5,32 @@ import { DMSans_400Regular } from "@expo-google-fonts/dm-sans/400Regular";
 import { DMSans_500Medium } from "@expo-google-fonts/dm-sans/500Medium";
 import { DMSans_600SemiBold } from "@expo-google-fonts/dm-sans/600SemiBold";
 import { useFonts } from "expo-font";
-import { DarkTheme, Stack, ThemeProvider } from "expo-router";
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { SQLiteProvider } from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 
-import { colors, stackScreenOptions } from "@/constants/theme";
+import { stackScreenOptions, type Theme } from "@/constants/theme";
 import { migrateDbIfNeeded } from "@/db/migrations";
+import { useStyles, useTheme } from "@/hooks/use-theme";
 import { LanguageProvider } from "@/i18n";
 
 // The navigators' own colors (headers, screen backgrounds, borders), so nothing falls back to
-// React Navigation's default light, white look.
-const navigationTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: colors.primary,
-    background: colors.background,
-    card: colors.background,
-    text: colors.text,
-    border: colors.border,
-  },
+// React Navigation's default white or black look.
+const makeNavigationTheme = ({ dark, colors }: Theme) => {
+  const base = dark ? DarkTheme : DefaultTheme;
+  return {
+    ...base,
+    colors: {
+      ...base.colors,
+      primary: colors.primary,
+      background: colors.background,
+      card: colors.background,
+      text: colors.text,
+      border: colors.border,
+    },
+  };
 };
 
 // Keep the splash screen up until the fonts are ready, so text never flashes in the phone's font.
@@ -44,6 +48,9 @@ export default function RootLayout() {
     DMSans_500Medium,
     DMSans_600SemiBold,
   });
+  const theme = useTheme();
+  const navigationTheme = useStyles(makeNavigationTheme);
+  const screenOptions = useStyles(stackScreenOptions);
 
   useEffect(() => {
     if (loaded || error) SplashScreen.hideAsync();
@@ -56,9 +63,9 @@ export default function RootLayout() {
     <SQLiteProvider databaseName="macro-tracker.db" onInit={migrateDbIfNeeded}>
       <LanguageProvider>
         <ThemeProvider value={navigationTheme}>
-          {/* Light clock and icons at the top, readable on the dark background. */}
-          <StatusBar style="light" />
-          <Stack screenOptions={stackScreenOptions}>
+          {/* Clock and icons at the top in the color that reads on the background. */}
+          <StatusBar style={theme.dark ? "light" : "dark"} />
+          <Stack screenOptions={screenOptions}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="food-form" />
             <Stack.Screen name="goal-form" />

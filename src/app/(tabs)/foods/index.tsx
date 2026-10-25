@@ -9,12 +9,15 @@ import { Icon } from "@/components/icon";
 import { IconButton } from "@/components/icon-button";
 import { Select } from "@/components/select";
 import { FOOD_TYPE_KEYS, type FoodType } from "@/constants/food";
-import { colors, fontSize, fonts, inputBox, radius, spacing } from "@/constants/theme";
+import { fontSize, fonts, inputBox, radius, spacing, type Theme } from "@/constants/theme";
+import { useStyles, useTheme } from "@/hooks/use-theme";
 import { type Food, getFoods } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
 import { normalize } from "@/utils/search";
 
 export default function Foods() {
+  const { colors } = useTheme();
+  const styles = useStyles(makeStyles);
   const db = useSQLiteContext();
   const { t } = useTranslation();
   const [foods, setFoods] = useState<Food[]>([]);
@@ -153,7 +156,7 @@ export default function Foods() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.background,
@@ -171,7 +174,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   search: {
-    ...inputBox,
+    ...inputBox(colors),
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,

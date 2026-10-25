@@ -12,7 +12,8 @@ import Animated, {
 import { Card } from "@/components/card";
 import { HeaderButton } from "@/components/header-button";
 import { ProgressArc } from "@/components/progress-arc";
-import { colors, fontSize, fonts, radius, spacing } from "@/constants/theme";
+import { fontSize, fonts, radius, spacing, type Theme } from "@/constants/theme";
+import { useStyles, useTheme } from "@/hooks/use-theme";
 import type { DayGoal } from "@/db/days";
 import type { Nutrition } from "@/db/entries";
 import { useTranslation } from "@/i18n";
@@ -51,6 +52,7 @@ function useCountUp(target: number) {
 
 // A thin rounded bar that slides to `value / target`. It turns red when over the target.
 function ProgressBar({ value, target }: { value: number; target: number }) {
+  const styles = useStyles(makeStyles);
   const isOver = value > target;
   const filled = useSharedValue(0);
 
@@ -82,6 +84,8 @@ export function DaySummary({
   setGoalLabel: string;
   onSetGoal: () => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useStyles(makeStyles);
   const { t, locale } = useTranslation();
   const calories = useCountUp(totals.calories);
   const kcalLeft = goal ? goal.calories - calories : 0;
@@ -152,7 +156,7 @@ export function DaySummary({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   card: {
     backgroundColor: colors.hero,
     borderWidth: 1,

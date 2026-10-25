@@ -1,6 +1,6 @@
 import { SymbolView, type SymbolViewProps } from "expo-symbols";
 
-import { colors } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 
 // Icons used in the app: SF Symbols on iOS, Material Symbols on Android.
 const ICONS = {
@@ -20,6 +20,7 @@ const ICONS = {
 
 export type IconName = keyof typeof ICONS;
 
-export function Icon({ name, size = 20, color = colors.textSecondary }: { name: IconName; size?: number; color?: string }) {
-  return <SymbolView name={ICONS[name]} size={size} tintColor={color} />;
+export function Icon({ name, size = 20, color }: { name: IconName; size?: number; color?: string }) {
+  const { colors } = useTheme();
+  return <SymbolView name={ICONS[name]} size={size} tintColor={color ?? colors.textSecondary} />;
 }

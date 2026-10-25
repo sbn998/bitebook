@@ -7,7 +7,8 @@ import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
 import { FOOD_TYPE_KEYS, type FoodType } from "@/constants/food";
-import { colors, fontSize, fonts, inputBox, radius, spacing } from "@/constants/theme";
+import { fontSize, fonts, inputBox, radius, spacing, type Theme } from "@/constants/theme";
+import { useStyles, useTheme } from "@/hooks/use-theme";
 import { type Food, getFoods } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
 import { formatNumber } from "@/utils/nutrition";
@@ -27,6 +28,8 @@ export function FoodPicker({
   onClose: () => void;
   pickedCounts: Record<number, number>;
 }) {
+  const { colors } = useTheme();
+  const styles = useStyles(makeStyles);
   const db = useSQLiteContext();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -142,7 +145,7 @@ export function FoodPicker({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.background,
@@ -170,7 +173,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   search: {
-    ...inputBox,
+    ...inputBox(colors),
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,

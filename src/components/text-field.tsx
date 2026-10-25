@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { type StyleProp, StyleSheet, Text, TextInput, type TextInputProps, View, type ViewStyle } from "react-native";
 
-import { colors, fontSize, fonts, inputBox } from "@/constants/theme";
+import { fontSize, fonts, inputBox, type Theme } from "@/constants/theme";
+import { useStyles, useTheme } from "@/hooks/use-theme";
 
 // A label, a text input and an optional error message below it.
 // `labelRight` shows something next to the label (e.g. a unit switch), `hint` a grey note under the input.
@@ -19,6 +20,9 @@ export function TextField({
   labelRight?: ReactNode;
   containerStyle?: StyleProp<ViewStyle>;
 } & TextInputProps) {
+  const { colors } = useTheme();
+  const fieldStyles = useStyles(makeFieldStyles);
+  const styles = useStyles(makeStyles);
   return (
     <View style={[fieldStyles.field, containerStyle]}>
       <View style={styles.labelRow}>
@@ -37,7 +41,7 @@ export function TextField({
 }
 
 // Also used by form pieces that aren't text inputs (like the dropdowns), so labels and errors match.
-export const fieldStyles = StyleSheet.create({
+export const makeFieldStyles = ({ colors }: Theme) => StyleSheet.create({
   field: {
     gap: 6,
   },
@@ -53,7 +57,7 @@ export const fieldStyles = StyleSheet.create({
   },
 });
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   labelRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -61,7 +65,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   input: {
-    ...inputBox,
+    ...inputBox(colors),
     fontSize: fontSize.medium,
     fontFamily: fonts.body,
     color: colors.text,

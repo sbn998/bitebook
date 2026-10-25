@@ -6,7 +6,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Card } from "@/components/card";
 import { HeaderButton } from "@/components/header-button";
 import { Select } from "@/components/select";
-import { colors, fontSize, fonts, spacing } from "@/constants/theme";
+import { fontSize, fonts, spacing, type Theme } from "@/constants/theme";
+import { useStyles } from "@/hooks/use-theme";
 import { WEEKDAY_NUMBERS } from "@/constants/weekdays";
 import { type Goal, getGoals, getWeekdayGoals, setWeekdayGoal, type WeekdayGoal } from "@/db/goals";
 import { type Strings, useTranslation } from "@/i18n";
@@ -23,6 +24,7 @@ function macroSummary(goal: Goal, t: Strings) {
 }
 
 export default function Goals() {
+  const styles = useStyles(makeStyles);
   const db = useSQLiteContext();
   const { t } = useTranslation();
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -97,7 +99,7 @@ export default function Goals() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   screen: {
     padding: spacing.lg,
     gap: spacing.md,

@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut, LinearTransition, useAnimatedStyle, withTiming } from "react-native-reanimated";
 
-import { cardStyles } from "@/components/card";
+import { makeCardStyles } from "@/components/card";
 import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
-import { colors, fontSize, fonts, spacing } from "@/constants/theme";
+import { fontSize, fonts, spacing, type Theme } from "@/constants/theme";
+import { useStyles, useTheme } from "@/hooks/use-theme";
 import { type FoodEntry, foodEntryNutrition, type MealEntry, sumNutrition } from "@/db/entries";
 import { unitName, useTranslation } from "@/i18n";
 import { formatNumber, macroLine } from "@/utils/nutrition";
@@ -28,6 +29,9 @@ export function MealEntryCard({
   onEditFood: (food: FoodEntry) => void;
   onDelete: () => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useStyles(makeStyles);
+  const cardStyles = useStyles(makeCardStyles);
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const total = sumNutrition(entry.foods);
@@ -106,7 +110,7 @@ export function MealEntryCard({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   card: {
     gap: spacing.sm,
   },

@@ -11,7 +11,8 @@ import {
 } from "react-native";
 
 import { Icon } from "@/components/icon";
-import { colors, fontSize, fonts, inputBox, radius, shadow, spacing } from "@/constants/theme";
+import { fontSize, fonts, inputBox, radius, spacing, type Theme } from "@/constants/theme";
+import { useStyles, useTheme } from "@/hooks/use-theme";
 
 // A box that looks like a text field and opens a list of options when tapped.
 export function Select<K extends string>({
@@ -31,6 +32,8 @@ export function Select<K extends string>({
   hasError?: boolean;
   style?: StyleProp<ViewStyle>;
 }) {
+  const { colors } = useTheme();
+  const styles = useStyles(makeStyles);
   const [open, setOpen] = useState(false);
   const selected = options.find((option) => option.key === value);
 
@@ -77,9 +80,9 @@ export function Select<K extends string>({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, shadow }: Theme) => StyleSheet.create({
   select: {
-    ...inputBox,
+    ...inputBox(colors),
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

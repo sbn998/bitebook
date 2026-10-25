@@ -4,7 +4,8 @@ import Animated, { LayoutAnimationConfig, SlideInLeft, SlideInRight } from "reac
 
 import { Dialog } from "@/components/dialog";
 import { Icon } from "@/components/icon";
-import { colors, fontSize, fonts, radius, spacing } from "@/constants/theme";
+import { fontSize, fonts, radius, spacing, type Theme } from "@/constants/theme";
+import { useStyles, useTheme } from "@/hooks/use-theme";
 import { useTranslation } from "@/i18n";
 import { parseDateString, toDateString, weekdayOf } from "@/utils/date";
 
@@ -22,6 +23,8 @@ export function CalendarDialog({
   onPick: (date: string) => void;
   onClose: () => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useStyles(makeStyles);
   const { t, locale } = useTranslation();
   const picked = parseDateString(date);
   // The first day of the month on screen.
@@ -105,7 +108,7 @@ export function CalendarDialog({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   monthRow: {
     flexDirection: "row",
     justifyContent: "space-between",

@@ -1,8 +1,9 @@
 // Design tokens: every color, font, size and shadow used by the app, named once.
 // Screens and components use these names instead of raw values.
 
-// The light palette isn't used yet: it's kept for when the app gets a light/dark option (SPEC "Not in v1").
-export const lightColors = {
+// Screens read the current palette with useTheme or useStyles (hooks/use-theme.ts), never these directly,
+// so they redraw when the theme changes.
+const lightColors = {
   primary: "#E8700F", // Orange: buttons, active tab, progress
   primaryText: "#B85509", // Darker orange, readable as text on white or on primaryTint
   primaryTint: "#FCEBDC", // Light orange background, e.g. type badges
@@ -21,9 +22,11 @@ export const lightColors = {
   heroTrack: "#F8DFC8", // Empty part of its progress arc and bars, and the selected tab's pill
 };
 
+export type Colors = typeof lightColors;
+
 // The same names with warm dark values. The orange stays the same; the colors made from it
 // (text, tints) change, because pale oranges would glow and dark orange text would disappear on dark.
-const darkColors: typeof lightColors = {
+const darkColors: Colors = {
   primary: "#E8700F",
   primaryText: "#FF9A4A", // Lighter orange, readable as text on dark or on primaryTint
   primaryTint: "#3A2515", // Deep orange-brown background, e.g. type badges
@@ -40,8 +43,6 @@ const darkColors: typeof lightColors = {
   hero: "#2A1E15",
   heroTrack: "#4A3220",
 };
-
-export const colors = darkColors;
 
 // Each font has one job: Archivo for titles, Barlow Condensed for numbers, DM Sans for everything else.
 // Custom fonts come in one file per weight, so pick the weight here instead of using fontWeight.
@@ -78,8 +79,7 @@ export const fontSize = {
   title: 22,
 };
 
-// Like the palettes: the light shadow is kept for the future light/dark option.
-export const lightShadow = {
+const lightShadow = {
   card: "0px 1px 2px rgba(28, 25, 22, 0.04), 0px 6px 20px rgba(28, 25, 22, 0.06)",
 };
 
@@ -87,23 +87,26 @@ const darkShadow: typeof lightShadow = {
   card: "0px 1px 2px rgba(0, 0, 0, 0.3), 0px 6px 20px rgba(0, 0, 0, 0.25)",
 };
 
-export const shadow = darkShadow;
+export type Theme = { dark: boolean; colors: Colors; shadow: typeof lightShadow };
+
+export const lightTheme: Theme = { dark: false, colors: lightColors, shadow: lightShadow };
+export const darkTheme: Theme = { dark: true, colors: darkColors, shadow: darkShadow };
 
 // Header and background look for every Stack navigator in the app.
-export const stackScreenOptions = {
+export const stackScreenOptions = ({ colors }: Theme) => ({
   headerStyle: { backgroundColor: colors.background },
   headerTintColor: colors.text, // Back button
   headerTitleStyle: { color: colors.text, fontFamily: fonts.title, fontSize: fontSize.title },
   headerShadowVisible: false,
   contentStyle: { backgroundColor: colors.background },
-};
+});
 
 // The shared look of text fields, dropdowns and the search box.
-export const inputBox = {
+export const inputBox = (colors: Colors) => ({
   backgroundColor: colors.surface,
   borderWidth: 1,
   borderColor: colors.border,
   borderRadius: radius.input,
   paddingHorizontal: spacing.md,
   paddingVertical: 10,
-};
+});

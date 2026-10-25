@@ -1,7 +1,8 @@
 import { Pressable, type StyleProp, StyleSheet, Text, type ViewStyle } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 
-import { colors, fontSize, fonts, radius, spacing } from "@/constants/theme";
+import { fontSize, fonts, radius, spacing, type Theme } from "@/constants/theme";
+import { useStyles } from "@/hooks/use-theme";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -22,6 +23,8 @@ export function Button({
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 }) {
+  const buttonStyles = useStyles(makeButtonStyles);
+  const textStyles = useStyles(makeTextStyles);
   const scale = useSharedValue(1);
   const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
 
@@ -67,7 +70,7 @@ export const buttonRowStyles = StyleSheet.create({
   },
 });
 
-const buttonStyles = StyleSheet.create({
+const makeButtonStyles = ({ colors }: Theme) => StyleSheet.create({
   primary: {
     backgroundColor: colors.primary,
   },
@@ -79,7 +82,7 @@ const buttonStyles = StyleSheet.create({
   },
 });
 
-const textStyles = StyleSheet.create({
+const makeTextStyles = ({ colors }: Theme) => StyleSheet.create({
   primary: {
     color: colors.onPrimary,
   },

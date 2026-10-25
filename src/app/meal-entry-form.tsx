@@ -10,8 +10,9 @@ import { FoodPicker } from "@/components/food-picker";
 import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
-import { fieldStyles } from "@/components/text-field";
-import { colors, fontSize, fonts, inputBox, radius, spacing } from "@/constants/theme";
+import { makeFieldStyles } from "@/components/text-field";
+import { fontSize, fonts, inputBox, radius, spacing, type Theme } from "@/constants/theme";
+import { useStyles, useTheme } from "@/hooks/use-theme";
 import { addMealEntry, sumNutrition } from "@/db/entries";
 import type { Food } from "@/db/foods";
 import { getMeals, type Meal } from "@/db/meals";
@@ -23,6 +24,9 @@ import { formatNumber, parseNumber } from "@/utils/nutrition";
 type Row = { key: number; food: Food; quantity: string };
 
 export default function MealEntryForm() {
+  const { colors } = useTheme();
+  const styles = useStyles(makeStyles);
+  const fieldStyles = useStyles(makeFieldStyles);
   const db = useSQLiteContext();
   const { t, locale } = useTranslation();
   // The day the meal is added to (YYYY-MM-DD), passed by the Main screen.
@@ -192,7 +196,7 @@ export default function MealEntryForm() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.background,
@@ -233,7 +237,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   amount: {
-    ...inputBox,
+    ...inputBox(colors),
     width: 72,
     paddingVertical: 6,
     textAlign: "right",

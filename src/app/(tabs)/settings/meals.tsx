@@ -8,11 +8,13 @@ import { Card } from "@/components/card";
 import { ConfirmBody, Dialog } from "@/components/dialog";
 import { HeaderButton } from "@/components/header-button";
 import { TextField } from "@/components/text-field";
-import { colors, fontSize, fonts, spacing } from "@/constants/theme";
+import { fontSize, fonts, spacing, type Theme } from "@/constants/theme";
+import { useStyles } from "@/hooks/use-theme";
 import { addMeal, deleteMeal, getMeals, type Meal, renameMeal } from "@/db/meals";
 import { useTranslation } from "@/i18n";
 
 export default function MealLabels() {
+  const styles = useStyles(makeStyles);
   const db = useSQLiteContext();
   const { t } = useTranslation();
   const [meals, setMeals] = useState<Meal[]>([]);
@@ -134,7 +136,7 @@ export default function MealLabels() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.background,

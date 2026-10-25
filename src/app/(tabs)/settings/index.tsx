@@ -9,7 +9,8 @@ import { Dialog } from "@/components/dialog";
 import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
-import { colors, fontSize, fonts, radius, spacing } from "@/constants/theme";
+import { fontSize, fonts, radius, spacing, type Theme } from "@/constants/theme";
+import { useStyles, useTheme } from "@/hooks/use-theme";
 import {
   type Backup,
   type BackupCounts,
@@ -24,6 +25,8 @@ import { pickBackupFile, shareBackup } from "@/utils/backup-file";
 
 // A menu of settings sections, the app's language, and exporting or importing the data.
 export default function Settings() {
+  const { colors } = useTheme();
+  const styles = useStyles(makeStyles);
   const db = useSQLiteContext();
   const { t, language, setLanguage } = useTranslation();
   // A short result or error shown in a popup, e.g. "Your data was imported."
@@ -154,7 +157,7 @@ export default function Settings() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   screen: {
     padding: spacing.lg,
     gap: spacing.lg,

@@ -8,7 +8,8 @@ import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
 import { ConfirmDialog } from "@/components/dialog";
 import { TextField } from "@/components/text-field";
-import { colors, fontSize, fonts, radius, spacing } from "@/constants/theme";
+import { fontSize, fonts, radius, spacing, type Theme } from "@/constants/theme";
+import { useStyles } from "@/hooks/use-theme";
 import { addGoal, deleteGoal, getGoal, getWeekdayGoals, setWeekdayGoal, updateGoal } from "@/db/goals";
 import { useTranslation } from "@/i18n";
 import { todayString } from "@/utils/date";
@@ -30,6 +31,7 @@ type MacroUnit = "g" | "%";
 const KCAL_TOLERANCE = 0.5;
 
 export default function GoalForm() {
+  const styles = useStyles(makeStyles);
   const db = useSQLiteContext();
   const { t } = useTranslation();
   // With an id (/goal-form?id=3) the form edits that goal; without one it adds a new goal.
@@ -293,6 +295,7 @@ export default function GoalForm() {
 
 // A small "g | %" switch shown next to each macro's label.
 function UnitSwitch({ value, onChange }: { value: MacroUnit; onChange: (unit: MacroUnit) => void }) {
+  const styles = useStyles(makeStyles);
   const { t } = useTranslation();
 
   return (
@@ -315,7 +318,7 @@ function UnitSwitch({ value, onChange }: { value: MacroUnit; onChange: (unit: Ma
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.background,

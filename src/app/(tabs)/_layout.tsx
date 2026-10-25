@@ -1,11 +1,13 @@
 import { NativeTabs } from "expo-router/native-tabs";
 
-import { colors, fonts } from "@/constants/theme";
+import { fonts } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 import { useTranslation } from "@/i18n";
 
 // Tabs appear in the order listed here, so Main sits in the middle.
 export default function TabsLayout() {
   const { t } = useTranslation();
+  const { colors } = useTheme();
 
   return (
     <NativeTabs

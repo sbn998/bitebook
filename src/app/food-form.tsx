@@ -8,14 +8,17 @@ import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
 import { ConfirmDialog } from "@/components/dialog";
 import { Select } from "@/components/select";
-import { fieldStyles, TextField } from "@/components/text-field";
+import { makeFieldStyles, TextField } from "@/components/text-field";
 import { FOOD_TYPE_KEYS, type FoodType, UNIT_KEYS, type Unit } from "@/constants/food";
-import { colors, fontSize, fonts, inputBox, spacing } from "@/constants/theme";
+import { fontSize, fonts, inputBox, spacing, type Theme } from "@/constants/theme";
+import { useStyles } from "@/hooks/use-theme";
 import { addFood, deleteFood, getFood, updateFood } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
 import { caloriesFromMacros, MACRO_FIELDS, type MacroKey, parseNumber } from "@/utils/nutrition";
 
 export default function FoodForm() {
+  const styles = useStyles(makeStyles);
+  const fieldStyles = useStyles(makeFieldStyles);
   const db = useSQLiteContext();
   const { t } = useTranslation();
   // With an id (/food-form?id=3) the form edits that food; without one it adds a new food.
@@ -220,7 +223,7 @@ export default function FoodForm() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.background,
@@ -246,7 +249,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   input: {
-    ...inputBox,
+    ...inputBox(colors),
     fontSize: fontSize.medium,
     fontFamily: fonts.body,
     color: colors.text,

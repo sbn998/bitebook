@@ -4,7 +4,8 @@ import { StyleSheet, Text, View } from "react-native";
 import { Button, buttonRowStyles } from "@/components/button";
 import { ConfirmBody, Dialog } from "@/components/dialog";
 import { TextField } from "@/components/text-field";
-import { colors, fontSize, fonts, radius, spacing } from "@/constants/theme";
+import { fontSize, fonts, radius, spacing, type Theme } from "@/constants/theme";
+import { useStyles } from "@/hooks/use-theme";
 import { type FoodEntry, foodEntryNutrition } from "@/db/entries";
 import { useTranslation } from "@/i18n";
 import { formatNumber, macroLine, parseNumber } from "@/utils/nutrition";
@@ -22,6 +23,7 @@ export function FoodEntryDialog({
   onDelete: () => void;
   onClose: () => void;
 }) {
+  const styles = useStyles(makeStyles);
   const { t } = useTranslation();
   const [amount, setAmount] = useState(formatNumber(entry.quantity, 1));
   const [error, setError] = useState("");
@@ -81,7 +83,7 @@ export function FoodEntryDialog({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   nutrition: {
     backgroundColor: colors.primaryTint,
     borderRadius: radius.input,
