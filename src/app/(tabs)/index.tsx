@@ -39,8 +39,8 @@ export default function Main() {
   const insets = useSafeAreaInsets();
   const [date, setDate] = useState(todayString);
   const [entries, setEntries] = useState<MealEntry[]>([]);
-  // The date `entries` belong to. It changes only once the new day has loaded, so the old day's
-  // cards never animate in again while waiting.
+  // The date `entries` and `goal` belong to. It changes only once the new day has loaded, so the old day's
+  // cards never animate in again while waiting, and the summary starts counting from 0 for the new day.
   const [entriesDate, setEntriesDate] = useState(date);
   const [goal, setGoal] = useState<DayGoal | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -52,11 +52,12 @@ export default function Main() {
   const today = todayString();
 
   const load = useCallback(() => {
-    getDayEntries(db, date).then((loaded) => {
-      setEntries(loaded);
+    // Both are set together, so the summary never shows one day's goal with another day's totals.
+    Promise.all([getDayEntries(db, date), getDayGoal(db, date, weekdayOf(date))]).then(([loadedEntries, loadedGoal]) => {
+      setEntries(loadedEntries);
+      setGoal(loadedGoal);
       setEntriesDate(date);
     });
-    getDayGoal(db, date, weekdayOf(date)).then(setGoal);
   }, [db, date]);
 
   // Reload when the screen comes into view (e.g. after changing goals) and when the date changes.
@@ -131,6 +132,7 @@ export default function Main() {
 
       <ScrollView contentContainerStyle={styles.content}>
         <DaySummary
+          key={`summary-${entriesDate}`}
           goal={goal}
           totals={dayTotals}
           setGoalLabel={t.main.setGoalFor(t.weekdaysPlural[weekdayOf(date) - 1])}
