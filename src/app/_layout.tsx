@@ -56,7 +56,7 @@ export default function RootLayout() {
   if (!loaded && !error) return null;
 
   return (
-    <SQLiteProvider databaseName="macro-tracker.db" onInit={migrateDbIfNeeded}>
+    <SQLiteProvider databaseName="bitebook.db" onInit={migrateDbIfNeeded}>
       <LanguageProvider>
         <ThemeSettingProvider>
           <Navigation />
