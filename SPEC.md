@@ -34,10 +34,12 @@ A simple app that will let users log what they eat each day, so they can track h
 - When picking a food for a meal, its amount starts at the food's reference amount (e.g. 100 for "per 100 g")
 - When a total goes over its goal, its progress bar turns red
 - On a past day without a goal, the "no goal" button sets the weekday's goal and also gives that day the chosen goal
+- Light and dark mode, selectable in the settings screen
 
 ## Before release
 
-- Splash screen: use the app's dark background (#14110F) and the app's own icon, instead of the Expo template's blue (#208AEF) and logo
+- Splash screen: the main screen's calorie arc on the app's background (light and dark versions), instead of the Expo template's blue (#208AEF) and logo
+- App name and icon: replace the Expo template's name and logos
 
 ## Not in v1
 
@@ -46,7 +48,8 @@ A simple app that will let users log what they eat each day, so they can track h
 - Barcode scanning, food database search
 - Charts and weekly stats
 - Food suggestions based on how many calories and macronutrients you have left
-- Light or dark mode, and other customization
+- Other customization
+- Short animated intro after the splash screen, showing the app name
 - Reusable meals (e.g Breakfast 1, breakfast 2, etc) which already contain pre-selected foods and you only need to change the amount of each one
 - Translate the app to more languages
 - Gestures (to delete food entries, navigation between screens, etc)
