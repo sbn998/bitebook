@@ -1,7 +1,8 @@
 import { router, Stack, useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useRef, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Card } from "@/components/card";
 import { HeaderButton } from "@/components/header-button";
@@ -21,6 +22,8 @@ export default function Foods() {
   const db = useSQLiteContext();
   const { t } = useTranslation();
   const [foods, setFoods] = useState<Food[]>([]);
+  // False until the first load finishes, so "no saved foods" never shows while the list is on its way.
+  const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<FoodType | null>(null);
   const [ascending, setAscending] = useState(true);
@@ -43,6 +46,7 @@ export default function Foods() {
     useCallback(() => {
       getFoods(db).then((loaded) => {
         setFoods(loaded);
+        setLoaded(true);
         // If the filtered type no longer has any foods (e.g. its last food was deleted), clear the filter.
         setTypeFilter((type) => (type && loaded.some((food) => food.type === type) ? type : null));
       });
@@ -115,43 +119,54 @@ export default function Foods() {
         </View>
       </View>
 
-      <FlatList
-        data={visibleFoods}
-        keyExtractor={(food) => String(food.id)}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <Text style={styles.empty}>{foods.length === 0 ? t.foods.empty : t.foods.noMatches}</Text>
-        }
-        renderItem={({ item: food }) => (
-          <Pressable onPress={() => openForm(food.id)}>
-            <Card style={styles.card}>
-              <View style={styles.cardTop}>
-                <Text style={styles.name} numberOfLines={1}>
-                  {food.name}
-                </Text>
-                <Text style={styles.badge}>{t.foodTypes[food.type]}</Text>
-              </View>
-              <Text style={styles.details}>
-                {[food.brand, t.foods.per(String(food.reference_amount), unitName(t, food.unit, food.reference_amount))].filter(Boolean).join(" · ")}
-              </Text>
-              {/* Macros first and calories on the right, like the totals on a meal card. */}
-              <View style={styles.nutrition}>
-                <Text style={styles.macro}>
-                  {t.macros.proteinShort} {food.protein}
-                </Text>
-                <Text style={styles.macro}>
-                  {t.macros.carbsShort} {food.carbs}
-                </Text>
-                <Text style={styles.macro}>
-                  {t.macros.fatShort} {food.fat}
-                </Text>
-                <Text style={styles.calories}>{food.calories} kcal</Text>
-              </View>
-            </Card>
-          </Pressable>
-        )}
-      />
+      {/* A spinner while the first load runs; then the list fades in, instead of appearing all at once. */}
+      {!loaded ? (
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : (
+        <Animated.View entering={FadeIn.duration(250)} style={styles.flex}>
+          <FlatList
+            data={visibleFoods}
+            keyExtractor={(food) => String(food.id)}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={[styles.list, visibleFoods.length === 0 && styles.listEmpty]}
+            ListEmptyComponent={
+              <Animated.Text style={styles.empty} entering={FadeIn.duration(250)}>
+                {foods.length === 0 ? t.foods.empty : t.foods.noMatches}
+              </Animated.Text>
+            }
+            renderItem={({ item: food }) => (
+              <Pressable onPress={() => openForm(food.id)}>
+                <Card style={styles.card}>
+                  <View style={styles.cardTop}>
+                    <Text style={styles.name} numberOfLines={1}>
+                      {food.name}
+                    </Text>
+                    <Text style={styles.badge}>{t.foodTypes[food.type]}</Text>
+                  </View>
+                  <Text style={styles.details}>
+                    {[food.brand, t.foods.per(String(food.reference_amount), unitName(t, food.unit, food.reference_amount))].filter(Boolean).join(" · ")}
+                  </Text>
+                  {/* Macros first and calories on the right, like the totals on a meal card. */}
+                  <View style={styles.nutrition}>
+                    <Text style={styles.macro}>
+                      {t.macros.proteinShort} {food.protein}
+                    </Text>
+                    <Text style={styles.macro}>
+                      {t.macros.carbsShort} {food.carbs}
+                    </Text>
+                    <Text style={styles.macro}>
+                      {t.macros.fatShort} {food.fat}
+                    </Text>
+                    <Text style={styles.calories}>{food.calories} kcal</Text>
+                  </View>
+                </Card>
+              </Pressable>
+            )}
+          />
+        </Animated.View>
+      )}
     </View>
   );
 }
@@ -192,11 +207,19 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     paddingTop: spacing.sm,
     gap: spacing.md,
   },
+  // With nothing to show, the message sits in the middle of the list's space.
+  listEmpty: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
   empty: {
     fontFamily: fonts.body,
     textAlign: "center",
-    marginTop: spacing.xxl,
     color: colors.textSecondary,
+  },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
   },
   card: {
     gap: spacing.xs,
