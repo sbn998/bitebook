@@ -1,4 +1,4 @@
-# Macro Tracker - v1 Database
+# Bitebook - v1 Database
 
 SQLite database stored locally on the device. Based on the Data section of [SPEC.md](SPEC.md).
 

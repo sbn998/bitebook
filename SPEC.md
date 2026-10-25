@@ -1,4 +1,4 @@
-# Macro Tracker - v1 Spec
+# Bitebook - v1 Spec
 
 ## Goal
 
@@ -35,11 +35,6 @@ A simple app that will let users log what they eat each day, so they can track h
 - When a total goes over its goal, its progress bar turns red
 - On a past day without a goal, the "no goal" button sets the weekday's goal and also gives that day the chosen goal
 - Light and dark mode, selectable in the settings screen
-
-## Before release
-
-- Splash screen: the main screen's calorie arc on the app's background (light and dark versions), instead of the Expo template's blue (#208AEF) and logo
-- App name and icon: replace the Expo template's name and logos
 
 ## Not in v1
 
