@@ -2,6 +2,7 @@
   "expo": {
     "name": "Bitebook",
     "slug": "bitebook",
+    "owner": "sbn998",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,6 +10,7 @@
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#14110F",
     "android": {
+      "package": "com.sbn998.bitebook",
       "adaptiveIcon": {
         "backgroundColor": "#14110F",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -42,6 +44,11 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "73e82c9f-a01c-4901-90d9-9ddbcc71b2b8"
+      }
     }
   }
 }
