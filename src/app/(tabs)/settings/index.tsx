@@ -10,7 +10,7 @@ import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
 import { fontSize, fonts, radius, spacing, type Theme } from "@/constants/theme";
-import { useStyles, useTheme } from "@/hooks/use-theme";
+import { type ThemeSetting, useStyles, useTheme, useThemeSetting } from "@/hooks/use-theme";
 import {
   type Backup,
   type BackupCounts,
@@ -23,12 +23,13 @@ import {
 import { type Language, useTranslation } from "@/i18n";
 import { pickBackupFile, shareBackup } from "@/utils/backup-file";
 
-// A menu of settings sections, the app's language, and exporting or importing the data.
+// A menu of settings sections, the app's language and theme, and exporting or importing the data.
 export default function Settings() {
   const { colors } = useTheme();
   const styles = useStyles(makeStyles);
   const db = useSQLiteContext();
   const { t, language, setLanguage } = useTranslation();
+  const { themeSetting, setThemeSetting } = useThemeSetting();
   // A short result or error shown in a popup, e.g. "Your data was imported."
   const [message, setMessage] = useState<string | null>(null);
   // A checked file waiting for the user to confirm replacing everything with it.
@@ -87,6 +88,12 @@ export default function Settings() {
     { key: "es", label: t.languages.es },
   ];
 
+  const themeOptions: { key: ThemeSetting; label: string }[] = [
+    { key: "auto", label: t.themes.auto },
+    { key: "light", label: t.themes.light },
+    { key: "dark", label: t.themes.dark },
+  ];
+
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.screen}>
       <Card style={styles.menu}>
@@ -106,7 +113,17 @@ export default function Settings() {
             options={languageOptions}
             value={language}
             onChange={setLanguage}
-            style={styles.languageSelect}
+            style={styles.select}
+          />
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.rowText}>{t.settings.theme}</Text>
+          <Select
+            title={t.settings.theme}
+            options={themeOptions}
+            value={themeSetting}
+            onChange={setThemeSetting}
+            style={styles.select}
           />
         </View>
       </Card>
@@ -213,7 +230,8 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     color: colors.text,
     marginBottom: -spacing.sm, // Sits close to its card
   },
-  languageSelect: {
-    width: 150,
+  // Wide enough for "System default", and the same for every dropdown so they line up.
+  select: {
+    width: 180,
   },
 });

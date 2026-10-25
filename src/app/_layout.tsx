@@ -9,11 +9,12 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { SQLiteProvider } from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
+import * as SystemUI from "expo-system-ui";
 import { useEffect } from "react";
 
 import { stackScreenOptions, type Theme } from "@/constants/theme";
 import { migrateDbIfNeeded } from "@/db/migrations";
-import { useStyles, useTheme } from "@/hooks/use-theme";
+import { ThemeSettingProvider, useStyles, useTheme } from "@/hooks/use-theme";
 import { LanguageProvider } from "@/i18n";
 
 // The navigators' own colors (headers, screen backgrounds, borders), so nothing falls back to
@@ -36,8 +37,6 @@ const makeNavigationTheme = ({ dark, colors }: Theme) => {
 // Keep the splash screen up until the fonts are ready, so text never flashes in the phone's font.
 SplashScreen.preventAutoHideAsync();
 
-// The tabs are one screen of this Stack. Screens outside (tabs), like the food form,
-// open on top of the tabs, covering the tab bar. Those forms set their own translated title.
 export default function RootLayout() {
   // The names here are the fontFamily names used in theme.ts.
   const [loaded, error] = useFonts({
@@ -48,9 +47,6 @@ export default function RootLayout() {
     DMSans_500Medium,
     DMSans_600SemiBold,
   });
-  const theme = useTheme();
-  const navigationTheme = useStyles(makeNavigationTheme);
-  const screenOptions = useStyles(stackScreenOptions);
 
   useEffect(() => {
     if (loaded || error) SplashScreen.hideAsync();
@@ -62,17 +58,38 @@ export default function RootLayout() {
   return (
     <SQLiteProvider databaseName="macro-tracker.db" onInit={migrateDbIfNeeded}>
       <LanguageProvider>
-        <ThemeProvider value={navigationTheme}>
-          {/* Clock and icons at the top in the color that reads on the background. */}
-          <StatusBar style={theme.dark ? "light" : "dark"} />
-          <Stack screenOptions={screenOptions}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="food-form" />
-            <Stack.Screen name="goal-form" />
-            <Stack.Screen name="meal-entry-form" />
-          </Stack>
-        </ThemeProvider>
+        <ThemeSettingProvider>
+          <Navigation />
+        </ThemeSettingProvider>
       </LanguageProvider>
     </SQLiteProvider>
+  );
+}
+
+// The tabs are one screen of this Stack. Screens outside (tabs), like the food form,
+// open on top of the tabs, covering the tab bar. Those forms set their own translated title.
+// Separate from RootLayout because it reads the theme, which needs ThemeSettingProvider above it.
+function Navigation() {
+  const theme = useTheme();
+  const navigationTheme = useStyles(makeNavigationTheme);
+  const screenOptions = useStyles(stackScreenOptions);
+
+  // The window behind every screen, which shows for a moment while a screen closes. It starts with
+  // app.json's dark backgroundColor, so it has to follow the theme, or closing a form flashes dark in light mode.
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(theme.colors.background);
+  }, [theme]);
+
+  return (
+    <ThemeProvider value={navigationTheme}>
+      {/* Clock and icons at the top in the color that reads on the background. */}
+      <StatusBar style={theme.dark ? "light" : "dark"} />
+      <Stack screenOptions={screenOptions}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="food-form" />
+        <Stack.Screen name="goal-form" />
+        <Stack.Screen name="meal-entry-form" />
+      </Stack>
+    </ThemeProvider>
   );
 }

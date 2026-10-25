@@ -89,7 +89,13 @@ export const es: Strings = {
     mealLabels: "Comidas",
     yourGoals: "Tus objetivos",
     language: "Idioma",
+    theme: "Tema",
     yourData: "Tus datos",
+  },
+  themes: {
+    auto: "Según el sistema",
+    light: "Claro",
+    dark: "Oscuro",
   },
   backup: {
     export: "Exportar datos",

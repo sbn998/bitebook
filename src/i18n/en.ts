@@ -93,7 +93,13 @@ export const en = {
     mealLabels: "Meal labels",
     yourGoals: "Your goals",
     language: "Language",
+    theme: "Theme",
     yourData: "Your data",
+  },
+  themes: {
+    auto: "System default",
+    light: "Light",
+    dark: "Dark",
   },
   backup: {
     export: "Export data",
