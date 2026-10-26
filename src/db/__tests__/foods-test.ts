@@ -59,13 +59,13 @@ describe("foods", () => {
     expect(saved.barcode).toBe("0012345678905");
   });
 
-  test("can't share a barcode, but any number can have none", async () => {
+  test("can share a barcode, e.g. the same product per 100 g and per serving", async () => {
     const db = await openTestDb();
     await saveFood(db, { ...chicken, barcode: "8480000123456" });
+    await saveFood(db, { ...chicken, reference_amount: 1, unit: "serving", calories: 250, barcode: "8480000123456" });
     await saveFood(db, chicken);
-    await saveFood(db, { ...chicken, name: "Turkey" });
-    await expect(addFood(db, { ...chicken, name: "Copy", barcode: "8480000123456" })).rejects.toThrow("UNIQUE");
-    expect(await getFoods(db)).toHaveLength(3);
+    const withBarcode = (await getFoods(db)).filter((food) => food.barcode === "8480000123456");
+    expect(withBarcode.map((food) => food.unit)).toEqual(["g", "serving"]);
   });
 
   test("keep their barcode when edited", async () => {

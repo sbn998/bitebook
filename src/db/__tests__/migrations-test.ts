@@ -139,17 +139,52 @@ describe("an upgrade from version 2", () => {
     expect(await userVersion(db)).toBe(DATABASE_VERSION);
   });
 
-  test("lets foods have a barcode, but never the same one twice", async () => {
+  test("lets several foods have the same barcode", async () => {
     const db = await openVersion2Db();
     await migrateDbIfNeeded(db);
-    await db.runAsync("UPDATE foods SET barcode = ? WHERE id = 1", "8480000123456");
-    const sameBarcode = db.runAsync(
-      "INSERT INTO foods (name, type, reference_amount, unit, calories, protein, carbs, fat, barcode) VALUES ('Copy', 'poultry', 100, 'g', 1, 0, 0, 0, ?)",
-      "8480000123456"
-    );
-    await expect(sameBarcode).rejects.toThrow("UNIQUE");
+    await saveTwoFoodsWithOneBarcode(db);
+    expect(await db.getAllAsync("SELECT barcode FROM foods WHERE barcode IS NOT NULL")).toHaveLength(2);
   });
 });
+
+describe("an upgrade from version 3", () => {
+  // Version 3 didn't let two foods share a barcode (a unique index), which version 4 undoes.
+  async function openVersion3Db() {
+    const db = createTestDb();
+    await db.execAsync(`
+      ${FOODS_BEFORE_VERSION_3}
+      ALTER TABLE foods ADD COLUMN barcode TEXT;
+      CREATE UNIQUE INDEX foods_barcode ON foods(barcode);
+      UPDATE foods SET barcode = '8480000123456';
+      PRAGMA user_version = 3;
+    `);
+    return db;
+  }
+
+  test("keeps the foods and their barcodes", async () => {
+    const db = await openVersion3Db();
+    await migrateDbIfNeeded(db);
+    expect(await db.getAllAsync("SELECT name, barcode FROM foods")).toEqual([
+      { name: "Chicken breast", barcode: "8480000123456" },
+    ]);
+    expect(await userVersion(db)).toBe(DATABASE_VERSION);
+  });
+
+  test("lets several foods have the same barcode", async () => {
+    const db = await openVersion3Db();
+    await migrateDbIfNeeded(db);
+    await saveTwoFoodsWithOneBarcode(db);
+    expect(await db.getAllAsync("SELECT barcode FROM foods WHERE barcode = '8480000123456'")).toHaveLength(3);
+  });
+});
+
+// The same product saved per 100 g and per serving.
+async function saveTwoFoodsWithOneBarcode(db: Awaited<ReturnType<typeof createTestDb>>) {
+  const insert = `INSERT INTO foods (name, type, reference_amount, unit, calories, protein, carbs, fat, barcode)
+                  VALUES ('Turkey', 'poultry', ?, ?, ?, 24, 0, 1, '8480000123456')`;
+  await db.runAsync(insert, 100, "g", 104);
+  await db.runAsync(insert, 1, "serving", 52);
+}
 
 describe("opening the app again", () => {
   test("doesn't change anything", async () => {

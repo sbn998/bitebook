@@ -14,7 +14,7 @@ export type Food = {
   protein: number;
   carbs: number;
   fat: number;
-  barcode: string | null; // As text, so leading zeros are kept. No two foods share one.
+  barcode: string | null; // As text, so leading zeros are kept. Several foods can share one.
 };
 
 // What the food form edits. The barcode is only set when a food is added, never edited.
