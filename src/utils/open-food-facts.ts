@@ -72,14 +72,21 @@ export function foodFromProduct(product: Product): ScannedFood {
   const categories = product.categories_tags ?? [];
   // "Hacendado, Mercadona" → "Hacendado"
   const brand = product.brands?.split(",")[0].trim();
+  const macros = {
+    protein: per100g(product, "proteins"),
+    carbs: per100g(product, "carbohydrates"),
+    fat: per100g(product, "fat"),
+  };
+  // Plain water often lists only its minerals. It has no macros, so they're 0 rather than unknown.
+  // Flavored waters can have sugar, so they're left as they are.
+  const plainWater = categories.includes("en:waters") && !categories.includes("en:flavored-waters");
+  const noMacros = macros.protein === null && macros.carbs === null && macros.fat === null;
   return {
     name: product.product_name?.trim() ?? "",
     brand: brand || null,
     type: foodTypeFromCategories(categories),
     unit: categories.includes("en:beverages") ? "ml" : "g",
-    protein: per100g(product, "proteins"),
-    carbs: per100g(product, "carbohydrates"),
-    fat: per100g(product, "fat"),
+    ...(plainWater && noMacros ? { protein: 0, carbs: 0, fat: 0 } : macros),
   };
 }
 
@@ -95,7 +102,12 @@ export async function lookUpBarcode(barcode: string): Promise<LookupResult> {
     if (!response.ok) return { status: "failed" };
     const body: { status?: number; product?: Product } = await response.json();
     if (body.status !== 1 || !body.product) return { status: "notFound" };
-    return { status: "found", food: foodFromProduct(body.product) };
+    const food = foodFromProduct(body.product);
+    // Some entries were added without filling anything in: nothing to fill the form with.
+    if (food.name === "" && food.protein === null && food.carbs === null && food.fat === null) {
+      return { status: "notFound" };
+    }
+    return { status: "found", food };
   } catch {
     // fetch fails like this without internet.
     return { status: "failed" };

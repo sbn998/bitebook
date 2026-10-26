@@ -48,6 +48,16 @@ describe("lookUpBarcode", () => {
     expect(await lookUpBarcode("8480000123456")).toEqual({ status: "notFound" });
   });
 
+  test("says not found for an entry with nothing filled in", async () => {
+    fakeAnswer(200, { status: 1, product: { categories_tags: [], nutriments: {} } });
+    expect(await lookUpBarcode("8412345678905")).toEqual({ status: "notFound" });
+  });
+
+  test("still fills in a product that only has a name", async () => {
+    fakeAnswer(200, { status: 1, product: { product_name: "Croissants" } });
+    expect(await lookUpBarcode("8412345678905")).toMatchObject({ status: "found", food: { name: "Croissants" } });
+  });
+
   test("fails when there's no internet", async () => {
     jest.spyOn(globalThis, "fetch").mockRejectedValue(new TypeError("Network request failed"));
     expect(await lookUpBarcode("3017624010701")).toEqual({ status: "failed" });
@@ -95,6 +105,22 @@ describe("foodFromProduct", () => {
 
   test("gives an empty name when the product has none", () => {
     expect(foodFromProduct({}).name).toBe("");
+  });
+
+  test("gives plain water 0 macros when it only lists minerals", () => {
+    // Like Cristaline: calcium, magnesium… but no calories or macros.
+    const water = { categories_tags: ["en:beverages", "en:waters", "en:spring-waters"], nutriments: { calcium_100g: 0.113 } };
+    expect(foodFromProduct(water)).toMatchObject({ type: "drinks", unit: "ml", protein: 0, carbs: 0, fat: 0 });
+  });
+
+  test("leaves flavored water empty, since it can have sugar", () => {
+    const flavored = { categories_tags: ["en:beverages", "en:waters", "en:flavored-waters"], nutriments: {} };
+    expect(foodFromProduct(flavored)).toMatchObject({ protein: null, carbs: null, fat: null });
+  });
+
+  test("keeps water's own values when it has them", () => {
+    const water = { categories_tags: ["en:waters"], nutriments: { carbohydrates_100g: 0.2 } };
+    expect(foodFromProduct(water)).toMatchObject({ protein: null, carbs: 0.2, fat: null });
   });
 });
 
