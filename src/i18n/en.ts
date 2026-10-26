@@ -84,6 +84,8 @@ export const en = {
     allowCamera: "Allow camera",
     cameraOff: "Camera access is turned off. You can turn it on in your phone's settings.",
     openSettings: "Open settings",
+    flashOn: "Turn on the flash",
+    flashOff: "Turn off the flash",
   },
   foodPicker: {
     title: "Add food",

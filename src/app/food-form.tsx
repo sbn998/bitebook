@@ -2,16 +2,17 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
 import { ConfirmDialog } from "@/components/dialog";
+import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
 import { makeFieldStyles, TextField } from "@/components/text-field";
 import { FOOD_TYPE_KEYS, type FoodType, UNIT_KEYS, type Unit } from "@/constants/food";
-import { fontSize, fonts, inputBox, spacing, type Theme } from "@/constants/theme";
-import { useStyles } from "@/hooks/use-theme";
+import { fontSize, fonts, inputBox, radius, spacing, type Theme } from "@/constants/theme";
+import { useStyles, useTheme } from "@/hooks/use-theme";
 import { addFood, deleteFood, getFood, updateFood } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
 import { errorMessages, readFoodForm } from "@/utils/forms";
@@ -20,6 +21,7 @@ import { caloriesFromMacros, MACRO_FIELDS, type MacroKey, parseNumber } from "@/
 export default function FoodForm() {
   const styles = useStyles(makeStyles);
   const fieldStyles = useStyles(makeFieldStyles);
+  const { colors } = useTheme();
   const db = useSQLiteContext();
   const { t } = useTranslation();
   // With an id (/food-form?id=3) the form edits that food; without one it adds a new food.
@@ -109,7 +111,15 @@ export default function FoodForm() {
       >
         {/* Only for new foods: a scanned barcode is saved when a food is added, never edited. */}
         {id === null && (
-          <Button title={t.foodForm.scan} variant="secondary" onPress={() => router.push("/barcode-scanner")} />
+          <Pressable onPress={() => router.push("/barcode-scanner")} style={({ pressed }) => pressed && styles.pressed}>
+            <Card style={styles.scanRow}>
+              <View style={styles.scanIcon}>
+                <Icon name="barcode" size={22} color={colors.primaryText} />
+              </View>
+              <Text style={[styles.scanTitle, styles.flex]}>{t.foodForm.scan}</Text>
+              <Icon name="chevronRight" />
+            </Card>
+          </Pressable>
         )}
         <Card style={styles.section}>
           <TextField label={t.common.name} value={name} onChangeText={setName} error={errors.name} />
@@ -233,5 +243,27 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   },
   inputError: {
     borderColor: colors.danger,
+  },
+  pressed: {
+    opacity: 0.7,
+  },
+  scanRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  // A round orange-tinted badge, like the food type badges.
+  scanIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primaryTint,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  scanTitle: {
+    fontSize: fontSize.medium,
+    fontFamily: fonts.title,
+    color: colors.text,
   },
 });

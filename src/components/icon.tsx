@@ -1,4 +1,5 @@
 import { SymbolView, type SymbolViewProps } from "expo-symbols";
+import { StyleSheet } from "react-native";
 
 import { useTheme } from "@/hooks/use-theme";
 
@@ -16,11 +17,24 @@ const ICONS = {
   close: { ios: "xmark", android: "close" },
   check: { ios: "checkmark", android: "check" },
   trash: { ios: "trash", android: "delete" },
+  barcode: { ios: "barcode.viewfinder", android: "barcode_scanner" },
+  flashOn: { ios: "bolt.fill", android: "flash_on" },
+  flashOff: { ios: "bolt.slash.fill", android: "flash_off" },
 } satisfies Record<string, SymbolViewProps["name"]>;
 
 export type IconName = keyof typeof ICONS;
 
 export function Icon({ name, size = 20, color }: { name: IconName; size?: number; color?: string }) {
   const { colors } = useTheme();
-  return <SymbolView name={ICONS[name]} size={size} tintColor={color ?? colors.textSecondary} />;
+  // On Android the icon is a letter of an icon font, which sits a little low in its box; centering fixes it.
+  return (
+    <SymbolView name={ICONS[name]} size={size} tintColor={color ?? colors.textSecondary} style={styles.centered} />
+  );
 }
+
+const styles = StyleSheet.create({
+  centered: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

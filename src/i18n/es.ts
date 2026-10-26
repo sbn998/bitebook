@@ -80,6 +80,8 @@ export const es: Strings = {
     allowCamera: "Permitir cámara",
     cameraOff: "El acceso a la cámara está desactivado. Puedes activarlo en los ajustes del teléfono.",
     openSettings: "Abrir ajustes",
+    flashOn: "Encender el flash",
+    flashOff: "Apagar el flash",
   },
   foodPicker: {
     title: "Añadir alimento",
