@@ -75,6 +75,15 @@ export const en = {
     calories: "Calories (kcal)",
     calculated: (kcal: number) => `${kcal} (calculated)`,
     caloriesOrMacro: "Enter calories or at least one macronutrient",
+    scan: "Scan barcode",
+  },
+  scanner: {
+    title: "Scan barcode",
+    pointCamera: "Point the camera at the barcode",
+    needsCamera: "Bitebook needs the camera to scan barcodes.",
+    allowCamera: "Allow camera",
+    cameraOff: "Camera access is turned off. You can turn it on in your phone's settings.",
+    openSettings: "Open settings",
   },
   foodPicker: {
     title: "Add food",

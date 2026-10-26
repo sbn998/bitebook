@@ -71,6 +71,15 @@ export const es: Strings = {
     calories: "Calorías (kcal)",
     calculated: (kcal: number) => `${kcal} (calculado)`,
     caloriesOrMacro: "Introduce las calorías o al menos un macronutriente",
+    scan: "Escanear código de barras",
+  },
+  scanner: {
+    title: "Escanear código de barras",
+    pointCamera: "Apunta la cámara al código de barras",
+    needsCamera: "Bitebook necesita la cámara para escanear códigos de barras.",
+    allowCamera: "Permitir cámara",
+    cameraOff: "El acceso a la cámara está desactivado. Puedes activarlo en los ajustes del teléfono.",
+    openSettings: "Abrir ajustes",
   },
   foodPicker: {
     title: "Añadir alimento",

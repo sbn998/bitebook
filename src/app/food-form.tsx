@@ -107,6 +107,10 @@ export default function FoodForm() {
         automaticallyAdjustKeyboardInsets
         contentContainerStyle={styles.form}
       >
+        {/* Only for new foods: a scanned barcode is saved when a food is added, never edited. */}
+        {id === null && (
+          <Button title={t.foodForm.scan} variant="secondary" onPress={() => router.push("/barcode-scanner")} />
+        )}
         <Card style={styles.section}>
           <TextField label={t.common.name} value={name} onChangeText={setName} error={errors.name} />
           <TextField label={t.foodForm.brand} value={brand} onChangeText={setBrand} />
