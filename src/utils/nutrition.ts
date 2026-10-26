@@ -28,6 +28,28 @@ export function percentFromGrams(key: MacroKey, grams: number, calories: number)
   return ((grams * KCAL_PER_GRAM[key]) / calories) * 100;
 }
 
+// Goal macro targets can be typed in grams or as a percentage of the calories. They're always saved as grams.
+export type MacroUnit = "g" | "%";
+
+// Small rounding differences (e.g. 112.5 g rounded to 113 g) shouldn't count as "over the goal".
+export const KCAL_TOLERANCE = 0.5;
+
+// The exact calories of macro targets in grams (null = no target), not rounded.
+export function macroCalories(grams: Record<MacroKey, number | null>) {
+  return MACRO_FIELDS.reduce((sum, { key }) => sum + (grams[key] ?? 0) * KCAL_PER_GRAM[key], 0);
+}
+
+// Whether macros of `macroKcal` calories go over a goal of `calories`, past the rounding tolerance.
+export function isOverGoal(macroKcal: number, calories: number) {
+  return macroKcal > calories + KCAL_TOLERANCE;
+}
+
+// What to type into the one empty macro to use up `kcalLeft`, rounded down so the total never goes over.
+// e.g. 90 kcal left for fat = 10 g, or 6% of 1500 kcal
+export function fillEmptyMacro(key: MacroKey, unit: MacroUnit, kcalLeft: number, calories: number) {
+  return unit === "g" ? Math.floor(kcalLeft / KCAL_PER_GRAM[key]) : Math.floor((kcalLeft / calories) * 1000) / 10;
+}
+
 // Rounds to at most `decimals` decimals and drops trailing zeros: 26.666 -> "26.7", 58.0 -> "58".
 export function formatNumber(value: number, decimals = 0) {
   const factor = 10 ** decimals;

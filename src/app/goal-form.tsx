@@ -15,20 +15,19 @@ import { useTranslation } from "@/i18n";
 import { todayString } from "@/utils/date";
 import {
   caloriesFromMacros,
+  fillEmptyMacro,
   formatNumber,
   gramsFromPercent,
+  isOverGoal,
   KCAL_PER_GRAM,
+  KCAL_TOLERANCE,
   MACRO_FIELDS,
+  macroCalories,
   type MacroKey,
+  type MacroUnit,
   parseNumber,
   percentFromGrams,
 } from "@/utils/nutrition";
-
-// Macro targets can be typed in grams or as a percentage of the calories. They're always saved as grams.
-type MacroUnit = "g" | "%";
-
-// Small rounding differences (e.g. 112.5 g rounded to 113 g) shouldn't count as "over the goal".
-const KCAL_TOLERANCE = 0.5;
 
 export default function GoalForm() {
   const styles = useStyles(makeStyles);
@@ -84,10 +83,10 @@ export default function GoalForm() {
   }
 
   const calculatedCalories = caloriesFromMacros(gramsOf("protein") ?? 0, gramsOf("carbs") ?? 0, gramsOf("fat") ?? 0);
-  const macroKcal = MACRO_FIELDS.reduce((sum, { key }) => sum + (gramsOf(key) ?? 0) * KCAL_PER_GRAM[key], 0);
+  const macroKcal = macroCalories({ protein: gramsOf("protein"), carbs: gramsOf("carbs"), fat: gramsOf("fat") });
   // How many calories the macros don't cover yet (negative = over the goal). Only with calories typed in.
   const kcalLeft = kcal === null ? null : kcal - macroKcal;
-  const isOver = kcalLeft !== null && kcalLeft < -KCAL_TOLERANCE;
+  const isOver = kcal !== null && isOverGoal(macroKcal, kcal);
   // The "Use for…" button appears when exactly one macro is empty and there are calories left for it.
   const emptyMacros = MACRO_FIELDS.filter(({ key }) => macros[key].trim() === "");
   const fillTarget = emptyMacros.length === 1 && kcalLeft !== null && kcalLeft > KCAL_TOLERANCE ? emptyMacros[0] : null;
@@ -120,11 +119,7 @@ export default function GoalForm() {
   function fillRemaining() {
     if (!fillTarget || kcalLeft === null || kcal === null) return;
     const { key } = fillTarget;
-    const value =
-      units[key] === "g"
-        ? Math.floor(kcalLeft / KCAL_PER_GRAM[key])
-        : Math.floor((kcalLeft / kcal) * 1000) / 10;
-    setMacros({ ...macros, [key]: String(value) });
+    setMacros({ ...macros, [key]: String(fillEmptyMacro(key, units[key], kcalLeft, kcal)) });
   }
 
   async function save() {
@@ -161,7 +156,7 @@ export default function GoalForm() {
     }
 
     // Typed-in calories can't be less than the macros add up to. (The red line under the macros says why.)
-    if (calories.trim() !== "" && goalKcal !== null && exactMacroKcal > goalKcal + KCAL_TOLERANCE) {
+    if (calories.trim() !== "" && goalKcal !== null && isOverGoal(exactMacroKcal, goalKcal)) {
       newErrors.total = "over"; // Never shown: it only blocks saving.
     }
 
