@@ -2,7 +2,17 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
@@ -15,8 +25,9 @@ import { fontSize, fonts, inputBox, radius, spacing, type Theme } from "@/consta
 import { useStyles, useTheme } from "@/hooks/use-theme";
 import { addFood, deleteFood, getFood, updateFood } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
-import { errorMessages, readFoodForm } from "@/utils/forms";
+import { errorMessages, readFoodForm, scannedFoodFields } from "@/utils/forms";
 import { caloriesFromMacros, MACRO_FIELDS, type MacroKey, parseNumber } from "@/utils/nutrition";
+import { lookUpBarcode } from "@/utils/open-food-facts";
 
 export default function FoodForm() {
   const styles = useStyles(makeStyles);
@@ -25,8 +36,13 @@ export default function FoodForm() {
   const db = useSQLiteContext();
   const { t } = useTranslation();
   // With an id (/food-form?id=3) the form edits that food; without one it adds a new food.
-  const params = useLocalSearchParams<{ id?: string }>();
+  // The scanner comes back with a barcode (/food-form?barcode=…), which fills in the food from it.
+  const params = useLocalSearchParams<{ id?: string; barcode?: string }>();
   const id = params.id ? Number(params.id) : null;
+  const barcode = params.barcode ?? null;
+  // The last barcode Open Food Facts answered for: until it's this one, the form is still looking it up.
+  const [lookedUp, setLookedUp] = useState<string | null>(null);
+  const lookingUp = barcode !== null && lookedUp !== barcode;
   const [loaded, setLoaded] = useState(id === null);
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
@@ -56,6 +72,25 @@ export default function FoodForm() {
     });
   }, [db, id]);
 
+  // After a scan, look the barcode up and fill in what Open Food Facts knows, replacing what was typed.
+  useEffect(() => {
+    if (barcode === null) return;
+    lookUpBarcode(barcode).then((result) => {
+      if (result.status === "found") {
+        const fields = scannedFoodFields(result.food);
+        setName(fields.name);
+        setBrand(fields.brand);
+        setType(fields.type);
+        setUnit(fields.unit);
+        setReferenceAmount(fields.referenceAmount);
+        setCalories(fields.calories);
+        setMacros(fields.macros);
+        setErrors({});
+      }
+      setLookedUp(barcode);
+    });
+  }, [barcode]);
+
   const hasMacros = MACRO_FIELDS.some(({ key }) => macros[key].trim() !== "");
   const calculatedCalories = caloriesFromMacros(
     parseNumber(macros.protein) ?? 0,
@@ -76,7 +111,8 @@ export default function FoodForm() {
     setErrors(errorMessages(t, newErrors));
     if (!food) return;
 
-    if (id === null) await addFood(db, { ...food, barcode: null });
+    // A scanned barcode is saved even if Open Food Facts didn't know it, so scanning it again finds this food.
+    if (id === null) await addFood(db, { ...food, barcode });
     else await updateFood(db, id, food);
     router.back();
   }
@@ -111,13 +147,17 @@ export default function FoodForm() {
       >
         {/* Only for new foods: a scanned barcode is saved when a food is added, never edited. */}
         {id === null && (
-          <Pressable onPress={() => router.push("/barcode-scanner")} style={({ pressed }) => pressed && styles.pressed}>
+          <Pressable
+            onPress={() => router.push("/barcode-scanner")}
+            disabled={lookingUp}
+            style={({ pressed }) => pressed && styles.pressed}
+          >
             <Card style={styles.scanRow}>
               <View style={styles.scanIcon}>
                 <Icon name="barcode" size={22} color={colors.primaryText} />
               </View>
-              <Text style={[styles.scanTitle, styles.flex]}>{t.foodForm.scan}</Text>
-              <Icon name="chevronRight" />
+              <Text style={[styles.scanTitle, styles.flex]}>{lookingUp ? t.foodForm.lookingUp : t.foodForm.scan}</Text>
+              {lookingUp ? <ActivityIndicator color={colors.primary} /> : <Icon name="chevronRight" />}
             </Card>
           </Pressable>
         )}

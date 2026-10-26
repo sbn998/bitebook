@@ -72,6 +72,7 @@ export const es: Strings = {
     calculated: (kcal: number) => `${kcal} (calculado)`,
     caloriesOrMacro: "Introduce las calorías o al menos un macronutriente",
     scan: "Escanear código de barras",
+    lookingUp: "Buscando el alimento…",
   },
   scanner: {
     title: "Escanear código de barras",

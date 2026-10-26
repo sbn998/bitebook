@@ -12,6 +12,7 @@ import {
   type MacroUnit,
   parseNumber,
 } from "@/utils/nutrition";
+import type { ScannedFood } from "@/utils/open-food-facts";
 
 // Why a form field can't be saved. The forms show each one as a message in the app's language.
 export type FieldError =
@@ -38,6 +39,24 @@ export type FoodFormFields = {
   calories: string;
   macros: Record<MacroKey, string>;
 };
+
+// The food form filled in from a scanned product, per 100 g (or ml). A value Open Food Facts doesn't
+// have stays an empty field, so it's clear it's missing. Calories stay empty too: Save calculates them
+// from the macros, because labels' calories often don't match their macros. Only when every macro is 0
+// (like water) are calories filled in as 0, so they don't depend on the macros at all.
+export function scannedFoodFields(food: ScannedFood): FoodFormFields {
+  const text = (value: number | null) => (value === null ? "" : String(value));
+  const noMacros = food.protein === 0 && food.carbs === 0 && food.fat === 0;
+  return {
+    name: food.name,
+    brand: food.brand ?? "",
+    type: food.type,
+    unit: food.unit,
+    referenceAmount: "100",
+    calories: noMacros ? "0" : "",
+    macros: { protein: text(food.protein), carbs: text(food.carbs), fat: text(food.fat) },
+  };
+}
 
 // Checks the food form and turns it into a food to save. Empty macros count as 0, and empty calories
 // are calculated from the macros, if there are any.

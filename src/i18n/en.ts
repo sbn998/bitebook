@@ -76,6 +76,7 @@ export const en = {
     calculated: (kcal: number) => `${kcal} (calculated)`,
     caloriesOrMacro: "Enter calories or at least one macronutrient",
     scan: "Scan barcode",
+    lookingUp: "Looking up the food…",
   },
   scanner: {
     title: "Scan barcode",
