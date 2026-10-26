@@ -1,7 +1,7 @@
 import type { SQLiteDatabase } from "expo-sqlite";
 
 import { addMealEntry, getDayEntries } from "@/db/entries";
-import { addFood, deleteFood, type Food, getFood, getFoods, updateFood } from "@/db/foods";
+import { addFood, deleteFood, type Food, getFood, getFoods, getFoodsByBarcode, updateFood } from "@/db/foods";
 import { addMeal } from "@/db/meals";
 import { openTestDb } from "@/db/test-db";
 
@@ -15,6 +15,7 @@ const chicken: Omit<Food, "id"> = {
   protein: 31,
   carbs: 0,
   fat: 3.6,
+  barcode: null,
 };
 
 // Saves a food and gives it back with its id.
@@ -50,6 +51,40 @@ describe("foods", () => {
     const saved = await saveFood(db, chicken);
     await updateFood(db, saved.id, { ...chicken, name: "Grilled chicken", calories: 170 });
     expect(await getFood(db, saved.id)).toMatchObject({ name: "Grilled chicken", calories: 170 });
+  });
+
+  test("can have a barcode, kept as text with its leading zeros", async () => {
+    const db = await openTestDb();
+    const saved = await saveFood(db, { ...chicken, barcode: "0012345678905" });
+    expect(saved.barcode).toBe("0012345678905");
+  });
+
+  test("can share a barcode, e.g. the same product per 100 g and per serving", async () => {
+    const db = await openTestDb();
+    await saveFood(db, { ...chicken, barcode: "8480000123456" });
+    await saveFood(db, { ...chicken, reference_amount: 1, unit: "serving", calories: 250, barcode: "8480000123456" });
+    await saveFood(db, chicken);
+    const withBarcode = (await getFoods(db)).filter((food) => food.barcode === "8480000123456");
+    expect(withBarcode.map((food) => food.unit)).toEqual(["g", "serving"]);
+  });
+
+  test("can be found by barcode, every version of the product", async () => {
+    const db = await openTestDb();
+    const per100g = await saveFood(db, { ...chicken, barcode: "8480000123456" });
+    await saveFood(db, { ...chicken, name: "Turkey", barcode: "8410000000000" });
+    const perServing = await saveFood(db, { ...chicken, reference_amount: 1, unit: "serving", barcode: "8480000123456" });
+    await saveFood(db, chicken);
+
+    expect(await getFoodsByBarcode(db, "8480000123456")).toEqual([per100g, perServing]);
+    expect(await getFoodsByBarcode(db, "0000000000000")).toEqual([]);
+  });
+
+  test("keep their barcode when edited", async () => {
+    const db = await openTestDb();
+    const saved = await saveFood(db, { ...chicken, barcode: "8480000123456" });
+    const { barcode, id, ...details } = saved;
+    await updateFood(db, id, { ...details, calories: 170 });
+    expect(await getFood(db, id)).toMatchObject({ calories: 170, barcode });
   });
 
   test("can be deleted", async () => {

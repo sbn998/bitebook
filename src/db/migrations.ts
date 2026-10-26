@@ -1,7 +1,7 @@
 import type { SQLiteDatabase } from "expo-sqlite";
 
 // Also used to refuse backup files made by a newer version of the app.
-export const DATABASE_VERSION = 2;
+export const DATABASE_VERSION = 4;
 
 // Runs every time the app opens the database, before any screen is shown.
 export async function migrateDbIfNeeded(db: SQLiteDatabase) {
@@ -111,6 +111,25 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
 
       COMMIT;
       PRAGMA foreign_keys = ON;
+    `);
+  }
+
+  // Migration 3: foods can remember the barcode they were scanned from (empty = none).
+  // SQLite can't add a UNIQUE column, so a unique index does it: no two foods share a barcode,
+  // but any number of foods can have none.
+  if (currentDbVersion < 3) {
+    await db.execAsync(`
+      ALTER TABLE foods ADD COLUMN barcode TEXT;
+      CREATE UNIQUE INDEX foods_barcode ON foods(barcode);
+    `);
+  }
+
+  // Migration 4: the same product can be saved more than once (e.g. per 100 g and per serving),
+  // so barcodes no longer have to be unique. A plain index still makes finding foods by barcode fast.
+  if (currentDbVersion < 4) {
+    await db.execAsync(`
+      DROP INDEX foods_barcode;
+      CREATE INDEX foods_barcode ON foods(barcode);
     `);
   }
 

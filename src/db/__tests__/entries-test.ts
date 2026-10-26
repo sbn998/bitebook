@@ -25,6 +25,7 @@ const chicken: Omit<Food, "id"> = {
   protein: 31,
   carbs: 0,
   fat: 3.6,
+  barcode: null,
 };
 // Rice: 130 kcal, 2.7 g protein, 28 g carbs, 0.3 g fat per 100 g.
 const rice: Omit<Food, "id"> = {
@@ -37,6 +38,7 @@ const rice: Omit<Food, "id"> = {
   protein: 2.7,
   carbs: 28,
   fat: 0.3,
+  barcode: null,
 };
 
 describe("foodEntryNutrition", () => {

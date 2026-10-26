@@ -1,0 +1,27 @@
+{
+  "code": "3017624010701",
+  "product": {
+    "brands": "Ferrero",
+    "categories_tags": [
+      "en:breakfasts",
+      "en:spreads",
+      "en:sweet-spreads",
+      "fr:pates-a-tartiner",
+      "en:hazelnut-spreads",
+      "en:chocolate-spreads",
+      "en:cocoa-and-hazelnuts-spreads",
+      "de:Other"
+    ],
+    "nutriments": {
+      "carbohydrates_100g": 57.5,
+      "energy-kcal_100g": 539,
+      "fat_100g": 30.9,
+      "proteins_100g": 6.3,
+      "salt_100g": 0.1075,
+      "sugars_100g": 56.3
+    },
+    "product_name": "Nutella"
+  },
+  "status": 1,
+  "status_verbose": "product found"
+}

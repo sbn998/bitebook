@@ -1,6 +1,14 @@
 import { en } from "@/i18n/en";
 import { es } from "@/i18n/es";
-import { errorMessages, type FoodFormFields, type GoalFormFields, readFoodForm, readGoalForm } from "@/utils/forms";
+import {
+  errorMessages,
+  type FoodFormFields,
+  type GoalFormFields,
+  readFoodForm,
+  readGoalForm,
+  scannedFoodFields,
+} from "@/utils/forms";
+import type { ScannedFood } from "@/utils/open-food-facts";
 
 // A filled-in food form; each test changes only what it's about.
 const chickenForm: FoodFormFields = {
@@ -94,6 +102,59 @@ describe("readFoodForm", () => {
     expect(readFoodForm({ ...chickenForm, referenceAmount: "" }).errors).toEqual({ reference_amount: "required" });
     expect(readFoodForm({ ...chickenForm, referenceAmount: "a lot" }).errors).toEqual({
       reference_amount: "validNumber",
+    });
+  });
+});
+
+describe("scannedFoodFields", () => {
+  const nutella: ScannedFood = {
+    name: "Nutella",
+    brand: "Ferrero",
+    type: "sweets_snacks",
+    unit: "g",
+    protein: 6.3,
+    carbs: 57.5,
+    fat: 30.9,
+  };
+
+  test("fills in the form per 100, leaving calories to be calculated", () => {
+    expect(scannedFoodFields(nutella)).toEqual({
+      name: "Nutella",
+      brand: "Ferrero",
+      type: "sweets_snacks",
+      unit: "g",
+      referenceAmount: "100",
+      calories: "",
+      macros: { protein: "6.3", carbs: "57.5", fat: "30.9" },
+    });
+  });
+
+  test("leaves what Open Food Facts doesn't have empty", () => {
+    const unknownBar = { ...nutella, brand: null, type: null, carbs: null, fat: null };
+    expect(scannedFoodFields(unknownBar)).toMatchObject({
+      brand: "",
+      type: null,
+      macros: { protein: "6.3", carbs: "", fat: "" },
+    });
+  });
+
+  test("fills in 0 calories when every macro is 0, like water", () => {
+    const water = { ...nutella, name: "Water", type: "drinks" as const, unit: "ml" as const, protein: 0, carbs: 0, fat: 0 };
+    expect(scannedFoodFields(water)).toMatchObject({ calories: "0", macros: { protein: "0", carbs: "0", fat: "0" } });
+  });
+
+  test("leaves calories empty when a macro is missing, even if the others are 0", () => {
+    const unknownDrink = { ...nutella, protein: 0, carbs: null, fat: 0 };
+    expect(scannedFoodFields(unknownDrink).calories).toBe("");
+  });
+
+  test("saves with calories calculated from the macros", () => {
+    // 6.3 × 4 + 57.5 × 4 + 30.9 × 9 = 533.3, while Nutella's label says 539
+    expect(readFoodForm(scannedFoodFields(nutella)).value).toMatchObject({
+      name: "Nutella",
+      reference_amount: 100,
+      calories: 533,
+      protein: 6.3,
     });
   });
 });

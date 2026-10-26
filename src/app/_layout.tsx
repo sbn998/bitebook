@@ -89,6 +89,7 @@ function Navigation() {
         <Stack.Screen name="food-form" />
         <Stack.Screen name="goal-form" />
         <Stack.Screen name="meal-entry-form" />
+        <Stack.Screen name="barcode-scanner" />
       </Stack>
     </ThemeProvider>
   );
