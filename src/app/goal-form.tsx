@@ -13,6 +13,7 @@ import { useStyles } from "@/hooks/use-theme";
 import { addGoal, deleteGoal, getGoal, getWeekdayGoals, setWeekdayGoal, updateGoal } from "@/db/goals";
 import { useTranslation } from "@/i18n";
 import { todayString } from "@/utils/date";
+import { errorMessages, readGoalForm } from "@/utils/forms";
 import {
   caloriesFromMacros,
   fillEmptyMacro,
@@ -123,47 +124,10 @@ export default function GoalForm() {
   }
 
   async function save() {
-    const newErrors: Record<string, string> = {};
+    const { value: goal, errors: newErrors } = readGoalForm({ name, calories, macros, units });
+    setErrors(errorMessages(t, newErrors));
+    if (!goal) return;
 
-    if (name.trim() === "") newErrors.name = t.common.required;
-
-    // Empty calories are calculated from the macros, unless any macro is a percentage of them.
-    let goalKcal = typedCalories;
-    if (calories.trim() === "") {
-      if (anyPercent) newErrors.calories = t.goalForm.caloriesForPercent;
-      else if (hasMacros) goalKcal = calculatedCalories;
-      else newErrors.calories = t.foodForm.caloriesOrMacro;
-    } else if (goalKcal === null) newErrors.calories = t.common.validNumber;
-    else if (goalKcal <= 0) newErrors.calories = t.common.moreThanZero;
-
-    // Empty macros mean "no target" and are saved as null. Percentages are saved as whole grams.
-    const macroValues: Record<MacroKey, number | null> = { protein: null, carbs: null, fat: null };
-    let exactMacroKcal = 0;
-    for (const { key } of MACRO_FIELDS) {
-      if (macros[key].trim() === "") continue;
-      const value = parseNumber(macros[key]);
-      if (value === null) newErrors[key] = t.common.validNumber;
-      else if (value < 0) newErrors[key] = t.common.notNegative;
-      else if (units[key] === "%" && value > 100) newErrors[key] = t.goalForm.maxPercent;
-      else if (units[key] === "g") {
-        macroValues[key] = value;
-        exactMacroKcal += value * KCAL_PER_GRAM[key];
-      } else if (goalKcal !== null && !newErrors.calories) {
-        const grams = gramsFromPercent(key, value, goalKcal);
-        macroValues[key] = Math.round(grams);
-        exactMacroKcal += grams * KCAL_PER_GRAM[key];
-      }
-    }
-
-    // Typed-in calories can't be less than the macros add up to. (The red line under the macros says why.)
-    if (calories.trim() !== "" && goalKcal !== null && isOverGoal(exactMacroKcal, goalKcal)) {
-      newErrors.total = "over"; // Never shown: it only blocks saving.
-    }
-
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0 || goalKcal === null) return;
-
-    const goal = { name: name.trim(), calories: goalKcal, ...macroValues };
     if (id === null) {
       const result = await addGoal(db, goal);
       if (params.assignWeekday) {
