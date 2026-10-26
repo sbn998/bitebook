@@ -1,8 +1,17 @@
 @AGENTS.md
 
 An app to track daily calories and macronutrients and compare them to a set goal. Using SQLite to save data locally. Multilanguage.
-Spec is in SPEC.md
+Spec is in SPEC.md.
 Database design is in DATABASE.md
+
+## Explaining things
+
+I'm learning React Native, Expo and the tools around them (npm, Jest, TypeScript config, git) as I build this.
+
+- The first time a new tool, file, setting, term or command comes up, explain in plain words what it is, why we need it here, and give a tiny example — before using it.
+- Don't use jargon without explaining it (e.g. lockfile, preset, devDependencies).
+- If a command prints a warning or something unexpected, say what it means and whether it matters.
+- Prefer one clear explanation over a long list of facts.
 
 ## 1. Think Before Coding
 
@@ -10,7 +19,6 @@ Database design is in DATABASE.md
 
 Before implementing:
 
-- Explain new concepts.
 - Propose a plan.
 - State your assumptions explicitly. If uncertain, ask.
 - If multiple interpretations exist, present them - don't pick silently.

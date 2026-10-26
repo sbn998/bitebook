@@ -57,12 +57,15 @@ npx eas-cli@latest build --platform android --profile preview
 
 All v1 features in the spec are done. The app has been tested by hand on Android only. It also targets iOS, but hasn't been run there.
 
-Next steps:
+Working on next (see [SPEC.md](SPEC.md)):
 
 - Automated tests, starting with the database rules for goals and imports
+- Barcode scanning with a food database lookup
+
+Later:
+
 - Weekly charts and stats
 - Reusable meals with preset foods
-- Barcode scanning and a food database search
 
 ## License
 

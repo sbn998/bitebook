@@ -14,6 +14,7 @@ import { fontSize, fonts, inputBox, spacing, type Theme } from "@/constants/them
 import { useStyles } from "@/hooks/use-theme";
 import { addFood, deleteFood, getFood, updateFood } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
+import { errorMessages, readFoodForm } from "@/utils/forms";
 import { caloriesFromMacros, MACRO_FIELDS, type MacroKey, parseNumber } from "@/utils/nutrition";
 
 export default function FoodForm() {
@@ -61,46 +62,18 @@ export default function FoodForm() {
   );
 
   async function save() {
-    const newErrors: Record<string, string> = {};
-
-    if (name.trim() === "") newErrors.name = t.common.required;
-    if (!type) newErrors.type = t.foodForm.chooseType;
-
-    const amount = parseNumber(referenceAmount);
-    if (referenceAmount.trim() === "") newErrors.reference_amount = t.common.required;
-    else if (amount === null) newErrors.reference_amount = t.common.validNumber;
-    else if (amount <= 0) newErrors.reference_amount = t.common.moreThanZero;
-
-    // Empty macros count as 0.
-    const macroValues = { protein: 0, carbs: 0, fat: 0 };
-    for (const { key } of MACRO_FIELDS) {
-      if (macros[key].trim() === "") continue;
-      const value = parseNumber(macros[key]);
-      if (value === null) newErrors[key] = t.common.validNumber;
-      else if (value < 0) newErrors[key] = t.common.notNegative;
-      else macroValues[key] = value;
-    }
-
-    // Empty calories are calculated from the macros, if there are any.
-    let kcal = parseNumber(calories);
-    if (calories.trim() === "") {
-      if (hasMacros) kcal = calculatedCalories;
-      else newErrors.calories = t.foodForm.caloriesOrMacro;
-    } else if (kcal === null) newErrors.calories = t.common.validNumber;
-    else if (kcal < 0) newErrors.calories = t.common.notNegative;
-
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0 || !type || amount === null || kcal === null) return;
-
-    const food = {
-      name: name.trim(),
-      brand: brand.trim() || null,
+    const { value: food, errors: newErrors } = readFoodForm({
+      name,
+      brand,
       type,
-      reference_amount: amount,
       unit,
-      calories: kcal,
-      ...macroValues,
-    };
+      referenceAmount,
+      calories,
+      macros,
+    });
+    setErrors(errorMessages(t, newErrors));
+    if (!food) return;
+
     if (id === null) await addFood(db, food);
     else await updateFood(db, id, food);
     router.back();
