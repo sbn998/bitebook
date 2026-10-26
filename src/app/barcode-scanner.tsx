@@ -41,7 +41,8 @@ export default function BarcodeScanner() {
   function finish(barcode: string) {
     if (done.current) return;
     done.current = true;
-    router.dismissTo({ pathname: "/food-form", params: { barcode } });
+    // `scan` makes every scan new to the form, even of the same barcode twice in a row.
+    router.dismissTo({ pathname: "/food-form", params: { barcode, scan: String(Date.now()) } });
   }
 
   const title = <Stack.Screen options={{ title: t.scanner.title }} />;

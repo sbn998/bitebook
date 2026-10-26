@@ -77,6 +77,11 @@ export const en = {
     caloriesOrMacro: "Enter calories or at least one macronutrient",
     scan: "Scan barcode",
     lookingUp: "Looking up the food…",
+    fromOpenFoodFacts: "Filled in from Open Food Facts",
+    notFound: "This product isn't in Open Food Facts. Fill it in by hand.",
+    lookupFailed: "Couldn't reach Open Food Facts. Check your connection and scan again.",
+    alreadySaved: "Already in your foods",
+    addAnother: "Add another",
   },
   scanner: {
     title: "Scan barcode",

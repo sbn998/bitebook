@@ -73,6 +73,11 @@ export const es: Strings = {
     caloriesOrMacro: "Introduce las calorías o al menos un macronutriente",
     scan: "Escanear código de barras",
     lookingUp: "Buscando el alimento…",
+    fromOpenFoodFacts: "Rellenado con datos de Open Food Facts",
+    notFound: "Este producto no está en Open Food Facts. Rellénalo a mano.",
+    lookupFailed: "No se pudo conectar con Open Food Facts. Comprueba tu conexión y vuelve a escanear.",
+    alreadySaved: "Ya está en tus alimentos",
+    addAnother: "Añadir otro",
   },
   scanner: {
     title: "Escanear código de barras",

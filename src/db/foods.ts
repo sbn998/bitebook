@@ -28,6 +28,11 @@ export function getFood(db: SQLiteDatabase, id: number) {
   return db.getFirstAsync<Food>("SELECT * FROM foods WHERE id = ?", id);
 }
 
+// The saved foods scanned from a barcode, e.g. the same product per 100 g and per serving.
+export function getFoodsByBarcode(db: SQLiteDatabase, barcode: string) {
+  return db.getAllAsync<Food>("SELECT * FROM foods WHERE barcode = ? ORDER BY id", barcode);
+}
+
 export function addFood(db: SQLiteDatabase, food: Omit<Food, "id">) {
   // The ? placeholders are filled in safely by SQLite, so user input can't run as SQL.
   return db.runAsync(
