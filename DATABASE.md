@@ -31,7 +31,7 @@ Saved, reusable foods.
 | protein          | REAL | Required. Per reference amount                    |
 | carbs            | REAL | Required. Per reference amount                    |
 | fat              | REAL | Required. Per reference amount                    |
-| barcode          | TEXT | Optional. The barcode it was scanned from, as text so leading zeros stay. Unique (index `foods_barcode`): no two foods share one. Set only when the food is added, never edited |
+| barcode          | TEXT | Optional. The barcode it was scanned from, as text so leading zeros stay. Several foods can share one (e.g. the same product per 100 g and per serving); index `foods_barcode` makes finding them fast. Set only when the food is added, never edited |
 
 ### `meals`
 
@@ -132,6 +132,7 @@ The database stores its version in `PRAGMA user_version`. On every app start, an
 | 1 | Create all tables |
 | 2 | Make `goals.protein`, `goals.carbs` and `goals.fat` optional. SQLite can't drop `NOT NULL`, so the table is rebuilt and its rows copied over |
 | 3 | Add `foods.barcode`, with a unique index (SQLite can't add a `UNIQUE` column directly). Existing foods get no barcode |
+| 4 | Let several foods share a barcode: the unique index `foods_barcode` is replaced by a plain one |
 
 All dates compared against "today" use the phone's local date, passed in by the app, not SQLite's `now` (which is UTC).
 

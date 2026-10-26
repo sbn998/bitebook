@@ -98,21 +98,21 @@ Each feature gets its own section, filled in before work on it starts.
   - The database is Open Food Facts: free, no account or key needed, and has many products sold in Spain. It needs an internet connection, and asks apps to identify themselves (app name, version and a contact email) and to credit it as the source of the data
   - Values are filled in per 100 g (or 100 ml for drinks), the way Open Food Facts stores them, so the reference amount is 100
   - Nothing is saved automatically: the form is filled in, and the user checks it and saves it as usual
-  - Saved foods keep their barcode (a new optional column, migration 3), so a scanned barcode can be matched to a food already in the list. Backups from older versions still import
+  - Saved foods keep their barcode (a new optional column), so a scanned barcode can be matched to the foods already in the list. The same product can be saved more than once, e.g. per 100 g and per serving, so several foods can share a barcode. Backups from older versions still import
   - When the food isn't in the database, the app says so and the form is filled in by hand. The barcode is still saved with the food, so scanning it again finds it in the list. Sending it to Open Food Facts is a later idea: adding products needs the user's own Open Food Facts account and password
-  - When a scanned food is already in the list, the app says it's already saved, with a button to open it
+  - When a scanned barcode is already in the list, the app shows the saved foods with that barcode and their reference amounts (e.g. per 100 g, per serving). The user can open one to edit it, or add the product again with a different reference amount
   - The type is picked when one of Open Food Facts' categories (like "dairies" or "beverages") clearly matches one of ours, otherwise it's left empty for the user
   - The scanner is a camera view inside our own screen, so it looks like the rest of the app and works the same on Android and iOS. It needs the camera permission, asked the first time
   - Without internet, the app shows a message to try again, and the form can still be filled in by hand
 - Open questions:
 - Parts:
-  - Part A: save barcodes: migration 3 adds the barcode column, DATABASE.md and the export/import are updated, with tests
+  - Part A: save barcodes: migration 3 adds the barcode column (migration 4 lets several foods share one), DATABASE.md and the export/import are updated, with tests
   - Part B: the Open Food Facts lookup: a function that takes a barcode and returns the name, brand, macros, unit and type, or why it couldn't (not found, no internet). Tested with saved example answers, so tests don't need the internet
   - Part C: ask for the permissions to use the phone's camera the first time a user wants to scan a barcode, and what to show if the user says no
   - Part D: redesign the add food form to have a button that lets the user scan a barcode, and open the scanner
   - Part E: autofill the fields with the received information after the API call, and save the barcode with the food
-  - Part F: the other cases: food already saved, not found, no internet. Then the texts in English and Spanish, and the credit to Open Food Facts
-- Done when: scanning a barcode autofills the food fields and lets the user save it easily. Scanning a food that's already saved, an unknown barcode or scanning without internet each show a clear message. Works in English and Spanish, tests pass, and it's checked on the phone
+  - Part F: the other cases: food already saved (the list of saved ones, to open one or add another), not found, no internet. Then the texts in English and Spanish, and the credit to Open Food Facts
+- Done when: scanning a barcode autofills the food fields and lets the user save it easily. Scanning a food that's already saved shows the saved ones to open or add another, and an unknown barcode or scanning without internet each show a clear message. Works in English and Spanish, tests pass, and it's checked on the phone
 
 ## Later ideas
 
