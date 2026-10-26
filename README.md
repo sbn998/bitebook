@@ -14,6 +14,7 @@ Built with Expo (React Native) and TypeScript, using SQLite for storage. Availab
 
 - **Daily log:** meals made of foods, with the day's totals on a calorie gauge and macro bars that turn red when over the goal.
 - **Food library:** foods saved once per reference amount (100 g, a slice, a cup…) and reused. Searchable, filterable by type and sortable.
+- **Barcode scanning:** scan a package to fill in a food from [Open Food Facts](https://world.openfoodfacts.org). Scanning a product that's already saved lists its versions (per 100 g, per serving…).
 - **Goals by weekday:** optional macro targets in grams or as a percentage of calories.
 - **Correct history:** editing a goal or a food never changes days that were already logged.
 - **Any day:** browse past days or plan future ones with arrows or a calendar.
@@ -26,8 +27,10 @@ Built with Expo (React Native) and TypeScript, using SQLite for storage. Availab
 - **Import is checked before anything changes** and runs in one transaction. Only the table's real columns are inserted, so nothing from the file reaches the SQL ([`backup.ts`](src/db/backup.ts)).
 - **Typed translations:** the Spanish texts are typed against the English ones, so a missing text is a compile error ([`en.ts`](src/i18n/en.ts)).
 - **Theme-aware styles** through a `useStyles` hook, so the whole app switches theme in a single render ([`use-theme.tsx`](src/hooks/use-theme.tsx)).
+- **Automated tests** with Jest (`npm test`). The real database code runs against an in-memory SQLite through a small stand-in for expo-sqlite ([`test-db.ts`](src/db/test-db.ts)), and barcode lookups are tested with saved Open Food Facts answers instead of the internet.
+- **Barcode lookup kept separate from the screen** ([`open-food-facts.ts`](src/utils/open-food-facts.ts)): it turns Open Food Facts' categories into the app's food types with an ordered list of rules, and tells "not found" apart from "no internet".
 
-[SPEC.md](SPEC.md) lists the v1 features and decisions, and [DATABASE.md](DATABASE.md) describes every table.
+[SPEC.md](SPEC.md) lists the features and decisions of each version, and [DATABASE.md](DATABASE.md) describes every table.
 
 ## Stack
 
@@ -36,6 +39,8 @@ Built with Expo (React Native) and TypeScript, using SQLite for storage. Availab
 - Expo Router (file-based routes, native bottom tabs)
 - expo-sqlite (database, plus its key-value store for settings)
 - React Native Reanimated, react-native-svg
+- expo-camera (barcode scanning) and the Open Food Facts API
+- Jest with jest-expo
 - EAS Build for Android builds
 
 ## Running it
@@ -47,7 +52,13 @@ npm install
 npx expo start
 ```
 
-Scan the QR code with Expo Go. To build an installable APK with EAS:
+Scan the QR code with Expo Go. To run the tests:
+
+```bash
+npm test
+```
+
+To build an installable APK with EAS:
 
 ```bash
 npx eas-cli@latest build --platform android --profile preview
@@ -55,14 +66,9 @@ npx eas-cli@latest build --platform android --profile preview
 
 ## Status and next steps
 
-All v1 features in the spec are done. The app has been tested by hand on Android only. It also targets iOS, but hasn't been run there.
+Versions 1.0 and 1.1 (barcode scanning and automated tests) are done. The app has been tested on Android only. It also targets iOS, but hasn't been run there.
 
-Working on next (see [SPEC.md](SPEC.md)):
-
-- Automated tests, starting with the database rules for goals and imports
-- Barcode scanning with a food database lookup
-
-Later:
+Ideas for later (see [SPEC.md](SPEC.md)):
 
 - Weekly charts and stats
 - Reusable meals with preset foods

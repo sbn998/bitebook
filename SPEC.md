@@ -59,7 +59,7 @@ A simple app that will let users log what they eat each day, so they can track h
 - What it does: export and import saved data
 - Decisions: exporting will be done in a JSON file. Importing will replace all existing data
 
-## 1.1 (in progress)
+## 1.1 (done)
 
 Each feature gets its own section, filled in before work on it starts.
 
@@ -130,7 +130,7 @@ Each feature gets its own section, filled in before work on it starts.
 
 ## Data
 
-- Food: name, calories, protein, carbs, fat, amount, units, brand, type
+- Food: name, calories, protein, carbs, fat, amount, units, brand, type, barcode (optional, can be shared by versions of the same product)
 - Food entry: which food + how much + which meal entry + copy of name & nutrition values at time of logging
 - Meal: name (2 meals can't have the same name)
 - Meal entry: which meal it belongs to + which day + copy of the meal's name
