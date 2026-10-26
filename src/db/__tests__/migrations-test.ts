@@ -39,13 +39,31 @@ describe("a new install", () => {
   });
 });
 
+// The foods table the way versions 1 and 2 created it (no barcode), with one food in it.
+const FOODS_BEFORE_VERSION_3 = `
+  CREATE TABLE foods (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    brand TEXT,
+    type TEXT NOT NULL,
+    reference_amount REAL NOT NULL,
+    unit TEXT NOT NULL,
+    calories REAL NOT NULL,
+    protein REAL NOT NULL,
+    carbs REAL NOT NULL,
+    fat REAL NOT NULL
+  );
+  INSERT INTO foods VALUES (1, 'Chicken breast', NULL, 'poultry', 100, 'g', 165, 31, 0, 3.6);
+`;
+
 describe("an upgrade from version 1", () => {
   // The tables migration 2 deals with, the way version 1 created them (macros were required),
-  // with a goal used by Monday and by one day.
+  // with a goal used by Monday and by one day, plus the foods table that migration 3 changes.
   async function openVersion1Db() {
     const db = createTestDb();
     await db.execAsync(`
       PRAGMA foreign_keys = ON;
+      ${FOODS_BEFORE_VERSION_3}
       CREATE TABLE goals (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
@@ -102,6 +120,34 @@ describe("an upgrade from version 1", () => {
     await db.runAsync("DELETE FROM goals WHERE id = ?", 1);
     expect(await db.getAllAsync("SELECT * FROM weekday_goals")).toEqual([]);
     expect(await db.getFirstAsync("SELECT goal_id, goal_name FROM days")).toEqual({ goal_id: null, goal_name: "Cut" });
+  });
+});
+
+describe("an upgrade from version 2", () => {
+  async function openVersion2Db() {
+    const db = createTestDb();
+    await db.execAsync(`${FOODS_BEFORE_VERSION_3} PRAGMA user_version = 2;`);
+    return db;
+  }
+
+  test("keeps the foods, without a barcode", async () => {
+    const db = await openVersion2Db();
+    await migrateDbIfNeeded(db);
+    expect(await db.getAllAsync("SELECT name, calories, barcode FROM foods")).toEqual([
+      { name: "Chicken breast", calories: 165, barcode: null },
+    ]);
+    expect(await userVersion(db)).toBe(DATABASE_VERSION);
+  });
+
+  test("lets foods have a barcode, but never the same one twice", async () => {
+    const db = await openVersion2Db();
+    await migrateDbIfNeeded(db);
+    await db.runAsync("UPDATE foods SET barcode = ? WHERE id = 1", "8480000123456");
+    const sameBarcode = db.runAsync(
+      "INSERT INTO foods (name, type, reference_amount, unit, calories, protein, carbs, fat, barcode) VALUES ('Copy', 'poultry', 100, 'g', 1, 0, 0, 0, ?)",
+      "8480000123456"
+    );
+    await expect(sameBarcode).rejects.toThrow("UNIQUE");
   });
 });
 

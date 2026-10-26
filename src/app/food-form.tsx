@@ -74,7 +74,7 @@ export default function FoodForm() {
     setErrors(errorMessages(t, newErrors));
     if (!food) return;
 
-    if (id === null) await addFood(db, food);
+    if (id === null) await addFood(db, { ...food, barcode: null });
     else await updateFood(db, id, food);
     router.back();
   }

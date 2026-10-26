@@ -19,12 +19,12 @@ import { openTestDb } from "@/db/test-db";
 
 const today = "2026-10-26"; // A Monday
 
-// A bit of everything: two foods, two meal names, a goal used on Mondays, and a Monday with lunch.
+// A bit of everything: two foods (one with a barcode), two meal names, a goal used on Mondays, and a Monday with lunch.
 async function fillDb(db: SQLiteDatabase) {
-  const food = { brand: null, type: "poultry", reference_amount: 100, unit: "g" } as const;
+  const food = { brand: null, type: "poultry", reference_amount: 100, unit: "g", barcode: null } as const;
   const chicken = (await addFood(db, { ...food, name: "Chicken breast", calories: 165, protein: 31, carbs: 0, fat: 3.6 }))
     .lastInsertRowId;
-  await addFood(db, { ...food, name: "Turkey", brand: "Mercadona", calories: 104, protein: 24, carbs: 0, fat: 1 });
+  await addFood(db, { ...food, name: "Turkey", brand: "Mercadona", calories: 104, protein: 24, carbs: 0, fat: 1, barcode: "8480000123456" });
   const lunch = (await addMeal(db, "Lunch")).lastInsertRowId;
   await addMeal(db, "Dinner");
   const goal = (await addGoal(db, { name: "Cut", calories: 1800, protein: 150, carbs: null, fat: 50 })).lastInsertRowId;
@@ -130,6 +130,21 @@ describe("exporting and importing", () => {
 
     await expect(restoreBackup(db, broken)).rejects.toThrow("FOREIGN KEY");
     expect((await createBackup(db)).data).toEqual(before);
+  });
+
+  test("imports a file from before foods had barcodes", async () => {
+    const db = await openTestDb();
+    // Version 2 files have no barcode column at all.
+    const chicken = { id: 1, name: "Chicken breast", brand: null, type: "poultry", reference_amount: 100, unit: "g" };
+    const oldFile = {
+      ...emptyBackup,
+      databaseVersion: 2,
+      data: { ...emptyBackup.data, foods: [{ ...chicken, calories: 165, protein: 31, carbs: 0, fat: 3.6 }] },
+    };
+
+    await restoreBackup(db, parseBackup(JSON.stringify(oldFile)));
+
+    expect(await db.getAllAsync("SELECT name, barcode FROM foods")).toEqual([{ name: "Chicken breast", barcode: null }]);
   });
 
   test("ignores columns the app doesn't know", async () => {

@@ -1,5 +1,5 @@
 import type { FoodType, Unit } from "@/constants/food";
-import type { Food } from "@/db/foods";
+import type { FoodDetails } from "@/db/foods";
 import type { Goal } from "@/db/goals";
 import type { Strings } from "@/i18n";
 import {
@@ -41,7 +41,7 @@ export type FoodFormFields = {
 
 // Checks the food form and turns it into a food to save. Empty macros count as 0, and empty calories
 // are calculated from the macros, if there are any.
-export function readFoodForm(fields: FoodFormFields): FormResult<Omit<Food, "id">> {
+export function readFoodForm(fields: FoodFormFields): FormResult<FoodDetails> {
   const errors: Record<string, FieldError> = {};
 
   if (fields.name.trim() === "") errors.name = "required";

@@ -14,7 +14,11 @@ export type Food = {
   protein: number;
   carbs: number;
   fat: number;
+  barcode: string | null; // As text, so leading zeros are kept. No two foods share one.
 };
+
+// What the food form edits. The barcode is only set when a food is added, never edited.
+export type FoodDetails = Omit<Food, "id" | "barcode">;
 
 export function getFoods(db: SQLiteDatabase) {
   return db.getAllAsync<Food>("SELECT * FROM foods ORDER BY name COLLATE NOCASE");
@@ -27,8 +31,8 @@ export function getFood(db: SQLiteDatabase, id: number) {
 export function addFood(db: SQLiteDatabase, food: Omit<Food, "id">) {
   // The ? placeholders are filled in safely by SQLite, so user input can't run as SQL.
   return db.runAsync(
-    `INSERT INTO foods (name, brand, type, reference_amount, unit, calories, protein, carbs, fat)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO foods (name, brand, type, reference_amount, unit, calories, protein, carbs, fat, barcode)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     food.name,
     food.brand,
     food.type,
@@ -37,11 +41,13 @@ export function addFood(db: SQLiteDatabase, food: Omit<Food, "id">) {
     food.calories,
     food.protein,
     food.carbs,
-    food.fat
+    food.fat,
+    food.barcode
   );
 }
 
-export function updateFood(db: SQLiteDatabase, id: number, food: Omit<Food, "id">) {
+// Leaves the barcode as it is.
+export function updateFood(db: SQLiteDatabase, id: number, food: FoodDetails) {
   return db.runAsync(
     `UPDATE foods
      SET name = ?, brand = ?, type = ?, reference_amount = ?, unit = ?,

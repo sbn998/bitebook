@@ -15,6 +15,7 @@ const chicken: Omit<Food, "id"> = {
   protein: 31,
   carbs: 0,
   fat: 3.6,
+  barcode: null,
 };
 
 // Saves a food and gives it back with its id.
@@ -50,6 +51,29 @@ describe("foods", () => {
     const saved = await saveFood(db, chicken);
     await updateFood(db, saved.id, { ...chicken, name: "Grilled chicken", calories: 170 });
     expect(await getFood(db, saved.id)).toMatchObject({ name: "Grilled chicken", calories: 170 });
+  });
+
+  test("can have a barcode, kept as text with its leading zeros", async () => {
+    const db = await openTestDb();
+    const saved = await saveFood(db, { ...chicken, barcode: "0012345678905" });
+    expect(saved.barcode).toBe("0012345678905");
+  });
+
+  test("can't share a barcode, but any number can have none", async () => {
+    const db = await openTestDb();
+    await saveFood(db, { ...chicken, barcode: "8480000123456" });
+    await saveFood(db, chicken);
+    await saveFood(db, { ...chicken, name: "Turkey" });
+    await expect(addFood(db, { ...chicken, name: "Copy", barcode: "8480000123456" })).rejects.toThrow("UNIQUE");
+    expect(await getFoods(db)).toHaveLength(3);
+  });
+
+  test("keep their barcode when edited", async () => {
+    const db = await openTestDb();
+    const saved = await saveFood(db, { ...chicken, barcode: "8480000123456" });
+    const { barcode, id, ...details } = saved;
+    await updateFood(db, id, { ...details, calories: 170 });
+    expect(await getFood(db, id)).toMatchObject({ calories: 170, barcode });
   });
 
   test("can be deleted", async () => {
