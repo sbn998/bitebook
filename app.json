@@ -3,7 +3,7 @@
     "name": "Bitebook",
     "slug": "bitebook",
     "owner": "sbn998",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "bitebook",
@@ -45,6 +45,14 @@
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to use the camera to scan food barcodes",
           "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraProguardRules": "-keepnames class com.google.mlkit.vision.barcode.BarcodeScanning\n-keep class com.google.mlkit.**Registrar { public <init>(); }"
+          }
         }
       ]
     ],
