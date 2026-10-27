@@ -46,6 +46,14 @@
           "cameraPermission": "Allow $(PRODUCT_NAME) to use the camera to scan food barcodes",
           "recordAudioAndroid": false
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraProguardRules": "-keepnames class com.google.mlkit.vision.barcode.BarcodeScanning\n-keep class com.google.mlkit.**Registrar { public <init>(); }"
+          }
+        }
       ]
     ],
     "experiments": {
