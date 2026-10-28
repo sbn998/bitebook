@@ -3,8 +3,12 @@ import * as Sharing from "expo-sharing";
 import type { SQLiteDatabase } from "expo-sqlite";
 import { Platform } from "react-native";
 
-import { createBackup } from "@/db/backup";
+import { BackupError, createBackup } from "@/db/backup";
 import { todayString } from "@/utils/date";
+
+// Far bigger than any backup (years of daily logging is a few MB). Reading a bigger file, like a photo
+// or video, into memory as text could crash the app, so such a file is rejected before reading it.
+const MAX_BACKUP_BYTES = 10 * 1024 * 1024;
 
 // Writes all the data to a JSON file (e.g. bitebook-2026-10-24.json) and opens the phone's share sheet,
 // where the user picks where to keep it: Google Drive, Files, email... Throws if anything fails.
@@ -26,6 +30,7 @@ export async function shareBackup(db: SQLiteDatabase, dialogTitle: string) {
 }
 
 // Opens the phone's file picker and returns the chosen file's text, or null if the user cancels.
+// Throws BackupError("invalid") for a file far too big to be a backup.
 // Any file type is allowed: cloud drives don't always label .json files as JSON, and the content
 // is checked afterwards anyway (parseBackup).
 // The file system's own picker is used because the file it returns comes with permission to read it.
@@ -33,5 +38,6 @@ export async function shareBackup(db: SQLiteDatabase, dialogTitle: string) {
 export async function pickBackupFile() {
   const picked = await File.pickFileAsync({ mimeTypes: "*/*" });
   if (picked.canceled) return null;
+  if (picked.result.size > MAX_BACKUP_BYTES) throw new BackupError("invalid");
   return picked.result.text();
 }
