@@ -78,7 +78,7 @@ export default function MealEntryForm() {
     const foods: { food: Food; quantity: number }[] = [];
     for (const row of rows) {
       const quantity = parseNumber(row.quantity);
-      if (row.quantity.trim() === "") newErrors[row.key] = t.common.required;
+      if (row.quantity.trim() === "") newErrors[row.key] = t.common.enterAmount;
       else if (quantity === null) newErrors[row.key] = t.common.validNumber;
       else if (quantity <= 0) newErrors[row.key] = t.common.moreThanZero;
       else foods.push({ food: row.food, quantity });

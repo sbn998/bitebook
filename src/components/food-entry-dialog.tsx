@@ -34,7 +34,7 @@ export function FoodEntryDialog({
 
   function save() {
     const quantity = parseNumber(amount);
-    if (amount.trim() === "") setError(t.common.required);
+    if (amount.trim() === "") setError(t.common.enterAmount);
     else if (quantity === null) setError(t.common.validNumber);
     else if (quantity <= 0) setError(t.common.moreThanZero);
     else onSave(quantity);

@@ -169,9 +169,9 @@ export function typingErrors(errors: Record<string, FieldError>) {
 }
 
 // The message shown under each field, in the app's language.
+// An empty field says what to fill in: the name field asks for a name, the others are amounts.
 export function errorMessages(t: Strings, errors: Record<string, FieldError>) {
-  const messages: Record<FieldError, string> = {
-    required: t.common.required,
+  const messages: Record<Exclude<FieldError, "required">, string> = {
     chooseType: t.foodForm.chooseType,
     validNumber: t.common.validNumber,
     moreThanZero: t.common.moreThanZero,
@@ -181,5 +181,9 @@ export function errorMessages(t: Strings, errors: Record<string, FieldError>) {
     maxPercent: t.goalForm.maxPercent,
     over: "", // Never shown: the goal form's red box explains it and Save is greyed out.
   };
-  return Object.fromEntries(Object.entries(errors).map(([field, error]) => [field, messages[error]]));
+  const message = (field: string, error: FieldError) => {
+    if (error !== "required") return messages[error];
+    return field === "name" ? t.common.enterName : t.common.enterAmount;
+  };
+  return Object.fromEntries(Object.entries(errors).map(([field, error]) => [field, message(field, error)]));
 }

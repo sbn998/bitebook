@@ -239,8 +239,13 @@ describe("readGoalForm", () => {
 describe("errorMessages", () => {
   test("shows each field's error in the app's language", () => {
     const errors = { name: "required", fat: "maxPercent" } as const;
-    expect(errorMessages(en, errors)).toEqual({ name: en.common.required, fat: en.goalForm.maxPercent });
-    expect(errorMessages(es, errors)).toEqual({ name: es.common.required, fat: es.goalForm.maxPercent });
+    expect(errorMessages(en, errors)).toEqual({ name: en.common.enterName, fat: en.goalForm.maxPercent });
+    expect(errorMessages(es, errors)).toEqual({ name: es.common.enterName, fat: es.goalForm.maxPercent });
+  });
+
+  test("says what to fill in for an empty field: a name, or else an amount", () => {
+    const errors = { name: "required", reference_amount: "required" } as const;
+    expect(errorMessages(en, errors)).toEqual({ name: en.common.enterName, reference_amount: en.common.enterAmount });
   });
 });
 
