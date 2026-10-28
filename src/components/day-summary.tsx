@@ -136,10 +136,11 @@ export function DaySummary({
       <View style={styles.macros}>
         {MACRO_FIELDS.map(({ key }) => {
           const target = goal?.[key] ?? null;
+          const isMacroOver = target !== null && totals[key] > target;
           return (
             <View key={key} style={styles.macro}>
               <Text style={[styles.label, styles.centered]}>{t.macros[key]}</Text>
-              <Text style={[styles.macroNumber, styles.centered, target !== null && totals[key] > target && styles.overText]}>
+              <Text style={[styles.macroNumber, styles.centered, isMacroOver && styles.overText]}>
                 {format(totals[key], locale)}
                 <Text style={styles.macroTarget}>{target !== null ? ` / ${format(target, locale)} g` : " g"}</Text>
               </Text>
@@ -147,6 +148,12 @@ export function DaySummary({
                 <ProgressBar value={totals[key]} target={target} />
               ) : (
                 goal && <Text style={[styles.noTarget, styles.centered]}>{t.summary.noTarget}</Text>
+              )}
+              {/* Says how much is over in words too, so red isn't the only sign. Rounded up, so it never says 0 g. */}
+              {isMacroOver && (
+                <Text style={[styles.overNote, styles.centered]}>
+                  {t.summary.gramsOver(format(Math.ceil(totals[key] - target), locale))}
+                </Text>
               )}
             </View>
           );
@@ -240,5 +247,10 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     fontFamily: fonts.body,
     fontSize: fontSize.small,
     color: colors.textSecondary,
+  },
+  overNote: {
+    fontFamily: fonts.bodyMedium,
+    fontSize: fontSize.small,
+    color: colors.danger,
   },
 });

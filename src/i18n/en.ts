@@ -195,6 +195,7 @@ export const en = {
   summary: {
     kcalLeft: "kcal left",
     kcalOver: "kcal over",
+    gramsOver: (grams: string) => `${grams} g over`,
     eaten: "Eaten",
     goal: "Goal",
     noGoal: "No goal for this day",

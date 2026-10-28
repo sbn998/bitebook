@@ -190,6 +190,7 @@ export const es: Strings = {
   summary: {
     kcalLeft: "kcal restantes",
     kcalOver: "kcal de más",
+    gramsOver: (grams: string) => `${grams} g de más`,
     eaten: "Consumidas",
     goal: "Objetivo",
     noGoal: "Sin objetivo para este día",
