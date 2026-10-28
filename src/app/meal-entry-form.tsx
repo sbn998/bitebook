@@ -6,12 +6,14 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text
 
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
+import { ConfirmDialog } from "@/components/dialog";
 import { FoodPicker } from "@/components/food-picker";
 import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
 import { makeFieldStyles } from "@/components/text-field";
 import { fontSize, fonts, inputBox, pressedStyle, radius, spacing, type Theme } from "@/constants/theme";
+import { useDiscardChanges } from "@/hooks/use-discard-changes";
 import { useStyles, useTheme } from "@/hooks/use-theme";
 import { addMealEntry, sumNutrition } from "@/db/entries";
 import type { Food } from "@/db/foods";
@@ -38,6 +40,8 @@ export default function MealEntryForm() {
   const [picking, setPicking] = useState(false);
   const nextKey = useRef(1);
   const headerHeight = useHeaderHeight();
+  // A chosen meal or any added food is worth asking about before leaving.
+  const { allowLeaving, dialog: discardDialog } = useDiscardChanges(mealId !== null || rows.length > 0);
 
   useEffect(() => {
     getMeals(db).then(setMeals);
@@ -84,6 +88,7 @@ export default function MealEntryForm() {
     if (Object.keys(newErrors).length > 0 || !meal) return;
 
     await addMealEntry(db, date, weekdayOf(date), meal, foods);
+    allowLeaving();
     router.back();
   }
 
@@ -193,6 +198,15 @@ export default function MealEntryForm() {
       </ScrollView>
 
       <FoodPicker visible={picking} onPick={addFood} onClose={() => setPicking(false)} pickedCounts={pickedCounts} />
+
+      <ConfirmDialog
+        visible={discardDialog.visible}
+        title={t.common.discardTitle}
+        message={t.common.discardMessage}
+        confirmTitle={t.common.discard}
+        onConfirm={discardDialog.onDiscard}
+        onCancel={discardDialog.onKeepEditing}
+      />
     </KeyboardAvoidingView>
   );
 }

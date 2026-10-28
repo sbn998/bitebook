@@ -18,6 +18,9 @@ export const en = {
     notNegative: "Can't be negative",
     cantUndo: "This can't be undone.",
     deleteTitle: (name: string) => `Delete ${name}?`,
+    discardTitle: "Discard changes?",
+    discardMessage: "These changes haven't been saved.",
+    discard: "Discard",
   },
   // Every food type and unit key must have a label (checked by TypeScript).
   foodTypes: {

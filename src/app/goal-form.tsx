@@ -9,6 +9,7 @@ import { Card } from "@/components/card";
 import { ConfirmDialog } from "@/components/dialog";
 import { TextField } from "@/components/text-field";
 import { fontSize, fonts, pressedStyle, radius, spacing, type Theme } from "@/constants/theme";
+import { useDiscardChanges } from "@/hooks/use-discard-changes";
 import { useStyles } from "@/hooks/use-theme";
 import { addGoal, deleteGoal, getGoal, getWeekdayGoals, setWeekdayGoal, updateGoal } from "@/db/goals";
 import { useTranslation } from "@/i18n";
@@ -127,6 +128,12 @@ export default function GoalForm() {
     setMacros({ ...macros, [key]: String(fillEmptyMacro(key, units[key], kcalLeft, kcal)) });
   }
 
+  // The fields as they were once the form was ready (empty, or the goal loaded), to tell whether anything changed.
+  const [startFields, setStartFields] = useState<string | null>(null);
+  const fieldsText = JSON.stringify({ name, calories, macros, units });
+  if (loaded && startFields === null) setStartFields(fieldsText);
+  const { allowLeaving, dialog: discardDialog } = useDiscardChanges(startFields !== null && fieldsText !== startFields);
+
   // Runs when leaving a field, so a typo shows right away instead of on Save, and a fixed one goes away.
   function checkFields() {
     const { errors: newErrors } = readGoalForm({ name, calories, macros, units });
@@ -147,6 +154,7 @@ export default function GoalForm() {
     } else {
       await updateGoal(db, id, goal, todayString());
     }
+    allowLeaving();
     router.back();
   }
 
@@ -154,6 +162,7 @@ export default function GoalForm() {
     if (id === null) return;
     setConfirmingDelete(false);
     await deleteGoal(db, id, todayString());
+    allowLeaving();
     router.back();
   }
 
@@ -261,6 +270,15 @@ export default function GoalForm() {
         confirmTitle={t.common.delete}
         onConfirm={deleteAndClose}
         onCancel={() => setConfirmingDelete(false)}
+      />
+
+      <ConfirmDialog
+        visible={discardDialog.visible}
+        title={t.common.discardTitle}
+        message={t.common.discardMessage}
+        confirmTitle={t.common.discard}
+        onConfirm={discardDialog.onDiscard}
+        onCancel={discardDialog.onKeepEditing}
       />
     </KeyboardAvoidingView>
   );

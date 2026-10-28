@@ -23,6 +23,7 @@ import { Select } from "@/components/select";
 import { makeFieldStyles, TextField } from "@/components/text-field";
 import { FOOD_TYPE_KEYS, type FoodType, UNIT_KEYS, type Unit } from "@/constants/food";
 import { fontSize, fonts, inputBox, radius, spacing, type Theme } from "@/constants/theme";
+import { useDiscardChanges } from "@/hooks/use-discard-changes";
 import { useStyles, useTheme } from "@/hooks/use-theme";
 import { addFood, deleteFood, type Food, getFood, getFoodsByBarcode, updateFood } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
@@ -132,6 +133,13 @@ export default function FoodForm() {
 
   const fields = { name, brand, type, unit, referenceAmount, calories, macros };
 
+  // The fields as they were once the form was ready (empty, or the food loaded), to tell whether anything changed.
+  // A scanned product filling in the form counts as a change, so it isn't lost by going back.
+  const [startFields, setStartFields] = useState<string | null>(null);
+  const fieldsText = JSON.stringify(fields);
+  if (loaded && startFields === null) setStartFields(fieldsText);
+  const { allowLeaving, dialog: discardDialog } = useDiscardChanges(startFields !== null && fieldsText !== startFields);
+
   // Runs when leaving a field, so a typo shows right away instead of on Save, and a fixed one goes away.
   function checkFields() {
     const { errors: newErrors } = readFoodForm(fields);
@@ -147,6 +155,7 @@ export default function FoodForm() {
     // A scanned barcode is saved even if Open Food Facts didn't know it, so scanning it again finds this food.
     if (id === null) await addFood(db, { ...food, barcode });
     else await updateFood(db, id, food);
+    allowLeaving();
     router.back();
   }
 
@@ -154,6 +163,7 @@ export default function FoodForm() {
     if (id === null) return;
     setConfirmingDelete(false);
     await deleteFood(db, id);
+    allowLeaving();
     router.back();
   }
 
@@ -220,7 +230,10 @@ export default function FoodForm() {
               accessibilityRole="button"
               key={food.id}
               style={({ pressed }) => [styles.savedRow, pressed && styles.pressed]}
-              onPress={() => router.replace({ pathname: "/food-form", params: { id: String(food.id) } })}
+              onPress={() => {
+                allowLeaving();
+                router.replace({ pathname: "/food-form", params: { id: String(food.id) } });
+              }}
             >
               <View style={styles.flex}>
                 <Text style={styles.scanTitle}>{food.name}</Text>
@@ -334,6 +347,15 @@ export default function FoodForm() {
         confirmTitle={t.common.delete}
         onConfirm={deleteAndClose}
         onCancel={() => setConfirmingDelete(false)}
+      />
+
+      <ConfirmDialog
+        visible={discardDialog.visible}
+        title={t.common.discardTitle}
+        message={t.common.discardMessage}
+        confirmTitle={t.common.discard}
+        onConfirm={discardDialog.onDiscard}
+        onCancel={discardDialog.onKeepEditing}
       />
     </KeyboardAvoidingView>
   );
