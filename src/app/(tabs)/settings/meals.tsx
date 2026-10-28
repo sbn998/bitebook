@@ -48,7 +48,7 @@ export default function MealLabels() {
   async function save() {
     const trimmed = name.trim();
     if (trimmed === "") {
-      setError(t.common.required);
+      setError(t.common.enterName);
       return;
     }
     // The database also rejects duplicates; checking here lets us show a clear message.

@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withSequence,
   withSpring,
@@ -32,11 +33,15 @@ function format(value: number, locale: string) {
 }
 
 // Returns a number that counts from its previous value to `target` over DURATION, slowing down at the end.
+// With the phone's "remove animations" setting on, it's just `target`. (Reanimated's animations follow that
+// setting by themselves; this one is hand-made, so it checks it here.)
 function useCountUp(target: number) {
+  const reduceMotion = useReducedMotion();
   const [value, setValue] = useState(0);
   const current = useRef(0);
 
   useEffect(() => {
+    if (reduceMotion) return;
     const from = current.current;
     const start = performance.now();
     let frame: number;
@@ -48,9 +53,9 @@ function useCountUp(target: number) {
     };
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
-  }, [target]);
+  }, [target, reduceMotion]);
 
-  return value;
+  return reduceMotion ? target : value;
 }
 
 // A thin rounded bar that slides to `value / target`. It turns red when over the target.
