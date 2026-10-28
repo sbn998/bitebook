@@ -149,7 +149,7 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   },
   amount: {
     fontFamily: fonts.body,
-    color: colors.textMuted,
+    color: colors.textSecondary,
   },
   foodKcal: {
     fontSize: fontSize.medium,
@@ -160,12 +160,12 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   foodMacros: {
     fontSize: fontSize.small,
     fontFamily: fonts.body,
-    color: colors.textMuted,
+    color: colors.textSecondary,
   },
   empty: {
     fontSize: fontSize.body,
     fontFamily: fonts.body,
-    color: colors.textMuted,
+    color: colors.textSecondary,
   },
   addFood: {
     alignItems: "flex-start",

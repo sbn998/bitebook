@@ -14,7 +14,7 @@ export default function TabsLayout() {
       backgroundColor={colors.background}
       iconColor={{ default: colors.textMuted, selected: colors.primary }}
       labelStyle={{
-        default: { color: colors.textMuted, fontFamily: fonts.bodyMedium },
+        default: { color: colors.textSecondary, fontFamily: fonts.bodyMedium },
         selected: { color: colors.text, fontFamily: fonts.bodyBold },
       }}
       // The pill behind the selected icon has the same color as the empty part of the calorie gauge on Main.

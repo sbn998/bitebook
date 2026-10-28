@@ -128,7 +128,7 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     textAlign: "center",
     fontSize: fontSize.small,
     fontFamily: fonts.bodyMedium,
-    color: colors.textMuted,
+    color: colors.textSecondary,
   },
   // Hides the next month while it slides in from outside the popup.
   clip: {
