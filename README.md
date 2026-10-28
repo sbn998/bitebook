@@ -20,6 +20,7 @@ Built with Expo (React Native) and TypeScript, using SQLite for storage. Availab
 - **Any day:** browse past days or plan future ones with arrows or a calendar.
 - **Backup:** export all data to a JSON file and import it on another phone.
 - **English and Spanish**, and **light and dark themes**, chosen in Settings.
+- **Accessible:** works with TalkBack and at the largest text size, meets 4.5:1 text contrast in both themes, and follows the phone's "remove animations" setting.
 
 ## How it's built
 
@@ -28,6 +29,7 @@ Built with Expo (React Native) and TypeScript, using SQLite for storage. Availab
 - **Typed translations:** the Spanish texts are typed against the English ones, so a missing text is a compile error ([`en.ts`](src/i18n/en.ts)).
 - **Theme-aware styles** through a `useStyles` hook, so the whole app switches theme in a single render ([`use-theme.tsx`](src/hooks/use-theme.tsx)).
 - **Automated tests** with Jest (`npm test`). The real database code runs against an in-memory SQLite through a small stand-in for expo-sqlite ([`test-db.ts`](src/db/test-db.ts)), and barcode lookups are tested with saved Open Food Facts answers instead of the internet.
+- **Design review against Apple's Human Interface Guidelines** (version 1.2): contrast ratios computed from the theme colors, screen reader roles and labels, layouts that stack at large text sizes ([`fontScale`](src/app/goal-form.tsx)), shared pieces for empty lists ([`empty-state.tsx`](src/components/empty-state.tsx)) and unsaved-changes warnings ([`use-discard-changes.ts`](src/hooks/use-discard-changes.ts)).
 - **Barcode lookup kept separate from the screen** ([`open-food-facts.ts`](src/utils/open-food-facts.ts)): it turns Open Food Facts' categories into the app's food types with an ordered list of rules, and tells "not found" apart from "no internet".
 
 [SPEC.md](SPEC.md) lists the features and decisions of each version, and [DATABASE.md](DATABASE.md) describes every table.
@@ -66,7 +68,7 @@ npx eas-cli@latest build --platform android --profile preview
 
 ## Status and next steps
 
-Versions 1.0 and 1.1 (barcode scanning and automated tests) are done. The app has been tested on Android only. It also targets iOS, but hasn't been run there.
+Versions 1.0, 1.1 (barcode scanning and automated tests) and 1.2 (design and accessibility pass) are done. The app has been tested on Android only. It also targets iOS, but hasn't been run there.
 
 Ideas for later (see [SPEC.md](SPEC.md)):
 
