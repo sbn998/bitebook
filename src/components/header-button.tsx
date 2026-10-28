@@ -1,13 +1,13 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-import { fontSize, fonts, spacing, type Theme } from "@/constants/theme";
+import { fontSize, fonts, pressedStyle, spacing, type Theme } from "@/constants/theme";
 import { useStyles } from "@/hooks/use-theme";
 
 // Orange text button for a screen's header, e.g. "Add".
 export function HeaderButton({ title, onPress }: { title: string; onPress: () => void }) {
   const styles = useStyles(makeStyles);
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} hitSlop={spacing.sm}>
+    <Pressable accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={onPress} hitSlop={spacing.sm}>
       <Text style={styles.text}>{title}</Text>
     </Pressable>
   );

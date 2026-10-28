@@ -14,7 +14,7 @@ import { FoodPicker } from "@/components/food-picker";
 import { Icon } from "@/components/icon";
 import { MealEntryCard } from "@/components/meal-entry-card";
 import { WeekdayGoalDialog } from "@/components/weekday-goal-dialog";
-import { fontSize, fonts, spacing, type Theme } from "@/constants/theme";
+import { fontSize, fonts, pressedStyle, spacing, type Theme } from "@/constants/theme";
 import { useStyles, useTheme } from "@/hooks/use-theme";
 import { type DayGoal, getDayGoal } from "@/db/days";
 import {
@@ -107,12 +107,12 @@ export default function Main() {
   return (
     <View style={styles.screen}>
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <Pressable accessibilityRole="button" onPress={() => setDate(addDays(date, -1))} hitSlop={spacing.sm} accessibilityLabel={t.main.previousDay}>
+        <Pressable accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => setDate(addDays(date, -1))} hitSlop={spacing.sm} accessibilityLabel={t.main.previousDay}>
           <Icon name="chevronLeft" size={24} />
         </Pressable>
 
         {/* Tapping the title jumps back to today. */}
-        <Pressable accessibilityRole="button" style={styles.title} onPress={() => setDate(today)} accessibilityHint={t.main.goToToday}>
+        <Pressable accessibilityRole="button" style={({ pressed }) => [styles.title, pressed && pressedStyle]} onPress={() => setDate(today)} accessibilityHint={t.main.goToToday}>
           <Text style={styles.titleText}>{dayTitle(date, today, t.dates, locale)}</Text>
           <Text style={styles.subtitle} numberOfLines={1}>
             {longDate(date, locale)}
@@ -121,10 +121,10 @@ export default function Main() {
         </Pressable>
 
         <View style={styles.headerRight}>
-          <Pressable accessibilityRole="button" onPress={() => setShowCalendar(true)} hitSlop={spacing.sm} accessibilityLabel={t.main.pickDate}>
+          <Pressable accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => setShowCalendar(true)} hitSlop={spacing.sm} accessibilityLabel={t.main.pickDate}>
             <Icon name="calendar" size={22} color={colors.primaryText} />
           </Pressable>
-          <Pressable accessibilityRole="button" onPress={() => setDate(addDays(date, 1))} hitSlop={spacing.sm} accessibilityLabel={t.main.nextDay}>
+          <Pressable accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => setDate(addDays(date, 1))} hitSlop={spacing.sm} accessibilityLabel={t.main.nextDay}>
             <Icon name="chevronRight" size={24} />
           </Pressable>
         </View>

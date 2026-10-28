@@ -11,7 +11,7 @@ import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
 import { makeFieldStyles } from "@/components/text-field";
-import { fontSize, fonts, inputBox, radius, spacing, type Theme } from "@/constants/theme";
+import { fontSize, fonts, inputBox, pressedStyle, radius, spacing, type Theme } from "@/constants/theme";
 import { useStyles, useTheme } from "@/hooks/use-theme";
 import { addMealEntry, sumNutrition } from "@/db/entries";
 import type { Food } from "@/db/foods";
@@ -167,7 +167,7 @@ export default function MealEntryForm() {
                 <Text style={styles.unit} numberOfLines={1}>
                   {unitName(t, row.food.unit, parseNumber(row.quantity) ?? 0)}
                 </Text>
-                <Pressable accessibilityRole="button" onPress={() => removeRow(row.key)} hitSlop={spacing.sm} accessibilityLabel={t.mealForm.removeFood}>
+                <Pressable accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => removeRow(row.key)} hitSlop={spacing.sm} accessibilityLabel={t.mealForm.removeFood}>
                   <Icon name="close" color={colors.textMuted} />
                 </Pressable>
               </View>

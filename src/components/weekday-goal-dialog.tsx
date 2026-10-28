@@ -6,7 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Button } from "@/components/button";
 import { Dialog } from "@/components/dialog";
 import { HeaderButton } from "@/components/header-button";
-import { fontSize, fonts, radius, spacing, type Theme } from "@/constants/theme";
+import { fontSize, fonts, pressedStyle, radius, spacing, type Theme } from "@/constants/theme";
 import { useStyles } from "@/hooks/use-theme";
 import { type Goal, getGoals, getWeekdayGoals, setWeekdayGoal } from "@/db/goals";
 import { useTranslation } from "@/i18n";
@@ -75,7 +75,7 @@ export function WeekdayGoalDialog({
           {goals.map((goal) => {
             const isCurrent = goal.id === currentGoalId;
             return (
-              <Pressable accessibilityRole="button" key={goal.id} style={[styles.goal, isCurrent && styles.goalCurrent]} onPress={() => pick(goal)}>
+              <Pressable key={goal.id} accessibilityRole="button" style={({ pressed }) => [styles.goal, isCurrent && styles.goalCurrent, pressed && pressedStyle]} onPress={() => pick(goal)}>
                 <Text style={[styles.goalName, isCurrent && styles.goalCurrentText]} numberOfLines={1}>
                   {goal.name}
                 </Text>

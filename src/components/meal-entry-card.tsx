@@ -5,7 +5,7 @@ import Animated, { FadeIn, FadeOut, LinearTransition, useAnimatedStyle, withTimi
 import { makeCardStyles } from "@/components/card";
 import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
-import { fontSize, fonts, spacing, type Theme } from "@/constants/theme";
+import { fontSize, fonts, pressedStyle, spacing, type Theme } from "@/constants/theme";
 import { useStyles, useTheme } from "@/hooks/use-theme";
 import { type FoodEntry, foodEntryNutrition, type MealEntry, sumNutrition } from "@/db/entries";
 import { unitName, useTranslation } from "@/i18n";
@@ -47,7 +47,7 @@ export function MealEntryCard({
       <View style={styles.header}>
         <Pressable
           accessibilityRole="button"
-          style={styles.headerToggle}
+          style={({ pressed }) => [styles.headerToggle, pressed && pressedStyle]}
           onPress={() => setExpanded(!expanded)}
           disabled={!hasFoods}
           accessibilityHint={expanded ? t.mealCard.hideDetails : t.mealCard.showDetails}
@@ -62,7 +62,7 @@ export function MealEntryCard({
             </Animated.View>
           )}
         </Pressable>
-        <Pressable accessibilityRole="button" onPress={onDelete} hitSlop={spacing.sm} accessibilityLabel={t.common.deleteTitle(entry.meal_name)}>
+        <Pressable accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={onDelete} hitSlop={spacing.sm} accessibilityLabel={t.common.deleteTitle(entry.meal_name)}>
           <Icon name="trash" size={18} color={colors.textMuted} />
         </Pressable>
       </View>
@@ -191,7 +191,7 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   total: {
     fontSize: fontSize.large,
     fontFamily: fonts.number,
-    color: colors.primaryText,
+    color: colors.text,
     fontVariant: ["tabular-nums"],
   },
 });

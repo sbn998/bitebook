@@ -7,7 +7,7 @@ import { useStyles } from "@/hooks/use-theme";
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 // "primary": filled orange button for the main action. "secondary": soft grey fill, e.g. Cancel.
-// "danger": red text on a light red fill for destructive actions.
+// "danger": red text on a light red fill with a red outline, for destructive actions.
 // The button shrinks a little while pressed, like a physical key.
 // `disabled` greys the button out and ignores taps; show the reason nearby so the user knows why.
 export function Button({
@@ -78,8 +78,13 @@ const makeButtonStyles = ({ colors }: Theme) => StyleSheet.create({
   secondary: {
     backgroundColor: colors.background,
   },
+  // The light red fill alone barely shows on the screen background, so it also gets a red outline.
+  // One point less padding keeps it as tall as the buttons next to it.
   danger: {
     backgroundColor: colors.dangerTint,
+    borderWidth: 1,
+    borderColor: colors.danger,
+    paddingVertical: 13,
   },
 });
 

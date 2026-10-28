@@ -6,7 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Card } from "@/components/card";
 import { HeaderButton } from "@/components/header-button";
 import { Select } from "@/components/select";
-import { fontSize, fonts, spacing, type Theme } from "@/constants/theme";
+import { fontSize, fonts, pressedStyle, spacing, type Theme } from "@/constants/theme";
 import { useBackToTopOnTabChange } from "@/hooks/use-back-to-top-on-tab-change";
 import { useStyles } from "@/hooks/use-theme";
 import { WEEKDAY_NUMBERS } from "@/constants/weekdays";
@@ -85,7 +85,7 @@ export default function Goals() {
         <Text style={styles.hint}>{t.goals.empty}</Text>
       ) : (
         goals.map((goal) => (
-          <Pressable accessibilityRole="button" key={goal.id} onPress={() => router.push({ pathname: "/goal-form", params: { id: goal.id } })}>
+          <Pressable key={goal.id} accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => router.push({ pathname: "/goal-form", params: { id: goal.id } })}>
             <Card style={styles.goal}>
               <Text style={styles.name}>{goal.name}</Text>
               {/* Macros first and calories on the right, like the totals on a meal card. */}
@@ -151,7 +151,7 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     marginLeft: "auto", // Pushes the calories to the right end
     fontSize: fontSize.medium,
     fontFamily: fonts.number,
-    color: colors.primaryText,
+    color: colors.text,
   },
   macros: {
     flexShrink: 1,

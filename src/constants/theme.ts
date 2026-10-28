@@ -5,7 +5,7 @@
 // so they redraw when the theme changes.
 const lightColors = {
   primary: "#E8700F", // Orange: buttons, active tab, progress
-  primaryText: "#B85509", // Darker orange, readable as text on white or on primaryTint
+  primaryText: "#A84D08", // Darker orange, readable as text on white or on primaryTint
   primaryTint: "#FCEBDC", // Light orange background, e.g. type badges
   onPrimary: "#FFFFFF", // Text on a primary background
   background: "#F5F2ED", // Warm off-white screen background, so white cards stand out
@@ -14,7 +14,8 @@ const lightColors = {
   textSecondary: "#6E6760",
   textMuted: "#A39C94", // Placeholders and inactive icons only: too light for text people need to read
   border: "#E8E3DC",
-  danger: "#D64545",
+  inputBorder: "#BAB6AF", // Edge of text fields and dropdowns: darker than border, so they show on white cards
+  danger: "#C23A3A",
   dangerTint: "#FDECEC", // Light red background, e.g. "over the goal"
   overlay: "rgba(28, 25, 22, 0.45)", // Dims the screen behind popups
   // The day's calorie card: a warm orange tint, so it stands out from the white cards below.
@@ -37,6 +38,7 @@ const darkColors: Colors = {
   textSecondary: "#A89F96",
   textMuted: "#6F675F",
   border: "#2E2925",
+  inputBorder: "#514C48",
   danger: "#F06A5E", // Brighter red, readable on dark
   dangerTint: "#3A1C1A",
   overlay: "rgba(0, 0, 0, 0.6)",
@@ -105,8 +107,11 @@ export const stackScreenOptions = ({ colors }: Theme) => ({
 export const inputBox = (colors: Colors) => ({
   backgroundColor: colors.surface,
   borderWidth: 1,
-  borderColor: colors.border,
+  borderColor: colors.inputBorder,
   borderRadius: radius.input,
   paddingHorizontal: spacing.md,
   paddingVertical: 10,
 });
+
+// How anything tappable looks while a finger is on it, so every tap shows it was felt.
+export const pressedStyle = { opacity: 0.5 };

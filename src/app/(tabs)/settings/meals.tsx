@@ -8,7 +8,7 @@ import { Card } from "@/components/card";
 import { ConfirmBody, Dialog } from "@/components/dialog";
 import { HeaderButton } from "@/components/header-button";
 import { TextField } from "@/components/text-field";
-import { fontSize, fonts, spacing, type Theme } from "@/constants/theme";
+import { fontSize, fonts, pressedStyle, spacing, type Theme } from "@/constants/theme";
 import { useBackToTopOnTabChange } from "@/hooks/use-back-to-top-on-tab-change";
 import { useStyles } from "@/hooks/use-theme";
 import { addMeal, deleteMeal, getMeals, type Meal, renameMeal } from "@/db/meals";
@@ -90,7 +90,7 @@ export default function MealLabels() {
           </View>
         }
         renderItem={({ item: meal }) => (
-          <Pressable accessibilityRole="button" onPress={() => openDialog(meal)}>
+          <Pressable accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => openDialog(meal)}>
             <Card>
               <Text style={styles.name}>{meal.name}</Text>
             </Card>
@@ -121,16 +121,12 @@ export default function MealLabels() {
             />
             <View style={buttonRowStyles.row}>
               <Button title={t.common.cancel} variant="secondary" onPress={closeDialog} style={buttonRowStyles.button} />
-              {isEditingMeal && (
-                <Button
-                  title={t.common.delete}
-                  variant="danger"
-                  onPress={() => setConfirmingDelete(true)}
-                  style={buttonRowStyles.button}
-                />
-              )}
               <Button title={t.common.save} onPress={save} style={buttonRowStyles.button} />
             </View>
+            {/* On its own line: three buttons in a row are too narrow for longer words, e.g. in Spanish. */}
+            {isEditingMeal && (
+              <Button title={t.common.delete} variant="danger" onPress={() => setConfirmingDelete(true)} />
+            )}
           </>
         )}
       </Dialog>

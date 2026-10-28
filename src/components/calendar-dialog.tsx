@@ -4,7 +4,7 @@ import Animated, { LayoutAnimationConfig, SlideInLeft, SlideInRight } from "reac
 
 import { Dialog } from "@/components/dialog";
 import { Icon } from "@/components/icon";
-import { fontSize, fonts, radius, spacing, type Theme } from "@/constants/theme";
+import { fontSize, fonts, pressedStyle, radius, spacing, type Theme } from "@/constants/theme";
 import { useStyles, useTheme } from "@/hooks/use-theme";
 import { useTranslation } from "@/i18n";
 import { parseDateString, toDateString, weekdayOf } from "@/utils/date";
@@ -55,12 +55,12 @@ export function CalendarDialog({
   return (
     <Dialog visible title={t.main.pickDate} onClose={onClose}>
       <View style={styles.monthRow}>
-        <Pressable accessibilityRole="button" onPress={() => changeMonth(-1)} hitSlop={spacing.sm} accessibilityLabel={t.calendar.previousMonth}>
+        <Pressable accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => changeMonth(-1)} hitSlop={spacing.sm} accessibilityLabel={t.calendar.previousMonth}>
           <Icon name="chevronLeft" size={24} color={colors.text} />
         </Pressable>
         {/* Some languages write month names in lowercase ("octubre de 2026"); as a title it starts with a capital. */}
         <Text style={styles.monthTitle}>{title.charAt(0).toUpperCase() + title.slice(1)}</Text>
-        <Pressable accessibilityRole="button" onPress={() => changeMonth(1)} hitSlop={spacing.sm} accessibilityLabel={t.calendar.nextMonth}>
+        <Pressable accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => changeMonth(1)} hitSlop={spacing.sm} accessibilityLabel={t.calendar.nextMonth}>
           <Icon name="chevronRight" size={24} color={colors.text} />
         </Pressable>
       </View>
@@ -89,7 +89,7 @@ export function CalendarDialog({
                   <Pressable
                     key={day}
                     accessibilityRole="button"
-                    style={styles.cell}
+                    style={({ pressed }) => [styles.cell, pressed && pressedStyle]}
                     onPress={() => onPick(day)}
                     accessibilityLabel={parseDateString(day).toLocaleDateString(locale, { dateStyle: "long" })}
                     accessibilityState={{ selected: isPicked }}
