@@ -55,12 +55,12 @@ export function CalendarDialog({
   return (
     <Dialog visible title={t.main.pickDate} onClose={onClose}>
       <View style={styles.monthRow}>
-        <Pressable onPress={() => changeMonth(-1)} hitSlop={spacing.sm} accessibilityLabel={t.calendar.previousMonth}>
+        <Pressable accessibilityRole="button" onPress={() => changeMonth(-1)} hitSlop={spacing.sm} accessibilityLabel={t.calendar.previousMonth}>
           <Icon name="chevronLeft" size={24} color={colors.text} />
         </Pressable>
         {/* Some languages write month names in lowercase ("octubre de 2026"); as a title it starts with a capital. */}
         <Text style={styles.monthTitle}>{title.charAt(0).toUpperCase() + title.slice(1)}</Text>
-        <Pressable onPress={() => changeMonth(1)} hitSlop={spacing.sm} accessibilityLabel={t.calendar.nextMonth}>
+        <Pressable accessibilityRole="button" onPress={() => changeMonth(1)} hitSlop={spacing.sm} accessibilityLabel={t.calendar.nextMonth}>
           <Icon name="chevronRight" size={24} color={colors.text} />
         </Pressable>
       </View>
@@ -88,9 +88,11 @@ export function CalendarDialog({
                 return (
                   <Pressable
                     key={day}
+                    accessibilityRole="button"
                     style={styles.cell}
                     onPress={() => onPick(day)}
                     accessibilityLabel={parseDateString(day).toLocaleDateString(locale, { dateStyle: "long" })}
+                    accessibilityState={{ selected: isPicked }}
                   >
                     <View style={[styles.day, day === today && styles.today, isPicked && styles.picked]}>
                       <Text style={[styles.dayText, day === today && styles.todayText, isPicked && styles.pickedText]}>
@@ -128,7 +130,7 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     textAlign: "center",
     fontSize: fontSize.small,
     fontFamily: fonts.bodyMedium,
-    color: colors.textMuted,
+    color: colors.textSecondary,
   },
   // Hides the next month while it slides in from outside the popup.
   clip: {

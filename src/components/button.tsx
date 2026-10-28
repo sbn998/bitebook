@@ -30,6 +30,7 @@ export function Button({
 
   return (
     <AnimatedPressable
+      accessibilityRole="button"
       style={[styles.button, buttonStyles[variant], disabled && styles.disabled, pressStyle, style]}
       onPress={onPress}
       onPressIn={() => scale.set(withSpring(0.96, { duration: 150 }))}

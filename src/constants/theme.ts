@@ -12,7 +12,7 @@ const lightColors = {
   surface: "#FFFFFF", // Cards, inputs, headers
   text: "#1C1916", // Warm near-black
   textSecondary: "#6E6760",
-  textMuted: "#A39C94", // Placeholders, inactive icons
+  textMuted: "#A39C94", // Placeholders and inactive icons only: too light for text people need to read
   border: "#E8E3DC",
   danger: "#D64545",
   dangerTint: "#FDECEC", // Light red background, e.g. "over the goal"

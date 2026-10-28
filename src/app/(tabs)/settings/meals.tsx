@@ -90,7 +90,7 @@ export default function MealLabels() {
           </View>
         }
         renderItem={({ item: meal }) => (
-          <Pressable onPress={() => openDialog(meal)}>
+          <Pressable accessibilityRole="button" onPress={() => openDialog(meal)}>
             <Card>
               <Text style={styles.name}>{meal.name}</Text>
             </Card>

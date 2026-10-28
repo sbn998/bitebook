@@ -239,6 +239,6 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   noTarget: {
     fontFamily: fonts.body,
     fontSize: fontSize.small,
-    color: colors.textMuted,
+    color: colors.textSecondary,
   },
 });

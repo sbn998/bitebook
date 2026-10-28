@@ -85,7 +85,7 @@ export default function Goals() {
         <Text style={styles.hint}>{t.goals.empty}</Text>
       ) : (
         goals.map((goal) => (
-          <Pressable key={goal.id} onPress={() => router.push({ pathname: "/goal-form", params: { id: goal.id } })}>
+          <Pressable accessibilityRole="button" key={goal.id} onPress={() => router.push({ pathname: "/goal-form", params: { id: goal.id } })}>
             <Card style={styles.goal}>
               <Text style={styles.name}>{goal.name}</Text>
               {/* Macros first and calories on the right, like the totals on a meal card. */}

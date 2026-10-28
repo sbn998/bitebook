@@ -137,7 +137,7 @@ export default function Foods() {
               </Animated.Text>
             }
             renderItem={({ item: food }) => (
-              <Pressable onPress={() => openForm(food.id)}>
+              <Pressable accessibilityRole="button" onPress={() => openForm(food.id)}>
                 <Card style={styles.card}>
                   <View style={styles.cardTop}>
                     <Text style={styles.name} numberOfLines={1}>

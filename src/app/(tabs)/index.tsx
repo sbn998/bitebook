@@ -107,12 +107,12 @@ export default function Main() {
   return (
     <View style={styles.screen}>
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <Pressable onPress={() => setDate(addDays(date, -1))} hitSlop={spacing.sm} accessibilityLabel={t.main.previousDay}>
+        <Pressable accessibilityRole="button" onPress={() => setDate(addDays(date, -1))} hitSlop={spacing.sm} accessibilityLabel={t.main.previousDay}>
           <Icon name="chevronLeft" size={24} />
         </Pressable>
 
         {/* Tapping the title jumps back to today. */}
-        <Pressable style={styles.title} onPress={() => setDate(today)} accessibilityLabel={t.main.goToToday}>
+        <Pressable accessibilityRole="button" style={styles.title} onPress={() => setDate(today)} accessibilityHint={t.main.goToToday}>
           <Text style={styles.titleText}>{dayTitle(date, today, t.dates, locale)}</Text>
           <Text style={styles.subtitle} numberOfLines={1}>
             {longDate(date, locale)}
@@ -121,10 +121,10 @@ export default function Main() {
         </Pressable>
 
         <View style={styles.headerRight}>
-          <Pressable onPress={() => setShowCalendar(true)} hitSlop={spacing.sm} accessibilityLabel={t.main.pickDate}>
+          <Pressable accessibilityRole="button" onPress={() => setShowCalendar(true)} hitSlop={spacing.sm} accessibilityLabel={t.main.pickDate}>
             <Icon name="calendar" size={22} color={colors.primaryText} />
           </Pressable>
-          <Pressable onPress={() => setDate(addDays(date, 1))} hitSlop={spacing.sm} accessibilityLabel={t.main.nextDay}>
+          <Pressable accessibilityRole="button" onPress={() => setDate(addDays(date, 1))} hitSlop={spacing.sm} accessibilityLabel={t.main.nextDay}>
             <Icon name="chevronRight" size={24} />
           </Pressable>
         </View>
