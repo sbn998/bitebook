@@ -145,7 +145,7 @@ export default function MealEntryForm() {
             <View key={row.key} style={styles.rowWrapper}>
               <View style={styles.row}>
                 <View style={styles.rowText}>
-                  <Text style={styles.foodName} numberOfLines={1}>
+                  <Text style={styles.foodName} numberOfLines={2}>
                     {row.food.name}
                   </Text>
                   <Text style={styles.hint} numberOfLines={1}>

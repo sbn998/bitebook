@@ -2,7 +2,7 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
@@ -49,6 +49,8 @@ export default function GoalForm() {
   const [usedOnWeekdays, setUsedOnWeekdays] = useState<number[]>([]);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const headerHeight = useHeaderHeight();
+  // With the phone's text bigger than normal, the three macro fields don't fit side by side, so they stack.
+  const stackMacros = useWindowDimensions().fontScale > 1;
 
   // In edit mode, load the goal once and fill in the fields (always in grams).
   useEffect(() => {
@@ -185,7 +187,7 @@ export default function GoalForm() {
             error={errors.calories}
           />
 
-          <View style={styles.macros}>
+          <View style={[styles.macros, stackMacros && styles.macrosStacked]}>
             {MACRO_FIELDS.map(({ key }) => (
               <TextField
                 key={key}
@@ -197,7 +199,7 @@ export default function GoalForm() {
                 placeholder={t.goalForm.none}
                 hint={hintFor(key)}
                 error={errors[key]}
-                containerStyle={styles.flex}
+                containerStyle={!stackMacros && styles.flex}
               />
             ))}
           </View>
@@ -299,6 +301,10 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: spacing.sm,
+  },
+  macrosStacked: {
+    flexDirection: "column",
+    alignItems: "stretch",
   },
   left: {
     flexDirection: "row",

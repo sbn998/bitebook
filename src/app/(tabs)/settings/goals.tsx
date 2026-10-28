@@ -1,7 +1,7 @@
 import { router, Stack, useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import { Card } from "@/components/card";
 import { HeaderButton } from "@/components/header-button";
@@ -26,6 +26,8 @@ function macroSummary(goal: Goal, t: Strings) {
 
 export default function Goals() {
   const styles = useStyles(makeStyles);
+  // The weekday column grows with the phone's text size, so "Miércoles" stays on one line and the dropdowns line up.
+  const weekdayWidth = 96 * useWindowDimensions().fontScale;
   useBackToTopOnTabChange();
   const db = useSQLiteContext();
   const { t } = useTranslation();
@@ -64,7 +66,7 @@ export default function Goals() {
               const goalId = weekdayGoals.find((w) => w.weekday === weekday)?.goal_id;
               return (
                 <View key={weekday} style={styles.planRow}>
-                  <Text style={styles.weekday}>{t.weekdays[weekday - 1]}</Text>
+                  <Text style={[styles.weekday, { width: weekdayWidth }]}>{t.weekdays[weekday - 1]}</Text>
                   <Select
                     title={t.weekdays[weekday - 1]}
                     options={goalOptions}
@@ -124,7 +126,6 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     gap: spacing.md,
   },
   weekday: {
-    width: 96,
     fontSize: fontSize.medium,
     fontFamily: fonts.body,
     color: colors.text,

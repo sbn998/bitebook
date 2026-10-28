@@ -79,7 +79,7 @@ export function MealEntryCard({
           <Animated.View key={food.id} entering={FadeIn} exiting={FadeOut.duration(150)} layout={layout}>
             <Pressable accessibilityRole="button" onPress={() => onEditFood(food)} style={({ pressed }) => pressed && styles.pressed}>
               <View style={styles.food}>
-                <Text style={styles.foodName} numberOfLines={1}>
+                <Text style={styles.foodName} numberOfLines={2}>
                   {food.name}
                   <Text style={styles.amount}>
                     {" "}

@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 
@@ -65,6 +66,8 @@ export default function FoodForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const headerHeight = useHeaderHeight();
+  // With the phone's text bigger than normal, the three macro fields don't fit side by side, so they stack.
+  const stackMacros = useWindowDimensions().fontScale > 1;
 
   // In edit mode, load the food once and fill in the fields.
   useEffect(() => {
@@ -286,7 +289,7 @@ export default function FoodForm() {
             error={errors.calories}
           />
 
-          <View style={styles.macros}>
+          <View style={[styles.macros, stackMacros && styles.macrosStacked]}>
             {MACRO_FIELDS.map(({ key }) => (
               <TextField
                 key={key}
@@ -296,7 +299,7 @@ export default function FoodForm() {
                 keyboardType="decimal-pad"
                 placeholder="0"
                 error={errors[key]}
-                containerStyle={styles.flex}
+                containerStyle={!stackMacros && styles.flex}
               />
             ))}
           </View>
@@ -351,6 +354,10 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: spacing.sm,
+  },
+  macrosStacked: {
+    flexDirection: "column",
+    alignItems: "stretch",
   },
   input: {
     ...inputBox(colors),
