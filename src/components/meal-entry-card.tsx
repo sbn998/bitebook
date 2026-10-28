@@ -46,10 +46,12 @@ export function MealEntryCard({
     <Animated.View style={[cardStyles.card, styles.card]} layout={layout}>
       <View style={styles.header}>
         <Pressable
+          accessibilityRole="button"
           style={styles.headerToggle}
           onPress={() => setExpanded(!expanded)}
           disabled={!hasFoods}
-          accessibilityLabel={expanded ? t.mealCard.hideDetails : t.mealCard.showDetails}
+          accessibilityHint={expanded ? t.mealCard.hideDetails : t.mealCard.showDetails}
+          accessibilityState={{ expanded, disabled: !hasFoods }}
         >
           <Text style={styles.name} numberOfLines={1}>
             {entry.meal_name}
@@ -60,7 +62,7 @@ export function MealEntryCard({
             </Animated.View>
           )}
         </Pressable>
-        <Pressable onPress={onDelete} hitSlop={spacing.sm} accessibilityLabel={t.common.deleteTitle(entry.meal_name)}>
+        <Pressable accessibilityRole="button" onPress={onDelete} hitSlop={spacing.sm} accessibilityLabel={t.common.deleteTitle(entry.meal_name)}>
           <Icon name="trash" size={18} color={colors.textMuted} />
         </Pressable>
       </View>
@@ -75,7 +77,7 @@ export function MealEntryCard({
         const nutrition = foodEntryNutrition(food);
         return (
           <Animated.View key={food.id} entering={FadeIn} exiting={FadeOut.duration(150)} layout={layout}>
-            <Pressable onPress={() => onEditFood(food)} style={({ pressed }) => pressed && styles.pressed}>
+            <Pressable accessibilityRole="button" onPress={() => onEditFood(food)} style={({ pressed }) => pressed && styles.pressed}>
               <View style={styles.food}>
                 <Text style={styles.foodName} numberOfLines={1}>
                   {food.name}

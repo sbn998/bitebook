@@ -92,6 +92,7 @@ export default function BarcodeScanner() {
       <View style={[styles.dim, styles.below]}>
         <Text style={styles.hint}>{t.scanner.pointCamera}</Text>
         <Pressable
+          accessibilityRole="button"
           style={({ pressed }) => [styles.flashButton, flashOn && styles.flashButtonOn, pressed && styles.pressed]}
           onPress={() => setFlashOn(!flashOn)}
           accessibilityLabel={flashOn ? t.scanner.flashOff : t.scanner.flashOn}

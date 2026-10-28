@@ -175,6 +175,7 @@ export default function FoodForm() {
         {/* Only for new foods: a scanned barcode is saved when a food is added, never edited. */}
         {id === null && (
           <Pressable
+            accessibilityRole="button"
             onPress={() => router.push("/barcode-scanner")}
             disabled={lookingUp}
             style={({ pressed }) => pressed && styles.pressed}
@@ -210,6 +211,7 @@ export default function FoodForm() {
         >
           {scanned?.saved.map((food) => (
             <Pressable
+              accessibilityRole="button"
               key={food.id}
               style={({ pressed }) => [styles.savedRow, pressed && styles.pressed]}
               onPress={() => router.replace({ pathname: "/food-form", params: { id: String(food.id) } })}
@@ -256,6 +258,7 @@ export default function FoodForm() {
             <Text style={fieldStyles.label}>{t.foodForm.referenceAmount}</Text>
             <View style={styles.row}>
               <TextInput
+                accessibilityLabel={t.foodForm.referenceAmount}
                 style={[styles.input, styles.flex, !!errors.reference_amount && styles.inputError]}
                 value={referenceAmount}
                 onChangeText={setReferenceAmount}

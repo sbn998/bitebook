@@ -75,7 +75,7 @@ export function WeekdayGoalDialog({
           {goals.map((goal) => {
             const isCurrent = goal.id === currentGoalId;
             return (
-              <Pressable key={goal.id} style={[styles.goal, isCurrent && styles.goalCurrent]} onPress={() => pick(goal)}>
+              <Pressable accessibilityRole="button" key={goal.id} style={[styles.goal, isCurrent && styles.goalCurrent]} onPress={() => pick(goal)}>
                 <Text style={[styles.goalName, isCurrent && styles.goalCurrentText]} numberOfLines={1}>
                   {goal.name}
                 </Text>

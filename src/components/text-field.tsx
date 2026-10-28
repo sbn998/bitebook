@@ -30,6 +30,7 @@ export function TextField({
         {labelRight}
       </View>
       <TextInput
+        accessibilityLabel={label}
         style={[styles.input, !!error && styles.inputError]}
         placeholderTextColor={colors.textMuted}
         {...inputProps}

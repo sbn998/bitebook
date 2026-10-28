@@ -16,7 +16,7 @@ export function IconButton({
 }) {
   const styles = useStyles(makeStyles);
   return (
-    <Pressable style={styles.button} onPress={onPress} accessibilityLabel={accessibilityLabel}>
+    <Pressable accessibilityRole="button" style={styles.button} onPress={onPress} accessibilityLabel={accessibilityLabel}>
       <Icon name={icon} />
     </Pressable>
   );

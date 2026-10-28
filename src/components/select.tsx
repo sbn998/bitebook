@@ -40,7 +40,9 @@ export function Select<K extends string>({
   return (
     <>
       <Pressable
+        accessibilityRole="button"
         style={[styles.select, hasError && styles.selectError, style]}
+        accessibilityLabel={`${title}, ${selected?.label ?? placeholder ?? ""}`}
         onPress={() => setOpen(true)}
       >
         <Text style={[styles.text, styles.shrink, !selected && styles.placeholder]} numberOfLines={1}>
@@ -51,8 +53,8 @@ export function Select<K extends string>({
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <View style={styles.overlay}>
-          {/* Tapping outside the list closes it. */}
-          <Pressable style={StyleSheet.absoluteFill} onPress={() => setOpen(false)} />
+          {/* Tapping outside the list closes it. Hidden from screen readers, so they start at the title; they close it with Back. */}
+          <Pressable style={StyleSheet.absoluteFill} onPress={() => setOpen(false)} importantForAccessibility="no" accessible={false} />
           <View style={styles.sheet}>
             <Text style={styles.sheetTitle}>{title}</Text>
             <FlatList
@@ -62,7 +64,9 @@ export function Select<K extends string>({
                 const isSelected = option.key === value;
                 return (
                   <Pressable
+                    accessibilityRole="button"
                     style={[styles.option, isSelected && styles.optionSelected]}
+                    accessibilityState={{ selected: isSelected }}
                     onPress={() => {
                       onChange(option.key);
                       setOpen(false);

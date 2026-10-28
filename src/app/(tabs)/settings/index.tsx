@@ -98,7 +98,7 @@ export default function Settings() {
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.screen}>
       <Card style={styles.menu}>
         {sections.map((section) => (
-          <Pressable key={section.href} style={styles.row} onPress={() => router.push(section.href)}>
+          <Pressable accessibilityRole="button" key={section.href} style={styles.row} onPress={() => router.push(section.href)}>
             <Text style={styles.rowText}>{section.label}</Text>
             <Icon name="chevronRight" color={colors.textMuted} />
           </Pressable>
@@ -130,11 +130,11 @@ export default function Settings() {
 
       <Text style={styles.sectionTitle}>{t.settings.yourData}</Text>
       <Card style={styles.menu}>
-        <Pressable style={styles.row} onPress={exportData}>
+        <Pressable accessibilityRole="button" style={styles.row} onPress={exportData}>
           <Text style={styles.rowText}>{t.backup.export}</Text>
           <Icon name="chevronRight" color={colors.textMuted} />
         </Pressable>
-        <Pressable style={styles.row} onPress={importData}>
+        <Pressable accessibilityRole="button" style={styles.row} onPress={importData}>
           <Text style={styles.rowText}>{t.backup.import}</Text>
           <Icon name="chevronRight" color={colors.textMuted} />
         </Pressable>

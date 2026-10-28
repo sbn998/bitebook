@@ -7,7 +7,7 @@ import { useStyles } from "@/hooks/use-theme";
 export function HeaderButton({ title, onPress }: { title: string; onPress: () => void }) {
   const styles = useStyles(makeStyles);
   return (
-    <Pressable onPress={onPress} hitSlop={spacing.sm}>
+    <Pressable accessibilityRole="button" onPress={onPress} hitSlop={spacing.sm}>
       <Text style={styles.text}>{title}</Text>
     </Pressable>
   );

@@ -24,8 +24,8 @@ export function Dialog({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       {/* Moves the dialog up when the keyboard opens, so its buttons stay visible. */}
       <KeyboardAvoidingView style={styles.overlay} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        {/* Tapping outside the dialog closes it. */}
-        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        {/* Tapping outside the dialog closes it. Hidden from screen readers, so they start at the title; they close it with Back. */}
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} importantForAccessibility="no" accessible={false} />
         <Card style={styles.dialog}>
           <Text style={styles.title}>{title}</Text>
           {children}

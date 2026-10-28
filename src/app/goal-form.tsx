@@ -217,7 +217,7 @@ export default function GoalForm() {
                 )}
               </View>
               {fillTarget && (
-                <Pressable style={styles.fillButton} onPress={fillRemaining}>
+                <Pressable accessibilityRole="button" style={styles.fillButton} onPress={fillRemaining}>
                   <Text style={styles.fillText}>{t.goalForm.useFor(t.macros[fillTarget.key])}</Text>
                 </Pressable>
               )}
@@ -263,11 +263,13 @@ function UnitSwitch({ value, onChange }: { value: MacroUnit; onChange: (unit: Ma
         const isOn = unit === value;
         return (
           <Pressable
+            accessibilityRole="button"
             key={unit}
             style={[styles.switchOption, isOn && styles.switchOptionOn]}
             onPress={() => onChange(unit)}
             hitSlop={4}
             accessibilityLabel={unit === "g" ? t.goalForm.grams : t.goalForm.percent}
+            accessibilityState={{ selected: isOn }}
           >
             <Text style={[styles.switchText, isOn && styles.switchTextOn]}>{unit}</Text>
           </Pressable>

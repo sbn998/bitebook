@@ -157,6 +157,7 @@ export default function MealEntryForm() {
                   </Text>
                 </View>
                 <TextInput
+                  accessibilityLabel={`${row.food.name}, ${t.foodEntry.amount(t.units[row.food.unit].other)}`}
                   style={[styles.amount, !!errors[row.key] && styles.amountError]}
                   value={row.quantity}
                   onChangeText={(text) => setQuantity(row.key, text)}
@@ -166,7 +167,7 @@ export default function MealEntryForm() {
                 <Text style={styles.unit} numberOfLines={1}>
                   {unitName(t, row.food.unit, parseNumber(row.quantity) ?? 0)}
                 </Text>
-                <Pressable onPress={() => removeRow(row.key)} hitSlop={spacing.sm} accessibilityLabel={t.mealForm.removeFood}>
+                <Pressable accessibilityRole="button" onPress={() => removeRow(row.key)} hitSlop={spacing.sm} accessibilityLabel={t.mealForm.removeFood}>
                   <Icon name="close" color={colors.textMuted} />
                 </Pressable>
               </View>

@@ -112,7 +112,7 @@ export function FoodPicker({
           renderItem={({ item: food }) => {
             const count = pickedCounts[food.id] ?? 0;
             return (
-              <Pressable style={({ pressed }) => [styles.row, pressed && styles.pressed]} onPress={() => onPick(food)}>
+              <Pressable accessibilityRole="button" style={({ pressed }) => [styles.row, pressed && styles.pressed]} onPress={() => onPick(food)}>
                 <View style={styles.rowText}>
                   <Text style={styles.name} numberOfLines={1}>
                     {food.name}
