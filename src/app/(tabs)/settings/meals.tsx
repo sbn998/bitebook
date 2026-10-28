@@ -121,16 +121,12 @@ export default function MealLabels() {
             />
             <View style={buttonRowStyles.row}>
               <Button title={t.common.cancel} variant="secondary" onPress={closeDialog} style={buttonRowStyles.button} />
-              {isEditingMeal && (
-                <Button
-                  title={t.common.delete}
-                  variant="danger"
-                  onPress={() => setConfirmingDelete(true)}
-                  style={buttonRowStyles.button}
-                />
-              )}
               <Button title={t.common.save} onPress={save} style={buttonRowStyles.button} />
             </View>
+            {/* On its own line: three buttons in a row are too narrow for longer words, e.g. in Spanish. */}
+            {isEditingMeal && (
+              <Button title={t.common.delete} variant="danger" onPress={() => setConfirmingDelete(true)} />
+            )}
           </>
         )}
       </Dialog>
