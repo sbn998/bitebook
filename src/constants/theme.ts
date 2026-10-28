@@ -17,6 +17,8 @@ const lightColors = {
   inputBorder: "#BAB6AF", // Edge of text fields and dropdowns: darker than border, so they show on white cards
   danger: "#C23A3A",
   dangerTint: "#FDECEC", // Light red background, e.g. "over the goal"
+  success: "#2A7047", // Green text for "it worked", e.g. "Your data was imported"
+  successTint: "#E3F2E8", // Its light green background
   overlay: "rgba(28, 25, 22, 0.45)", // Dims the screen behind popups
   // The day's calorie card: a warm orange tint, so it stands out from the white cards below.
   hero: "#FFF4E9",
@@ -41,6 +43,8 @@ const darkColors: Colors = {
   inputBorder: "#514C48",
   danger: "#F06A5E", // Brighter red, readable on dark
   dangerTint: "#3A1C1A",
+  success: "#6FCF97", // Brighter green, readable on dark
+  successTint: "#183224",
   overlay: "rgba(0, 0, 0, 0.6)",
   hero: "#2A1E15",
   heroTrack: "#4A3220",

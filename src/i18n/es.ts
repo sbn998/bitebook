@@ -122,7 +122,6 @@ export const es: Strings = {
     export: "Exportar datos",
     shareTitle: "Guardar tus datos",
     exportFailed: "No se han podido exportar tus datos. Inténtalo de nuevo.",
-    ok: "Aceptar",
     import: "Importar datos",
     replaceTitle: "¿Sustituir todos tus datos?",
     summary: (counts: { foods: number; meals: number; goals: number; days: number }) => {

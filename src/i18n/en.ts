@@ -126,7 +126,6 @@ export const en = {
     export: "Export data",
     shareTitle: "Save your data",
     exportFailed: "Couldn't export your data. Try again.",
-    ok: "OK",
     import: "Import data",
     replaceTitle: "Replace all your data?",
     // e.g. "42 foods, 4 meal labels, 3 goals and 120 days"

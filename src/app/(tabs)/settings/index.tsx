@@ -1,6 +1,6 @@
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { Button, buttonRowStyles } from "@/components/button";
@@ -30,8 +30,11 @@ export default function Settings() {
   const db = useSQLiteContext();
   const { t, language, setLanguage } = useTranslation();
   const { themeSetting, setThemeSetting } = useThemeSetting();
-  // A short result or error shown in a popup, e.g. "Your data was imported."
-  const [message, setMessage] = useState<string | null>(null);
+  // The last export or import result, e.g. "Your data was imported.", shown under its buttons.
+  const [message, setMessage] = useState<{ text: string; isError: boolean } | null>(null);
+
+  // Runs when the screen leaves view: an old result would be confusing when coming back later.
+  useFocusEffect(useCallback(() => () => setMessage(null), []));
   // A checked file waiting for the user to confirm replacing everything with it.
   const [pendingImport, setPendingImport] = useState<{
     backup: Backup;
@@ -40,26 +43,29 @@ export default function Settings() {
   } | null>(null);
 
   async function exportData() {
+    setMessage(null);
     try {
       await shareBackup(db, t.backup.shareTitle);
     } catch {
-      setMessage(t.backup.exportFailed);
+      setMessage({ text: t.backup.exportFailed, isError: true });
     }
   }
 
   // Picks a file and checks it. Nothing is changed until the user confirms.
   // Unexpected failures are also logged, so the real cause shows in the dev server's terminal.
   async function importData() {
+    setMessage(null);
     try {
       const text = await pickBackupFile();
       if (text === null) return;
       const backup = parseBackup(text);
       setPendingImport({ backup, file: countBackup(backup), current: await countCurrentData(db) });
     } catch (error) {
-      if (error instanceof BackupError) setMessage(error.reason === "newer" ? t.backup.newerFile : t.backup.invalidFile);
-      else {
+      if (error instanceof BackupError) {
+        setMessage({ text: error.reason === "newer" ? t.backup.newerFile : t.backup.invalidFile, isError: true });
+      } else {
         console.error("Import: reading the file failed", error);
-        setMessage(t.backup.importFailed);
+        setMessage({ text: t.backup.importFailed, isError: true });
       }
     }
   }
@@ -71,10 +77,10 @@ export default function Settings() {
     setPendingImport(null);
     try {
       await restoreBackup(db, backup);
-      setMessage(t.backup.imported);
+      setMessage({ text: t.backup.imported, isError: false });
     } catch (error) {
       console.error("Import: replacing the data failed", error);
-      setMessage(t.backup.importFailed);
+      setMessage({ text: t.backup.importFailed, isError: true });
     }
   }
 
@@ -140,6 +146,14 @@ export default function Settings() {
         </Pressable>
       </Card>
 
+      {/* Right under the buttons that started it, instead of a popup to close. Red when something failed.
+          TalkBack reads it out as soon as it appears. */}
+      {message && (
+        <Text style={[styles.result, message.isError && styles.resultError]} accessibilityLiveRegion="polite">
+          {message.text}
+        </Text>
+      )}
+
       <Dialog visible={pendingImport !== null} title={t.backup.replaceTitle} onClose={() => setPendingImport(null)}>
         {pendingImport && (
           <>
@@ -165,11 +179,6 @@ export default function Settings() {
           </>
         )}
       </Dialog>
-
-      <Dialog visible={message !== null} title={t.settings.yourData} onClose={() => setMessage(null)}>
-        <Text style={styles.rowHint}>{message}</Text>
-        <Button title={t.backup.ok} onPress={() => setMessage(null)} />
-      </Dialog>
     </ScrollView>
   );
 }
@@ -194,10 +203,20 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     fontFamily: fonts.body,
     color: colors.text,
   },
-  rowHint: {
+  // Green when it worked; red, like the food form's "lookup failed" box, when something failed.
+  result: {
+    borderRadius: radius.input,
+    overflow: "hidden",
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     fontSize: fontSize.body,
-    fontFamily: fonts.body,
-    color: colors.textSecondary,
+    fontFamily: fonts.bodyMedium,
+    backgroundColor: colors.successTint,
+    color: colors.success,
+  },
+  resultError: {
+    backgroundColor: colors.dangerTint,
+    color: colors.danger,
   },
   counts: {
     backgroundColor: colors.background,
