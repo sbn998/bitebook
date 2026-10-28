@@ -112,3 +112,6 @@ export const inputBox = (colors: Colors) => ({
   paddingHorizontal: spacing.md,
   paddingVertical: 10,
 });
+
+// How anything tappable looks while a finger is on it, so every tap shows it was felt.
+export const pressedStyle = { opacity: 0.5 };

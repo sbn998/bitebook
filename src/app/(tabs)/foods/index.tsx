@@ -10,7 +10,7 @@ import { Icon } from "@/components/icon";
 import { IconButton } from "@/components/icon-button";
 import { Select } from "@/components/select";
 import { FOOD_TYPE_KEYS, type FoodType } from "@/constants/food";
-import { fontSize, fonts, inputBox, radius, spacing, type Theme } from "@/constants/theme";
+import { fontSize, fonts, inputBox, pressedStyle, radius, spacing, type Theme } from "@/constants/theme";
 import { useStyles, useTheme } from "@/hooks/use-theme";
 import { type Food, getFoods } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
@@ -137,7 +137,7 @@ export default function Foods() {
               </Animated.Text>
             }
             renderItem={({ item: food }) => (
-              <Pressable accessibilityRole="button" onPress={() => openForm(food.id)}>
+              <Pressable accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => openForm(food.id)}>
                 <Card style={styles.card}>
                   <View style={styles.cardTop}>
                     <Text style={styles.name} numberOfLines={1}>

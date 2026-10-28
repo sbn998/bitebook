@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { Icon } from "@/components/icon";
-import { fontSize, fonts, inputBox, radius, spacing, type Theme } from "@/constants/theme";
+import { fontSize, fonts, inputBox, pressedStyle, radius, spacing, type Theme } from "@/constants/theme";
 import { useStyles, useTheme } from "@/hooks/use-theme";
 
 // A box that looks like a text field and opens a list of options when tapped.
@@ -41,7 +41,7 @@ export function Select<K extends string>({
     <>
       <Pressable
         accessibilityRole="button"
-        style={[styles.select, hasError && styles.selectError, style]}
+        style={({ pressed }) => [styles.select, hasError && styles.selectError, style, pressed && pressedStyle]}
         accessibilityLabel={`${title}, ${selected?.label ?? placeholder ?? ""}`}
         onPress={() => setOpen(true)}
       >
@@ -65,7 +65,7 @@ export function Select<K extends string>({
                 return (
                   <Pressable
                     accessibilityRole="button"
-                    style={[styles.option, isSelected && styles.optionSelected]}
+                    style={({ pressed }) => [styles.option, isSelected && styles.optionSelected, pressed && pressedStyle]}
                     accessibilityState={{ selected: isSelected }}
                     onPress={() => {
                       onChange(option.key);

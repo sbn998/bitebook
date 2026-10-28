@@ -8,7 +8,7 @@ import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
 import { ConfirmDialog } from "@/components/dialog";
 import { TextField } from "@/components/text-field";
-import { fontSize, fonts, radius, spacing, type Theme } from "@/constants/theme";
+import { fontSize, fonts, pressedStyle, radius, spacing, type Theme } from "@/constants/theme";
 import { useStyles } from "@/hooks/use-theme";
 import { addGoal, deleteGoal, getGoal, getWeekdayGoals, setWeekdayGoal, updateGoal } from "@/db/goals";
 import { useTranslation } from "@/i18n";
@@ -217,7 +217,7 @@ export default function GoalForm() {
                 )}
               </View>
               {fillTarget && (
-                <Pressable accessibilityRole="button" style={styles.fillButton} onPress={fillRemaining}>
+                <Pressable accessibilityRole="button" style={({ pressed }) => [styles.fillButton, pressed && pressedStyle]} onPress={fillRemaining}>
                   <Text style={styles.fillText}>{t.goalForm.useFor(t.macros[fillTarget.key])}</Text>
                 </Pressable>
               )}
@@ -265,7 +265,7 @@ function UnitSwitch({ value, onChange }: { value: MacroUnit; onChange: (unit: Ma
           <Pressable
             key={unit}
             accessibilityRole="button"
-            style={[styles.switchOption, isOn && styles.switchOptionOn]}
+            style={({ pressed }) => [styles.switchOption, isOn && styles.switchOptionOn, pressed && pressedStyle]}
             onPress={() => onChange(unit)}
             // Taller and wider than it looks, so it's easy to hit. Only a little downward: the text field is just below.
             hitSlop={{ top: 14, bottom: 5, left: unit === "g" ? 10 : 0, right: unit === "%" ? 10 : 0 }}

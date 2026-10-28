@@ -9,7 +9,7 @@ import { Dialog } from "@/components/dialog";
 import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { Select } from "@/components/select";
-import { fontSize, fonts, radius, spacing, type Theme } from "@/constants/theme";
+import { fontSize, fonts, pressedStyle, radius, spacing, type Theme } from "@/constants/theme";
 import { type ThemeSetting, useStyles, useTheme, useThemeSetting } from "@/hooks/use-theme";
 import {
   type Backup,
@@ -98,7 +98,7 @@ export default function Settings() {
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.screen}>
       <Card style={styles.menu}>
         {sections.map((section) => (
-          <Pressable accessibilityRole="button" key={section.href} style={styles.row} onPress={() => router.push(section.href)}>
+          <Pressable key={section.href} accessibilityRole="button" style={({ pressed }) => [styles.row, pressed && pressedStyle]} onPress={() => router.push(section.href)}>
             <Text style={styles.rowText}>{section.label}</Text>
             <Icon name="chevronRight" color={colors.textMuted} />
           </Pressable>
@@ -130,11 +130,11 @@ export default function Settings() {
 
       <Text style={styles.sectionTitle}>{t.settings.yourData}</Text>
       <Card style={styles.menu}>
-        <Pressable accessibilityRole="button" style={styles.row} onPress={exportData}>
+        <Pressable accessibilityRole="button" style={({ pressed }) => [styles.row, pressed && pressedStyle]} onPress={exportData}>
           <Text style={styles.rowText}>{t.backup.export}</Text>
           <Icon name="chevronRight" color={colors.textMuted} />
         </Pressable>
-        <Pressable accessibilityRole="button" style={styles.row} onPress={importData}>
+        <Pressable accessibilityRole="button" style={({ pressed }) => [styles.row, pressed && pressedStyle]} onPress={importData}>
           <Text style={styles.rowText}>{t.backup.import}</Text>
           <Icon name="chevronRight" color={colors.textMuted} />
         </Pressable>

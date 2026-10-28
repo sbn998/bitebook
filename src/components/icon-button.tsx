@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet } from "react-native";
 
 import { Icon, type IconName } from "@/components/icon";
-import { inputBox, type Theme } from "@/constants/theme";
+import { inputBox, pressedStyle, type Theme } from "@/constants/theme";
 import { useStyles } from "@/hooks/use-theme";
 
 // A square button with an icon, the same height as text fields.
@@ -16,7 +16,7 @@ export function IconButton({
 }) {
   const styles = useStyles(makeStyles);
   return (
-    <Pressable accessibilityRole="button" style={styles.button} onPress={onPress} accessibilityLabel={accessibilityLabel}>
+    <Pressable accessibilityRole="button" style={({ pressed }) => [styles.button, pressed && pressedStyle]} onPress={onPress} accessibilityLabel={accessibilityLabel}>
       <Icon name={icon} />
     </Pressable>
   );
