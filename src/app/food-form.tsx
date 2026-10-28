@@ -26,7 +26,7 @@ import { fontSize, fonts, inputBox, radius, spacing, type Theme } from "@/consta
 import { useStyles, useTheme } from "@/hooks/use-theme";
 import { addFood, deleteFood, type Food, getFood, getFoodsByBarcode, updateFood } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
-import { errorMessages, readFoodForm, scannedFoodFields } from "@/utils/forms";
+import { errorMessages, readFoodForm, scannedFoodFields, typingErrors } from "@/utils/forms";
 import { caloriesFromMacros, MACRO_FIELDS, type MacroKey, parseNumber } from "@/utils/nutrition";
 import { type LookupResult, lookUpBarcode } from "@/utils/open-food-facts";
 
@@ -64,6 +64,8 @@ export default function FoodForm() {
   const [calories, setCalories] = useState("");
   const [macros, setMacros] = useState<Record<MacroKey, string>>({ protein: "", carbs: "", fat: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // After the first Save, empty required fields are pointed out too, not only typos.
+  const [triedSave, setTriedSave] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const headerHeight = useHeaderHeight();
   // With the phone's text bigger than normal, the three macro fields don't fit side by side, so they stack.
@@ -128,16 +130,17 @@ export default function FoodForm() {
     parseNumber(macros.fat) ?? 0
   );
 
+  const fields = { name, brand, type, unit, referenceAmount, calories, macros };
+
+  // Runs when leaving a field, so a typo shows right away instead of on Save, and a fixed one goes away.
+  function checkFields() {
+    const { errors: newErrors } = readFoodForm(fields);
+    setErrors(errorMessages(t, triedSave ? newErrors : typingErrors(newErrors)));
+  }
+
   async function save() {
-    const { value: food, errors: newErrors } = readFoodForm({
-      name,
-      brand,
-      type,
-      unit,
-      referenceAmount,
-      calories,
-      macros,
-    });
+    setTriedSave(true);
+    const { value: food, errors: newErrors } = readFoodForm(fields);
     setErrors(errorMessages(t, newErrors));
     if (!food) return;
 
@@ -241,7 +244,7 @@ export default function FoodForm() {
           </View>
         </Dialog>
         <Card style={styles.section}>
-          <TextField label={t.common.name} value={name} onChangeText={setName} error={errors.name} />
+          <TextField label={t.common.name} value={name} onChangeText={setName} onBlur={checkFields} error={errors.name} />
           <TextField label={t.foodForm.brand} value={brand} onChangeText={setBrand} />
 
           <View style={fieldStyles.field}>
@@ -250,7 +253,10 @@ export default function FoodForm() {
               title={t.foods.type}
               options={FOOD_TYPE_KEYS.map((key) => ({ key, label: t.foodTypes[key] }))}
               value={type}
-              onChange={setType}
+              onChange={(key) => {
+                setType(key);
+                setErrors({ ...errors, type: "" });
+              }}
               placeholder={t.foodForm.chooseType}
               hasError={!!errors.type}
             />
@@ -265,6 +271,7 @@ export default function FoodForm() {
                 style={[styles.input, styles.flex, !!errors.reference_amount && styles.inputError]}
                 value={referenceAmount}
                 onChangeText={setReferenceAmount}
+                onBlur={checkFields}
                 keyboardType="decimal-pad"
               />
               <Select
@@ -284,6 +291,7 @@ export default function FoodForm() {
             label={t.foodForm.calories}
             value={calories}
             onChangeText={setCalories}
+            onBlur={checkFields}
             keyboardType="decimal-pad"
             placeholder={hasMacros ? t.foodForm.calculated(calculatedCalories) : undefined}
             error={errors.calories}
@@ -296,6 +304,7 @@ export default function FoodForm() {
                 label={`${t.macros[key]} (g)`}
                 value={macros[key]}
                 onChangeText={(text) => setMacros({ ...macros, [key]: text })}
+                onBlur={checkFields}
                 keyboardType="decimal-pad"
                 placeholder="0"
                 error={errors[key]}

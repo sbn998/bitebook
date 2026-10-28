@@ -13,7 +13,7 @@ import { useStyles } from "@/hooks/use-theme";
 import { addGoal, deleteGoal, getGoal, getWeekdayGoals, setWeekdayGoal, updateGoal } from "@/db/goals";
 import { useTranslation } from "@/i18n";
 import { todayString } from "@/utils/date";
-import { errorMessages, readGoalForm } from "@/utils/forms";
+import { errorMessages, readGoalForm, typingErrors } from "@/utils/forms";
 import {
   caloriesFromMacros,
   fillEmptyMacro,
@@ -45,6 +45,8 @@ export default function GoalForm() {
   const [macros, setMacros] = useState<Record<MacroKey, string>>({ protein: "", carbs: "", fat: "" });
   const [units, setUnits] = useState<Record<MacroKey, MacroUnit>>({ protein: "g", carbs: "g", fat: "g" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // After the first Save, empty required fields are pointed out too, not only typos.
+  const [triedSave, setTriedSave] = useState(false);
   // Weekdays that use this goal, for the delete confirmation.
   const [usedOnWeekdays, setUsedOnWeekdays] = useState<number[]>([]);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -125,7 +127,14 @@ export default function GoalForm() {
     setMacros({ ...macros, [key]: String(fillEmptyMacro(key, units[key], kcalLeft, kcal)) });
   }
 
+  // Runs when leaving a field, so a typo shows right away instead of on Save, and a fixed one goes away.
+  function checkFields() {
+    const { errors: newErrors } = readGoalForm({ name, calories, macros, units });
+    setErrors(errorMessages(t, triedSave ? newErrors : typingErrors(newErrors)));
+  }
+
   async function save() {
+    setTriedSave(true);
     const { value: goal, errors: newErrors } = readGoalForm({ name, calories, macros, units });
     setErrors(errorMessages(t, newErrors));
     if (!goal) return;
@@ -172,6 +181,7 @@ export default function GoalForm() {
             label={t.common.name}
             value={name}
             onChangeText={setName}
+            onBlur={checkFields}
             placeholder={t.goalForm.namePlaceholder}
             error={errors.name}
           />
@@ -182,6 +192,7 @@ export default function GoalForm() {
             label={t.foodForm.calories}
             value={calories}
             onChangeText={setCalories}
+            onBlur={checkFields}
             keyboardType="decimal-pad"
             placeholder={hasMacros && !anyPercent ? t.foodForm.calculated(calculatedCalories) : undefined}
             error={errors.calories}
@@ -195,6 +206,7 @@ export default function GoalForm() {
                 labelRight={<UnitSwitch value={units[key]} onChange={(unit) => switchUnit(key, unit)} />}
                 value={macros[key]}
                 onChangeText={(text) => setMacros({ ...macros, [key]: text })}
+                onBlur={checkFields}
                 keyboardType="decimal-pad"
                 placeholder={t.goalForm.none}
                 hint={hintFor(key)}
