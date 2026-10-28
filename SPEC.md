@@ -114,6 +114,24 @@ Each feature gets its own section, filled in before work on it starts.
   - Part F: the other cases: food already saved (the list of saved ones, to open one or add another), not found, no internet. Then the texts in English and Spanish, and the credit to Open Food Facts
 - Done when: scanning a barcode autofills the food fields and lets the user save it easily. Scanning a food that's already saved shows the saved ones to open or add another, and an unknown barcode or scanning without internet each show a clear message. Works in English and Spanish, tests pass, and it's checked on the phone
 
+## 1.2 (done)
+
+### Design and accessibility pass
+
+- Goal: make the app readable and usable for more people (low vision, screen readers, large text, reduced motion) and more consistent, after a review of every screen and form against Apple's Human Interface Guidelines
+- What it does:
+  - Text people need to read, and orange and red text, pass 4.5:1 contrast in light and dark themes; text fields have a visible edge
+  - TalkBack names every button, field and dropdown, and reads selected and expanded states
+  - Larger tap areas, and every button shows when it's pressed
+  - Forms and the weekly plan stay readable at the largest text size
+  - Empty lists say what's missing and link to the next step
+  - Form errors show when leaving a field and say what to fill in
+  - Leaving a form with unsaved changes asks first
+  - Export and import results show under their buttons (green or red) instead of a popup
+  - The calorie count-up follows the phone's "remove animations" setting
+- Decisions: orange is only for things that can be tapped (calorie numbers are plain text); field edges are 2:1, softer than the 3:1 web guideline, because 3:1 looked too heavy; the in-app theme setting stays, since it's normal on Android and defaults to the system's; files over 10 MB are rejected on import (a backup is a few MB at most)
+- Done when: every Critical, High, Medium and Low finding of the review is fixed or has a stated reason not to be, each checked on the phone in light and dark mode, English and Spanish
+
 ## Later ideas
 
 - Option to add optional micronutrients to food entries
