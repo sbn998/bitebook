@@ -151,7 +151,7 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     marginLeft: "auto", // Pushes the calories to the right end
     fontSize: fontSize.medium,
     fontFamily: fonts.number,
-    color: colors.primaryText,
+    color: colors.text,
   },
   macros: {
     flexShrink: 1,

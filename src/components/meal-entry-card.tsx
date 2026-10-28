@@ -191,7 +191,7 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   total: {
     fontSize: fontSize.large,
     fontFamily: fonts.number,
-    color: colors.primaryText,
+    color: colors.text,
     fontVariant: ["tabular-nums"],
   },
 });
