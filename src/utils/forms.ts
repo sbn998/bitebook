@@ -159,6 +159,15 @@ export function readGoalForm(fields: GoalFormFields): FormResult<Omit<Goal, "id"
   return { value: { name: fields.name.trim(), calories, ...macros }, errors };
 }
 
+// Errors that only mean a field is still empty. While someone is filling in a form they wait for Save,
+// because leaving a field empty may just mean "not yet".
+const EMPTY_FIELD_ERRORS: FieldError[] = ["required", "chooseType", "caloriesOrMacro", "caloriesForPercent"];
+
+// The errors to show as soon as someone leaves a field, before they press Save: the ones about what they typed.
+export function typingErrors(errors: Record<string, FieldError>) {
+  return Object.fromEntries(Object.entries(errors).filter(([, error]) => !EMPTY_FIELD_ERRORS.includes(error)));
+}
+
 // The message shown under each field, in the app's language.
 export function errorMessages(t: Strings, errors: Record<string, FieldError>) {
   const messages: Record<FieldError, string> = {

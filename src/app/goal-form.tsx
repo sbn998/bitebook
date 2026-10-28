@@ -2,18 +2,19 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
 import { ConfirmDialog } from "@/components/dialog";
 import { TextField } from "@/components/text-field";
 import { fontSize, fonts, pressedStyle, radius, spacing, type Theme } from "@/constants/theme";
+import { useDiscardChanges } from "@/hooks/use-discard-changes";
 import { useStyles } from "@/hooks/use-theme";
 import { addGoal, deleteGoal, getGoal, getWeekdayGoals, setWeekdayGoal, updateGoal } from "@/db/goals";
 import { useTranslation } from "@/i18n";
 import { todayString } from "@/utils/date";
-import { errorMessages, readGoalForm } from "@/utils/forms";
+import { errorMessages, readGoalForm, typingErrors } from "@/utils/forms";
 import {
   caloriesFromMacros,
   fillEmptyMacro,
@@ -45,10 +46,14 @@ export default function GoalForm() {
   const [macros, setMacros] = useState<Record<MacroKey, string>>({ protein: "", carbs: "", fat: "" });
   const [units, setUnits] = useState<Record<MacroKey, MacroUnit>>({ protein: "g", carbs: "g", fat: "g" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // After the first Save, empty required fields are pointed out too, not only typos.
+  const [triedSave, setTriedSave] = useState(false);
   // Weekdays that use this goal, for the delete confirmation.
   const [usedOnWeekdays, setUsedOnWeekdays] = useState<number[]>([]);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const headerHeight = useHeaderHeight();
+  // With the phone's text bigger than normal, the three macro fields don't fit side by side, so they stack.
+  const stackMacros = useWindowDimensions().fontScale > 1;
 
   // In edit mode, load the goal once and fill in the fields (always in grams).
   useEffect(() => {
@@ -123,7 +128,20 @@ export default function GoalForm() {
     setMacros({ ...macros, [key]: String(fillEmptyMacro(key, units[key], kcalLeft, kcal)) });
   }
 
+  // The fields as they were once the form was ready (empty, or the goal loaded), to tell whether anything changed.
+  const [startFields, setStartFields] = useState<string | null>(null);
+  const fieldsText = JSON.stringify({ name, calories, macros, units });
+  if (loaded && startFields === null) setStartFields(fieldsText);
+  const { allowLeaving, dialog: discardDialog } = useDiscardChanges(startFields !== null && fieldsText !== startFields);
+
+  // Runs when leaving a field, so a typo shows right away instead of on Save, and a fixed one goes away.
+  function checkFields() {
+    const { errors: newErrors } = readGoalForm({ name, calories, macros, units });
+    setErrors(errorMessages(t, triedSave ? newErrors : typingErrors(newErrors)));
+  }
+
   async function save() {
+    setTriedSave(true);
     const { value: goal, errors: newErrors } = readGoalForm({ name, calories, macros, units });
     setErrors(errorMessages(t, newErrors));
     if (!goal) return;
@@ -136,6 +154,7 @@ export default function GoalForm() {
     } else {
       await updateGoal(db, id, goal, todayString());
     }
+    allowLeaving();
     router.back();
   }
 
@@ -143,6 +162,7 @@ export default function GoalForm() {
     if (id === null) return;
     setConfirmingDelete(false);
     await deleteGoal(db, id, todayString());
+    allowLeaving();
     router.back();
   }
 
@@ -170,6 +190,7 @@ export default function GoalForm() {
             label={t.common.name}
             value={name}
             onChangeText={setName}
+            onBlur={checkFields}
             placeholder={t.goalForm.namePlaceholder}
             error={errors.name}
           />
@@ -180,12 +201,13 @@ export default function GoalForm() {
             label={t.foodForm.calories}
             value={calories}
             onChangeText={setCalories}
+            onBlur={checkFields}
             keyboardType="decimal-pad"
             placeholder={hasMacros && !anyPercent ? t.foodForm.calculated(calculatedCalories) : undefined}
             error={errors.calories}
           />
 
-          <View style={styles.macros}>
+          <View style={[styles.macros, stackMacros && styles.macrosStacked]}>
             {MACRO_FIELDS.map(({ key }) => (
               <TextField
                 key={key}
@@ -193,11 +215,12 @@ export default function GoalForm() {
                 labelRight={<UnitSwitch value={units[key]} onChange={(unit) => switchUnit(key, unit)} />}
                 value={macros[key]}
                 onChangeText={(text) => setMacros({ ...macros, [key]: text })}
+                onBlur={checkFields}
                 keyboardType="decimal-pad"
                 placeholder={t.goalForm.none}
                 hint={hintFor(key)}
                 error={errors[key]}
-                containerStyle={styles.flex}
+                containerStyle={!stackMacros && styles.flex}
               />
             ))}
           </View>
@@ -247,6 +270,15 @@ export default function GoalForm() {
         confirmTitle={t.common.delete}
         onConfirm={deleteAndClose}
         onCancel={() => setConfirmingDelete(false)}
+      />
+
+      <ConfirmDialog
+        visible={discardDialog.visible}
+        title={t.common.discardTitle}
+        message={t.common.discardMessage}
+        confirmTitle={t.common.discard}
+        onConfirm={discardDialog.onDiscard}
+        onCancel={discardDialog.onKeepEditing}
       />
     </KeyboardAvoidingView>
   );
@@ -299,6 +331,10 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: spacing.sm,
+  },
+  macrosStacked: {
+    flexDirection: "column",
+    alignItems: "stretch",
   },
   left: {
     flexDirection: "row",

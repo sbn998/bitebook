@@ -1,9 +1,10 @@
 import { router, Stack, useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import { Card } from "@/components/card";
+import { EmptyState } from "@/components/empty-state";
 import { HeaderButton } from "@/components/header-button";
 import { Select } from "@/components/select";
 import { fontSize, fonts, pressedStyle, spacing, type Theme } from "@/constants/theme";
@@ -26,6 +27,8 @@ function macroSummary(goal: Goal, t: Strings) {
 
 export default function Goals() {
   const styles = useStyles(makeStyles);
+  // The weekday column grows with the phone's text size, so "Miércoles" stays on one line and the dropdowns line up.
+  const weekdayWidth = 96 * useWindowDimensions().fontScale;
   useBackToTopOnTabChange();
   const db = useSQLiteContext();
   const { t } = useTranslation();
@@ -52,7 +55,7 @@ export default function Goals() {
   }
 
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.screen}>
+    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={[styles.screen, goals.length === 0 && styles.screenEmpty]}>
       <Stack.Screen options={{ headerRight: () => <HeaderButton title={t.common.add} onPress={() => router.push("/goal-form")} /> }} />
 
       {/* The weekly plan only makes sense once there are goals to pick from. */}
@@ -64,7 +67,7 @@ export default function Goals() {
               const goalId = weekdayGoals.find((w) => w.weekday === weekday)?.goal_id;
               return (
                 <View key={weekday} style={styles.planRow}>
-                  <Text style={styles.weekday}>{t.weekdays[weekday - 1]}</Text>
+                  <Text style={[styles.weekday, { width: weekdayWidth }]}>{t.weekdays[weekday - 1]}</Text>
                   <Select
                     title={t.weekdays[weekday - 1]}
                     options={goalOptions}
@@ -80,23 +83,23 @@ export default function Goals() {
         </>
       )}
 
-      <Text style={styles.sectionTitle}>{t.goals.presets}</Text>
       {goals.length === 0 ? (
-        <Text style={styles.hint}>{t.goals.empty}</Text>
+        <EmptyState message={t.goals.empty} actionTitle={t.goalForm.addTitle} onAction={() => router.push("/goal-form")} />
       ) : (
-        goals.map((goal) => (
-          <Pressable key={goal.id} accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => router.push({ pathname: "/goal-form", params: { id: goal.id } })}>
-            <Card style={styles.goal}>
-              <Text style={styles.name}>{goal.name}</Text>
-              {/* Macros first and calories on the right, like the totals on a meal card. */}
-              <View style={styles.nutrition}>
-                <Text style={styles.macros}>{macroSummary(goal, t)}</Text>
-                <Text style={styles.calories}>{goal.calories} kcal</Text>
-              </View>
-            </Card>
-          </Pressable>
-        ))
+        <Text style={styles.sectionTitle}>{t.goals.presets}</Text>
       )}
+      {goals.map((goal) => (
+        <Pressable key={goal.id} accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => router.push({ pathname: "/goal-form", params: { id: goal.id } })}>
+          <Card style={styles.goal}>
+            <Text style={styles.name}>{goal.name}</Text>
+            {/* Macros first and calories on the right, like the totals on a meal card. */}
+            <View style={styles.nutrition}>
+              <Text style={styles.macros}>{macroSummary(goal, t)}</Text>
+              <Text style={styles.calories}>{goal.calories} kcal</Text>
+            </View>
+          </Card>
+        </Pressable>
+      ))}
     </ScrollView>
   );
 }
@@ -105,6 +108,11 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   screen: {
     padding: spacing.lg,
     gap: spacing.md,
+  },
+  // With no goals, the message sits in the middle of the screen, as in the other lists.
+  screenEmpty: {
+    flexGrow: 1,
+    justifyContent: "center",
   },
   flex: {
     flex: 1,
@@ -124,15 +132,9 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     gap: spacing.md,
   },
   weekday: {
-    width: 96,
     fontSize: fontSize.medium,
     fontFamily: fonts.body,
     color: colors.text,
-  },
-  hint: {
-    fontSize: fontSize.body,
-    fontFamily: fonts.body,
-    color: colors.textSecondary,
   },
   goal: {
     gap: spacing.xs,

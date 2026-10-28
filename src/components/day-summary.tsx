@@ -22,6 +22,9 @@ import { MACRO_FIELDS } from "@/utils/nutrition";
 const DURATION = 900;
 const EASING = Easing.out(Easing.cubic);
 const ARC_WIDTH = 200;
+const ARC_STROKE = 12;
+// Room for the eaten and goal texts, each centered under one end of the arc.
+const END_WIDTH = 120;
 
 // Whole numbers with the thousands separator of the app's language, e.g. 1,240 or 1.240.
 function format(value: number, locale: string) {
@@ -104,7 +107,7 @@ export function DaySummary({
         <ProgressArc
           progress={goal ? totals.calories / goal.calories : 0}
           width={ARC_WIDTH}
-          strokeWidth={12}
+          strokeWidth={ARC_STROKE}
           color={isOver ? colors.danger : colors.primary}
           trackColor={colors.heroTrack}
         >
@@ -117,11 +120,11 @@ export function DaySummary({
 
       {goal ? (
         <View style={styles.ends}>
-          <View>
+          <View style={styles.end}>
             <Text style={styles.label}>{t.summary.eaten}</Text>
             <Text style={styles.endNumber}>{format(calories, locale)}</Text>
           </View>
-          <View style={styles.endRight}>
+          <View style={styles.end}>
             <Text style={styles.label}>{t.summary.goal}</Text>
             <Text style={styles.endNumber}>{format(goal.calories, locale)}</Text>
           </View>
@@ -136,10 +139,11 @@ export function DaySummary({
       <View style={styles.macros}>
         {MACRO_FIELDS.map(({ key }) => {
           const target = goal?.[key] ?? null;
+          const isMacroOver = target !== null && totals[key] > target;
           return (
             <View key={key} style={styles.macro}>
               <Text style={[styles.label, styles.centered]}>{t.macros[key]}</Text>
-              <Text style={[styles.macroNumber, styles.centered, target !== null && totals[key] > target && styles.overText]}>
+              <Text style={[styles.macroNumber, styles.centered, isMacroOver && styles.overText]}>
                 {format(totals[key], locale)}
                 <Text style={styles.macroTarget}>{target !== null ? ` / ${format(target, locale)} g` : " g"}</Text>
               </Text>
@@ -147,6 +151,12 @@ export function DaySummary({
                 <ProgressBar value={totals[key]} target={target} />
               ) : (
                 goal && <Text style={[styles.noTarget, styles.centered]}>{t.summary.noTarget}</Text>
+              )}
+              {/* Says how much is over in words too, so red isn't the only sign. Rounded up, so it never says 0 g. */}
+              {isMacroOver && (
+                <Text style={[styles.overNote, styles.centered]}>
+                  {t.summary.gramsOver(format(Math.ceil(totals[key] - target), locale))}
+                </Text>
               )}
             </View>
           );
@@ -180,15 +190,17 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   overText: {
     color: colors.danger,
   },
-  // Eaten and goal sit under the two ends of the gauge.
+  // Eaten and goal sit under the two ends of the gauge: the row spans from one end's center to the other's,
+  // plus half an END_WIDTH on each side, so each text is centered right under its end.
   ends: {
-    width: ARC_WIDTH + spacing.xl,
+    width: ARC_WIDTH - ARC_STROKE + END_WIDTH,
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: -spacing.sm,
   },
-  endRight: {
-    alignItems: "flex-end",
+  end: {
+    width: END_WIDTH,
+    alignItems: "center",
   },
   endNumber: {
     fontFamily: fonts.numberMedium,
@@ -240,5 +252,10 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     fontFamily: fonts.body,
     fontSize: fontSize.small,
     color: colors.textSecondary,
+  },
+  overNote: {
+    fontFamily: fonts.bodyMedium,
+    fontSize: fontSize.small,
+    color: colors.danger,
   },
 });

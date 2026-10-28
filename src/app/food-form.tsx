@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 
@@ -22,10 +23,11 @@ import { Select } from "@/components/select";
 import { makeFieldStyles, TextField } from "@/components/text-field";
 import { FOOD_TYPE_KEYS, type FoodType, UNIT_KEYS, type Unit } from "@/constants/food";
 import { fontSize, fonts, inputBox, radius, spacing, type Theme } from "@/constants/theme";
+import { useDiscardChanges } from "@/hooks/use-discard-changes";
 import { useStyles, useTheme } from "@/hooks/use-theme";
 import { addFood, deleteFood, type Food, getFood, getFoodsByBarcode, updateFood } from "@/db/foods";
 import { unitName, useTranslation } from "@/i18n";
-import { errorMessages, readFoodForm, scannedFoodFields } from "@/utils/forms";
+import { errorMessages, readFoodForm, scannedFoodFields, typingErrors } from "@/utils/forms";
 import { caloriesFromMacros, MACRO_FIELDS, type MacroKey, parseNumber } from "@/utils/nutrition";
 import { type LookupResult, lookUpBarcode } from "@/utils/open-food-facts";
 
@@ -63,8 +65,12 @@ export default function FoodForm() {
   const [calories, setCalories] = useState("");
   const [macros, setMacros] = useState<Record<MacroKey, string>>({ protein: "", carbs: "", fat: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // After the first Save, empty required fields are pointed out too, not only typos.
+  const [triedSave, setTriedSave] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const headerHeight = useHeaderHeight();
+  // With the phone's text bigger than normal, the three macro fields don't fit side by side, so they stack.
+  const stackMacros = useWindowDimensions().fontScale > 1;
 
   // In edit mode, load the food once and fill in the fields.
   useEffect(() => {
@@ -125,22 +131,31 @@ export default function FoodForm() {
     parseNumber(macros.fat) ?? 0
   );
 
+  const fields = { name, brand, type, unit, referenceAmount, calories, macros };
+
+  // The fields as they were once the form was ready (empty, or the food loaded), to tell whether anything changed.
+  // A scanned product filling in the form counts as a change, so it isn't lost by going back.
+  const [startFields, setStartFields] = useState<string | null>(null);
+  const fieldsText = JSON.stringify(fields);
+  if (loaded && startFields === null) setStartFields(fieldsText);
+  const { allowLeaving, dialog: discardDialog } = useDiscardChanges(startFields !== null && fieldsText !== startFields);
+
+  // Runs when leaving a field, so a typo shows right away instead of on Save, and a fixed one goes away.
+  function checkFields() {
+    const { errors: newErrors } = readFoodForm(fields);
+    setErrors(errorMessages(t, triedSave ? newErrors : typingErrors(newErrors)));
+  }
+
   async function save() {
-    const { value: food, errors: newErrors } = readFoodForm({
-      name,
-      brand,
-      type,
-      unit,
-      referenceAmount,
-      calories,
-      macros,
-    });
+    setTriedSave(true);
+    const { value: food, errors: newErrors } = readFoodForm(fields);
     setErrors(errorMessages(t, newErrors));
     if (!food) return;
 
     // A scanned barcode is saved even if Open Food Facts didn't know it, so scanning it again finds this food.
     if (id === null) await addFood(db, { ...food, barcode });
     else await updateFood(db, id, food);
+    allowLeaving();
     router.back();
   }
 
@@ -148,6 +163,7 @@ export default function FoodForm() {
     if (id === null) return;
     setConfirmingDelete(false);
     await deleteFood(db, id);
+    allowLeaving();
     router.back();
   }
 
@@ -214,7 +230,10 @@ export default function FoodForm() {
               accessibilityRole="button"
               key={food.id}
               style={({ pressed }) => [styles.savedRow, pressed && styles.pressed]}
-              onPress={() => router.replace({ pathname: "/food-form", params: { id: String(food.id) } })}
+              onPress={() => {
+                allowLeaving();
+                router.replace({ pathname: "/food-form", params: { id: String(food.id) } });
+              }}
             >
               <View style={styles.flex}>
                 <Text style={styles.scanTitle}>{food.name}</Text>
@@ -238,7 +257,7 @@ export default function FoodForm() {
           </View>
         </Dialog>
         <Card style={styles.section}>
-          <TextField label={t.common.name} value={name} onChangeText={setName} error={errors.name} />
+          <TextField label={t.common.name} value={name} onChangeText={setName} onBlur={checkFields} error={errors.name} />
           <TextField label={t.foodForm.brand} value={brand} onChangeText={setBrand} />
 
           <View style={fieldStyles.field}>
@@ -247,7 +266,10 @@ export default function FoodForm() {
               title={t.foods.type}
               options={FOOD_TYPE_KEYS.map((key) => ({ key, label: t.foodTypes[key] }))}
               value={type}
-              onChange={setType}
+              onChange={(key) => {
+                setType(key);
+                setErrors({ ...errors, type: "" });
+              }}
               placeholder={t.foodForm.chooseType}
               hasError={!!errors.type}
             />
@@ -262,6 +284,7 @@ export default function FoodForm() {
                 style={[styles.input, styles.flex, !!errors.reference_amount && styles.inputError]}
                 value={referenceAmount}
                 onChangeText={setReferenceAmount}
+                onBlur={checkFields}
                 keyboardType="decimal-pad"
               />
               <Select
@@ -281,22 +304,24 @@ export default function FoodForm() {
             label={t.foodForm.calories}
             value={calories}
             onChangeText={setCalories}
+            onBlur={checkFields}
             keyboardType="decimal-pad"
             placeholder={hasMacros ? t.foodForm.calculated(calculatedCalories) : undefined}
             error={errors.calories}
           />
 
-          <View style={styles.macros}>
+          <View style={[styles.macros, stackMacros && styles.macrosStacked]}>
             {MACRO_FIELDS.map(({ key }) => (
               <TextField
                 key={key}
                 label={`${t.macros[key]} (g)`}
                 value={macros[key]}
                 onChangeText={(text) => setMacros({ ...macros, [key]: text })}
+                onBlur={checkFields}
                 keyboardType="decimal-pad"
                 placeholder="0"
                 error={errors[key]}
-                containerStyle={styles.flex}
+                containerStyle={!stackMacros && styles.flex}
               />
             ))}
           </View>
@@ -322,6 +347,15 @@ export default function FoodForm() {
         confirmTitle={t.common.delete}
         onConfirm={deleteAndClose}
         onCancel={() => setConfirmingDelete(false)}
+      />
+
+      <ConfirmDialog
+        visible={discardDialog.visible}
+        title={t.common.discardTitle}
+        message={t.common.discardMessage}
+        confirmTitle={t.common.discard}
+        onConfirm={discardDialog.onDiscard}
+        onCancel={discardDialog.onKeepEditing}
       />
     </KeyboardAvoidingView>
   );
@@ -351,6 +385,10 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: spacing.sm,
+  },
+  macrosStacked: {
+    flexDirection: "column",
+    alignItems: "stretch",
   },
   input: {
     ...inputBox(colors),

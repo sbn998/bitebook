@@ -16,6 +16,9 @@ export const es: Strings = {
     notNegative: "No puede ser negativo",
     cantUndo: "Esta acción no se puede deshacer.",
     deleteTitle: (name: string) => `¿Eliminar ${name}?`,
+    discardTitle: "¿Descartar los cambios?",
+    discardMessage: "Estos cambios no se han guardado.",
+    discard: "Descartar",
   },
   foodTypes: {
     beef: "Ternera",
@@ -190,6 +193,7 @@ export const es: Strings = {
   summary: {
     kcalLeft: "kcal restantes",
     kcalOver: "kcal de más",
+    gramsOver: (grams: string) => `${grams} g de más`,
     eaten: "Consumidas",
     goal: "Objetivo",
     noGoal: "Sin objetivo para este día",

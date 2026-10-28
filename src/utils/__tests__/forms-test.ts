@@ -7,6 +7,7 @@ import {
   readFoodForm,
   readGoalForm,
   scannedFoodFields,
+  typingErrors,
 } from "@/utils/forms";
 import type { ScannedFood } from "@/utils/open-food-facts";
 
@@ -240,5 +241,28 @@ describe("errorMessages", () => {
     const errors = { name: "required", fat: "maxPercent" } as const;
     expect(errorMessages(en, errors)).toEqual({ name: en.common.required, fat: en.goalForm.maxPercent });
     expect(errorMessages(es, errors)).toEqual({ name: es.common.required, fat: es.goalForm.maxPercent });
+  });
+});
+
+describe("typingErrors", () => {
+  test("keeps the errors about what was typed and drops the ones about empty fields", () => {
+    const { errors } = readFoodForm({
+      ...chickenForm,
+      name: "",
+      type: null,
+      calories: "abc",
+      macros: { ...chickenForm.macros, fat: "-1" },
+    });
+    expect(typingErrors(errors)).toEqual({ calories: "validNumber", fat: "notNegative" });
+  });
+
+  test("drops the goal form's calories errors that only mean they're still empty", () => {
+    const { errors } = readGoalForm({ ...cutForm, calories: "", macros: { protein: "", carbs: "", fat: "" } });
+    expect(errors).toEqual({ calories: "caloriesOrMacro" });
+    expect(typingErrors(errors)).toEqual({});
+    const macros = { protein: "30", carbs: "40", fat: "30" };
+    const percent = readGoalForm({ ...cutForm, calories: "", macros, units: allPercent }).errors;
+    expect(percent).toEqual({ calories: "caloriesForPercent" });
+    expect(typingErrors(percent)).toEqual({});
   });
 });
