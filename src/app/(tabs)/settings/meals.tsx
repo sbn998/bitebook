@@ -6,6 +6,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { Button, buttonRowStyles } from "@/components/button";
 import { Card } from "@/components/card";
 import { ConfirmBody, Dialog } from "@/components/dialog";
+import { EmptyState } from "@/components/empty-state";
 import { HeaderButton } from "@/components/header-button";
 import { TextField } from "@/components/text-field";
 import { fontSize, fonts, pressedStyle, spacing, type Theme } from "@/constants/theme";
@@ -83,11 +84,9 @@ export default function MealLabels() {
       <FlatList
         data={meals}
         keyExtractor={(meal) => String(meal.id)}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, meals.length === 0 && styles.listEmpty]}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>{t.meals.emptyTitle}</Text>
-          </View>
+          <EmptyState message={t.meals.emptyTitle} actionTitle={t.meals.addTitle} onAction={() => openDialog("new")} />
         }
         renderItem={({ item: meal }) => (
           <Pressable accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => openDialog(meal)}>
@@ -143,15 +142,10 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.md,
   },
-  empty: {
-    alignItems: "center",
-    marginTop: spacing.xxl,
-    gap: spacing.xs,
-  },
-  emptyTitle: {
-    fontSize: fontSize.medium,
-    fontFamily: fonts.title,
-    color: colors.text,
+  // With nothing to show, the message sits in the middle of the list's space, as in the Foods list.
+  listEmpty: {
+    flexGrow: 1,
+    justifyContent: "center",
   },
   name: {
     fontSize: fontSize.medium,

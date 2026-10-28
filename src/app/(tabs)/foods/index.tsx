@@ -5,6 +5,7 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, Vi
 import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Card } from "@/components/card";
+import { EmptyState } from "@/components/empty-state";
 import { HeaderButton } from "@/components/header-button";
 import { Icon } from "@/components/icon";
 import { IconButton } from "@/components/icon-button";
@@ -132,9 +133,14 @@ export default function Foods() {
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={[styles.list, visibleFoods.length === 0 && styles.listEmpty]}
             ListEmptyComponent={
-              <Animated.Text style={styles.empty} entering={FadeIn.duration(250)}>
-                {foods.length === 0 ? t.foods.empty : t.foods.noMatches}
-              </Animated.Text>
+              <Animated.View entering={FadeIn.duration(250)}>
+                {/* With no foods at all, offer the next step right here; with no matches, just say so. */}
+                {foods.length === 0 ? (
+                  <EmptyState message={t.foods.empty} actionTitle={t.foodForm.addTitle} onAction={() => openForm()} />
+                ) : (
+                  <EmptyState message={t.foods.noMatches} />
+                )}
+              </Animated.View>
             }
             renderItem={({ item: food }) => (
               <Pressable accessibilityRole="button" style={({ pressed }) => pressed && pressedStyle} onPress={() => openForm(food.id)}>
@@ -211,11 +217,6 @@ const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   listEmpty: {
     flexGrow: 1,
     justifyContent: "center",
-  },
-  empty: {
-    fontFamily: fonts.body,
-    textAlign: "center",
-    color: colors.textSecondary,
   },
   loading: {
     flex: 1,
